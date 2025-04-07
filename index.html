@@ -196,6 +196,53 @@
         color: var(--primary);
       }
       
+      .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: var(--light);
+        border-radius: var(--border-radius);
+        width: 100%;
+      }
+      
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      
+      .stat-item i {
+        color: var(--primary);
+        font-size: 18px;
+      }
+      
+      .solved-indicator {
+        color: var(--success);
+        font-weight: bold;
+      }
+      
+      .solved-indicator i {
+        color: var(--success);
+      }
+      
+      .failed-indicator {
+        color: #e63946;
+        font-weight: bold;
+      }
+      
+      .failed-indicator i {
+        color: #e63946;
+      }
+      
+      #timer {
+        font-family: 'Consolas', monospace;
+        letter-spacing: 1px;
+      }
+      
       .solution-controls {
         display: flex;
         align-items: center;
@@ -305,7 +352,26 @@
     <div class="container">
       <h1><i class="fas fa-puzzle-piece"></i> Witness Puzzle Solver</h1>
       
-      <div id="puzzle-info-compact" class="info-compact"></div>
+      <div id="puzzle-info-compact" class="info-compact" style="display: none;"></div>
+      
+      <div class="stats-container" id="stats-container" style="display: none;">
+        <div class="stat-item">
+          <i class="fas fa-clock"></i>
+          <span id="timer">00:00</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-redo-alt"></i>
+          <span id="attempts-counter">0</span> attempts
+        </div>
+        <div class="stat-item solved-indicator" style="display: none;" id="solved-indicator">
+          <i class="fas fa-check-circle"></i>
+          <span>Solved</span>
+        </div>
+        <div class="stat-item failed-indicator" style="display: none;" id="failed-indicator">
+          <i class="fas fa-times-circle"></i>
+          <span>Failed</span>
+        </div>
+      </div>
       
       <div class="input-section">
         <div class="input-header">
@@ -327,7 +393,7 @@
         <div id="success-message" class="success-message"></div>
       </div>
       
-      <div id="puzzle-container">
+      <div id="puzzle-container" style="display: none;">
         <svg id="puzzle" xmlns="http://www.w3.org/2000/svg"></svg>
       </div>
       
@@ -345,6 +411,14 @@
         
         let currentPuzzle = null;
         let currentSolutionIndex = 0;
+        let timerInterval = null;
+        let startTime = null;
+        let attemptCount = 0;
+        let puzzleSolved = false;
+        let puzzleFailed = false;
+        
+        // Store the original PLAY_SOUND function once
+        const originalPlaySound = window.PLAY_SOUND;
         
         const puzzleInput = document.getElementById('puzzle-input');
         const loadPuzzleBtn = document.getElementById('load-puzzle');
@@ -359,9 +433,99 @@
         const successMessage = document.getElementById('success-message');
         const toggleInputBtn = document.getElementById('toggle-input');
         const inputContent = document.getElementById('input-content');
+        const timerElement = document.getElementById('timer');
+        const attemptsCounter = document.getElementById('attempts-counter');
+        const statsContainer = document.getElementById('stats-container');
+        const solvedIndicator = document.getElementById('solved-indicator');
+        const failedIndicator = document.getElementById('failed-indicator');
         
         // Set sample puzzle in textarea
         puzzleInput.value = JSON.stringify(samplePuzzle, null, 2);
+        
+        // Timer functions
+        function startTimer() {
+          // Don't restart if already solved
+          if (puzzleSolved) return;
+          
+          // Reset timer
+          stopTimer();
+          startTime = Date.now();
+          updateTimer();
+          
+          timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        function stopTimer() {
+          if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+          }
+        }
+        
+        function updateTimer() {
+          if (!startTime) return;
+          
+          const elapsedTime = Date.now() - startTime;
+          const seconds = Math.floor((elapsedTime / 1000) % 60);
+          const minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
+          const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+          
+          if (hours > 0) {
+            timerElement.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+          } else {
+            timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+          }
+        }
+        
+        // Reset attempts counter
+        function resetAttempts() {
+          // Don't reset if already solved
+          if (puzzleSolved) return;
+          
+          attemptCount = 0;
+          attemptsCounter.textContent = attemptCount;
+        }
+        
+        // Increment attempts counter
+        function incrementAttempts() {
+          // Don't increment if already solved
+          if (puzzleSolved) return;
+          
+          attemptCount++;
+          attemptsCounter.textContent = attemptCount;
+        }
+        
+        // Mark puzzle as solved
+        function markAsSolved() {
+          if (puzzleSolved) return;
+          
+          puzzleSolved = true;
+          
+          // If the puzzle was previously marked as failed (solution was shown),
+          // maintain the failed state instead of showing solved
+          if (!puzzleFailed) {
+            solvedIndicator.style.display = 'flex';
+          }
+          
+          stopTimer();
+        }
+        
+        // Mark puzzle as failed (when solution is shown)
+        function markAsFailed() {
+          puzzleFailed = true;
+          failedIndicator.style.display = 'flex';
+          
+          // Hide solved indicator if it's showing
+          solvedIndicator.style.display = 'none';
+        }
+        
+        // Reset solved state
+        function resetSolvedState() {
+          puzzleSolved = false;
+          puzzleFailed = false;
+          solvedIndicator.style.display = 'none';
+          failedIndicator.style.display = 'none';
+        }
         
         // Toggle input section
         toggleInputBtn.addEventListener('click', function() {
@@ -428,6 +592,18 @@
               currentSolutionIndex = 0;
               updateSolutionCounter();
               
+              // Reset solved state
+              resetSolvedState();
+              
+              // Show all puzzle-related containers
+              statsContainer.style.display = 'flex';
+              puzzleInfoCompact.style.display = 'flex';
+              document.getElementById('puzzle-container').style.display = 'flex';
+              
+              // Start timer and reset attempts
+              startTimer();
+              resetAttempts();
+              
               // Collapse input section after loading
               inputContent.classList.add('collapsed');
               const icon = toggleInputBtn.querySelector('i');
@@ -454,16 +630,46 @@
           nextSolutionBtn.style.display = 'none';
           errorMessage.style.display = 'none';
           successMessage.style.display = 'none';
+          
+          // Hide all puzzle-related containers
+          statsContainer.style.display = 'none';
+          puzzleInfoCompact.style.display = 'none';
+          document.getElementById('puzzle-container').style.display = 'none';
+          
+          // Stop timer and reset attempts
+          stopTimer();
+          timerElement.textContent = '00:00';
+          resetAttempts();
+          
+          // Reset solved state
+          resetSolvedState();
+          
+          // Reset sound handler to original
+          window.PLAY_SOUND = originalPlaySound;
+          window.TRACE_COMPLETION_FUNC = null;
+          
           showMessage('success', 'Cleared!');
         });
         
         // Show solution
         showSolutionBtn.addEventListener('click', function() {
           setLoading(true);
+          
+          // Only mark as failed and stop timer if the puzzle wasn't already solved
+          if (!puzzleSolved) {
+            stopTimer();
+            
+            // Mark this as giving up on the current attempt - permanently mark as failed
+            markAsFailed();
+            showMessage('error', 'Using solution - attempt failed!');
+          } else {
+            // If the puzzle was already solved, it's okay to show the solution
+            showMessage('success', 'Showing solution for solved puzzle');
+          }
+          
           setTimeout(() => {
             if (currentPuzzle && currentPuzzle.solutions && currentPuzzle.solutions.length > 0) {
               displaySolution(currentPuzzle, currentSolutionIndex);
-              showMessage('success', 'Solution displayed!');
               
               // Show next solution button if there are multiple solutions
               if (currentPuzzle.solutions.length > 1) {
@@ -605,6 +811,9 @@
               });
             }
             
+            // Reset the callbacks for the new puzzle
+            setupPuzzleCallbacks();
+            
             // Draw the puzzle
             window.draw(puzzle);
             
@@ -636,6 +845,40 @@
             console.error('Error creating puzzle:', error);
             showMessage('error', 'Error creating puzzle: ' + error.message);
           }
+        }
+        
+        // Setup callbacks for puzzle completion and sound handling
+        function setupPuzzleCallbacks() {
+          // Set up callback for correct solutions
+          window.TRACE_COMPLETION_FUNC = function(puzzle, path) {
+            // This is called when a puzzle is solved correctly
+            console.log('Puzzle solved correctly!');
+            
+            // Mark the puzzle as solved, but don't change failed state
+            markAsSolved();
+            
+            // Only show the success message if the puzzle wasn't previously failed
+            if (!puzzleFailed) {
+              showMessage('success', 'Puzzle solved correctly!');
+            } else {
+              // If the puzzle was already marked as failed, still acknowledge
+              // but remind that it's still considered failed
+              showMessage('error', 'Puzzle solved, but marked as failed due to using solution!');
+            }
+          };
+          
+          // Override the sound function to capture solution attempts
+          window.PLAY_SOUND = function(soundType) {
+            // Call the original function if it exists
+            if (originalPlaySound) originalPlaySound(soundType);
+            
+            // Track attempts based on sound type
+            if (soundType === 'fail') {
+              // Increment attempts counter on failed attempts
+              incrementAttempts();
+              console.log('Incorrect solution attempt');
+            }
+          };
         }
         
         // Display a solution on the puzzle
