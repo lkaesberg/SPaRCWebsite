@@ -5,7 +5,285 @@
     <title>Witness Puzzle Solver</title>
     <link rel="stylesheet" type="text/css" href="data/style.css" id="stylesheet">
     <link rel="icon" type="image/png" href="data/favicon.png">
-    <style title="animations"></style>
+    <style>
+      :root {
+        --primary: #3a86ff;
+        --secondary: #8338ec;
+        --success: #38b000;
+        --dark: #333;
+        --light: #f8f9fa;
+        --border-radius: 8px;
+      }
+      
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f0f2f5;
+        color: var(--dark);
+        line-height: 1.6;
+      }
+      
+      h1 {
+        margin-bottom: 20px;
+        color: var(--primary);
+        font-weight: 600;
+        text-align: center;
+      }
+      
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+      }
+      
+      .input-section {
+        width: 100%;
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+      }
+      
+      .input-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background-color: var(--light);
+        cursor: pointer;
+      }
+      
+      .input-header h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      
+      .toggle-btn {
+        background: none;
+        border: none;
+        color: var(--dark);
+        cursor: pointer;
+        padding: 5px;
+      }
+      
+      #input-content {
+        transition: max-height 0.3s ease;
+        max-height: 300px;
+        overflow: hidden;
+      }
+      
+      #input-content.collapsed {
+        max-height: 0;
+      }
+      
+      .input-section h3 {
+        color: var(--dark);
+        margin-bottom: 0;
+      }
+      
+      textarea {
+        width: 100%;
+        height: 150px;
+        font-family: 'Consolas', monospace;
+        padding: 15px;
+        box-sizing: border-box;
+        border: none;
+        border-top: 1px solid #eee;
+        resize: none;
+        transition: border 0.3s ease;
+        font-size: 14px;
+      }
+      
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(58,134,255,0.2);
+      }
+      
+      .buttons {
+        display: flex;
+        gap: 15px;
+        padding: 10px 15px;
+        background-color: var(--light);
+        justify-content: flex-end;
+      }
+      
+      button {
+        padding: 8px 16px;
+        cursor: pointer;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+      
+      button:hover {
+        background-color: #2a76ef;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+      
+      button:active {
+        transform: translateY(0);
+      }
+      
+      #clear-puzzle {
+        background-color: #6c757d;
+      }
+      
+      #clear-puzzle:hover {
+        background-color: #5a6268;
+      }
+      
+      #show-solution, #next-solution {
+        background-color: var(--success);
+      }
+      
+      #show-solution:hover, #next-solution:hover {
+        background-color: #2b9348;
+      }
+      
+      #puzzle-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: 15px 0;
+        padding: 20px;
+        background-color: var(--light);
+        border-radius: var(--border-radius);
+        overflow: auto;
+      }
+      
+      #puzzle {
+        max-width: 100%;
+        height: auto;
+      }
+      
+      .info-compact {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 10px 15px;
+        background-color: var(--light);
+        border-radius: var(--border-radius);
+        font-size: 14px;
+        align-items: center;
+      }
+      
+      .info-compact .info-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      
+      .info-compact .info-label {
+        font-weight: 600;
+        color: var(--primary);
+      }
+      
+      .solution-controls {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 15px;
+      }
+      
+      .solution-counter {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--dark);
+      }
+      
+      .loader {
+        display: none;
+        width: 24px;
+        height: 24px;
+        border: 3px solid var(--light);
+        border-bottom-color: var(--primary);
+        border-radius: 50%;
+        margin: 0 auto;
+        animation: rotation 1s linear infinite;
+      }
+      
+      @keyframes rotation {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .success-message {
+        color: var(--success);
+        text-align: center;
+        font-weight: 600;
+        margin: 10px 0;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      
+      .error-message {
+        color: #e63946;
+        text-align: center;
+        font-weight: 600;
+        margin: 10px 0;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      @keyframes drawLine {
+        from { stroke-dashoffset: 1000; }
+        to { stroke-dashoffset: 0; }
+      }
+      
+      #solution-path path {
+        stroke-dasharray: 1000;
+        animation: drawLine 1.5s ease-in-out forwards;
+      }
+      
+      #status-messages {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 40px;
+        gap: 10px;
+      }
+      
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px;
+        }
+        
+        .info-compact {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        
+        .buttons {
+          flex-direction: column;
+        }
+        
+        .solution-controls {
+          flex-direction: column;
+          width: 100%;
+        }
+      }
+    </style>
     <script type="text/javascript" src="engine/utilities.js"></script>
     <script type="text/javascript" src="engine/svg.js"></script>
     <script type="text/javascript" src="engine/polyominos.js"></script>
@@ -18,82 +296,46 @@
     <script type="text/javascript" src="engine/custom_mechanics.js"></script>
     <!-- Add js-yaml library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      h1 {
-        margin-bottom: 20px;
-      }
-      .container {
-        width: 100%;
-        max-width: 1200px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      .input-section {
-        width: 100%;
-        margin-bottom: 20px;
-      }
-      textarea {
-        width: 100%;
-        height: 200px;
-        font-family: monospace;
-        padding: 10px;
-        box-sizing: border-box;
-        margin-bottom: 10px;
-      }
-      .buttons {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-      }
-      button {
-        padding: 8px 16px;
-        cursor: pointer;
-      }
-      #puzzle-container {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-      }
-      .info {
-        margin-top: 20px;
-        padding: 10px;
-        background-color: #f5f5f5;
-        border-radius: 5px;
-        width: 100%;
-      }
-    </style>
+    <!-- Add font awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
   <body>
     <!-- Hidden elements required by the engine -->
     <input type="hidden" id="sens" value="1.0">
     <div class="container">
-      <h1>Witness Puzzle Solver</h1>
+      <h1><i class="fas fa-puzzle-piece"></i> Witness Puzzle Solver</h1>
+      
+      <div id="puzzle-info-compact" class="info-compact"></div>
       
       <div class="input-section">
-        <textarea id="puzzle-input" placeholder="Paste your puzzle JSON string here..."></textarea>
+        <div class="input-header">
+          <h3><i class="fas fa-code"></i> Puzzle Input</h3>
+          <button id="toggle-input" class="toggle-btn"><i class="fas fa-chevron-up"></i></button>
+        </div>
+        <div id="input-content">
+          <textarea id="puzzle-input" placeholder="Paste your puzzle JSON string here..."></textarea>
+          <div class="buttons">
+            <button id="load-puzzle"><i class="fas fa-play"></i> Load Puzzle</button>
+            <button id="clear-puzzle"><i class="fas fa-eraser"></i> Clear</button>
+          </div>
+        </div>
       </div>
       
-      <div class="buttons">
-        <button id="load-puzzle">Load Puzzle</button>
-        <button id="clear-puzzle">Clear</button>
-        <button id="show-solution" style="display: none;">Show Solution</button>
+      <div id="status-messages">
+        <div class="loader" id="loading-indicator"></div>
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
       </div>
       
       <div id="puzzle-container">
         <svg id="puzzle" xmlns="http://www.w3.org/2000/svg"></svg>
       </div>
       
-      <div class="info" id="puzzle-info"></div>
+      <div class="solution-controls" id="solution-controls" style="display: none;">
+        <button id="show-solution"><i class="fas fa-lightbulb"></i> Show Solution</button>
+        <button id="next-solution" style="display: none;"><i class="fas fa-forward"></i> Next Solution</button>
+        <div class="solution-counter" id="solution-counter"></div>
+      </div>
     </div>
     
     <script>
@@ -102,50 +344,154 @@
         const samplePuzzle = {"difficulty_level":5,"difficulty_score":5.8,"grid_size":{"height":2,"width":3},"id":"176d1e37ebbacac0","polyshapes":{"16":"·█··\n····\n····\n····"},"puzzle_array":[["+","+","+","+","+",".","+"],["S","N","+","P-R-16","+","o-B","+"],["+","+","+","+","+","+","+"],["+","N","+","N","+","o-B","+"],["+","+","E","+","+","+","+"]],"solution_count":1,"solutions":[{"index":0,"path":[{"x":0,"y":1},{"x":0,"y":0},{"x":1,"y":0},{"x":2,"y":0},{"x":2,"y":1},{"x":2,"y":2},{"x":3,"y":2},{"x":4,"y":2},{"x":4,"y":1},{"x":4,"y":0},{"x":5,"y":0},{"x":6,"y":0},{"x":6,"y":1},{"x":6,"y":2},{"x":6,"y":3},{"x":6,"y":4},{"x":5,"y":4},{"x":4,"y":4},{"x":3,"y":4},{"x":2,"y":4}],"pathLength":20}],"text_visualization":"puzzle:\n  dimensions:\n    width: 3\n    height: 2\n  start:\n    x: 0\n    y: 1\n  end:\n    x: 2\n    y: 4\n  cells:\n    - position:\n        x: 3\n        y: 1\n      properties:\n        type: \"poly\"\n        polyshape: 16\n        color: \"red\"\n    - position:\n        x: 5\n        y: 0\n      properties:\n        dot: 1\n        color: \"black\"\n    - position:\n        x: 5\n        y: 1\n      properties:\n        type: \"square\"\n        color: \"blue\"\n    - position:\n        x: 5\n        y: 3\n      properties:\n        type: \"square\"\n        color: \"blue\"\n"};
         
         let currentPuzzle = null;
+        let currentSolutionIndex = 0;
+        
         const puzzleInput = document.getElementById('puzzle-input');
         const loadPuzzleBtn = document.getElementById('load-puzzle');
         const clearPuzzleBtn = document.getElementById('clear-puzzle');
         const showSolutionBtn = document.getElementById('show-solution');
-        const puzzleInfo = document.getElementById('puzzle-info');
+        const nextSolutionBtn = document.getElementById('next-solution');
+        const solutionControls = document.getElementById('solution-controls');
+        const solutionCounter = document.getElementById('solution-counter');
+        const puzzleInfoCompact = document.getElementById('puzzle-info-compact');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        const toggleInputBtn = document.getElementById('toggle-input');
+        const inputContent = document.getElementById('input-content');
         
         // Set sample puzzle in textarea
         puzzleInput.value = JSON.stringify(samplePuzzle, null, 2);
         
-        // Load puzzle from JSON
-        loadPuzzleBtn.addEventListener('click', function() {
-          try {
-            const inputText = puzzleInput.value.trim();
-            if (!inputText) {
-              alert('Please enter a puzzle JSON string');
-              return;
-            }
-            
-            const puzzleData = JSON.parse(inputText);
-            createPuzzleFromData(puzzleData);
-            showSolutionBtn.style.display = 'block';
-          } catch (error) {
-            console.error('Error parsing puzzle:', error);
-            alert('Error loading puzzle: ' + error.message);
+        // Toggle input section
+        toggleInputBtn.addEventListener('click', function() {
+          inputContent.classList.toggle('collapsed');
+          const icon = toggleInputBtn.querySelector('i');
+          if (inputContent.classList.contains('collapsed')) {
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+          } else {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
           }
         });
         
-        // Clear the puzzle
+        // Helper function to show/hide loading
+        function setLoading(isLoading) {
+          loadingIndicator.style.display = isLoading ? 'block' : 'none';
+          loadPuzzleBtn.disabled = isLoading;
+          clearPuzzleBtn.disabled = isLoading;
+          showSolutionBtn.disabled = isLoading;
+          nextSolutionBtn.disabled = isLoading;
+        }
+        
+        // Helper function to show messages
+        function showMessage(type, message) {
+          if (type === 'error') {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+            setTimeout(() => {
+              errorMessage.style.display = 'none';
+            }, 5000);
+          } else {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            setTimeout(() => {
+              successMessage.style.display = 'none';
+            }, 5000);
+          }
+        }
+        
+        // Load puzzle from JSON
+        loadPuzzleBtn.addEventListener('click', function() {
+          setLoading(true);
+          errorMessage.style.display = 'none';
+          successMessage.style.display = 'none';
+          
+          setTimeout(() => {
+            try {
+              const inputText = puzzleInput.value.trim();
+              if (!inputText) {
+                setLoading(false);
+                showMessage('error', 'Please enter a puzzle JSON string');
+                return;
+              }
+              
+              const puzzleData = JSON.parse(inputText);
+              createPuzzleFromData(puzzleData);
+              solutionControls.style.display = 'flex';
+              showMessage('success', 'Puzzle loaded successfully!');
+              
+              // Reset solution index
+              currentSolutionIndex = 0;
+              updateSolutionCounter();
+              
+              // Collapse input section after loading
+              inputContent.classList.add('collapsed');
+              const icon = toggleInputBtn.querySelector('i');
+              icon.classList.remove('fa-chevron-up');
+              icon.classList.add('fa-chevron-down');
+              
+              setLoading(false);
+            } catch (error) {
+              console.error('Error parsing puzzle:', error);
+              showMessage('error', 'Error loading puzzle: ' + error.message);
+              setLoading(false);
+            }
+          }, 500); // Simulate processing time
+        });
+        
+        // Clear the puzzle and input
         clearPuzzleBtn.addEventListener('click', function() {
           const svg = document.getElementById('puzzle');
           while (svg.firstChild) svg.removeChild(svg.firstChild);
           currentPuzzle = null;
-          puzzleInfo.innerHTML = '';
-          showSolutionBtn.style.display = 'none';
+          puzzleInput.value = '';
+          puzzleInfoCompact.innerHTML = '';
+          solutionControls.style.display = 'none';
+          nextSolutionBtn.style.display = 'none';
+          errorMessage.style.display = 'none';
+          successMessage.style.display = 'none';
+          showMessage('success', 'Cleared!');
         });
         
         // Show solution
         showSolutionBtn.addEventListener('click', function() {
-          if (currentPuzzle && currentPuzzle.solutions && currentPuzzle.solutions.length > 0) {
-            displaySolution(currentPuzzle);
-          } else {
-            alert('No solutions available for this puzzle');
-          }
+          setLoading(true);
+          setTimeout(() => {
+            if (currentPuzzle && currentPuzzle.solutions && currentPuzzle.solutions.length > 0) {
+              displaySolution(currentPuzzle, currentSolutionIndex);
+              showMessage('success', 'Solution displayed!');
+              
+              // Show next solution button if there are multiple solutions
+              if (currentPuzzle.solutions.length > 1) {
+                nextSolutionBtn.style.display = 'block';
+                updateSolutionCounter();
+              }
+            } else {
+              showMessage('error', 'No solutions available for this puzzle');
+            }
+            setLoading(false);
+          }, 500); // Simulate processing time
         });
+        
+        // Next solution
+        nextSolutionBtn.addEventListener('click', function() {
+          if (!currentPuzzle || !currentPuzzle.solutions || currentPuzzle.solutions.length <= 1) return;
+          
+          currentSolutionIndex = (currentSolutionIndex + 1) % currentPuzzle.solutions.length;
+          displaySolution(currentPuzzle, currentSolutionIndex);
+          updateSolutionCounter();
+        });
+        
+        // Update solution counter
+        function updateSolutionCounter() {
+          if (currentPuzzle && currentPuzzle.solutions && currentPuzzle.solutions.length > 0) {
+            solutionCounter.textContent = `Solution ${currentSolutionIndex + 1} of ${currentPuzzle.solutions.length}`;
+          }
+        }
         
         // Create puzzle from the input data
         function createPuzzleFromData(puzzleData) {
@@ -267,25 +613,42 @@
             cursorPosElement.id = "cursorPos";
             svg.appendChild(cursorPosElement);
             
-            // Display puzzle info
-            puzzleInfo.innerHTML = `
-              <h3>Puzzle Info</h3>
-              <p>Dimensions: ${width}x${height}</p>
-              <p>Difficulty: ${puzzleData.difficulty_level} (Score: ${puzzleData.difficulty_score})</p>
-              <p>ID: ${puzzleData.id}</p>
-              <p>Solution Count: ${puzzleData.solution_count}</p>
+            // Display compact puzzle info
+            puzzleInfoCompact.innerHTML = `
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-puzzle-piece"></i> Dimensions:</span>
+                <span>${width}x${height}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-star"></i> Difficulty:</span>
+                <span>${puzzleData.difficulty_level} (${puzzleData.difficulty_score.toFixed(1)})</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-hashtag"></i> ID:</span>
+                <span>${puzzleData.id}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-list-ol"></i> Solutions:</span>
+                <span>${puzzleData.solution_count}</span>
+              </div>
             `;
           } catch (error) {
             console.error('Error creating puzzle:', error);
-            alert('Error creating puzzle: ' + error.message);
+            showMessage('error', 'Error creating puzzle: ' + error.message);
           }
         }
         
         // Display a solution on the puzzle
-        function displaySolution(puzzleData) {
+        function displaySolution(puzzleData, solutionIndex) {
           if (!puzzleData.solutions || puzzleData.solutions.length === 0) return;
           
-          const solution = puzzleData.solutions[0];
+          // Remove previous solution if it exists
+          const existingSolution = document.getElementById('solution-path');
+          if (existingSolution) {
+            existingSolution.remove();
+          }
+          
+          const solution = puzzleData.solutions[solutionIndex];
           const path = solution.path;
           
           // Draw the solution path on the puzzle
@@ -310,7 +673,7 @@
           });
           
           pathElement.setAttribute("d", pathData);
-          pathElement.setAttribute("stroke", "#00ff00");
+          pathElement.setAttribute("stroke", "#38b000");
           pathElement.setAttribute("stroke-width", "8");
           pathElement.setAttribute("fill", "none");
           pathElement.setAttribute("stroke-linecap", "round");
