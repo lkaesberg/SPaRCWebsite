@@ -247,13 +247,13 @@
       }
       
       @keyframes drawLine {
-        from { stroke-dashoffset: 1000; }
+        from { stroke-dashoffset: 5000; }
         to { stroke-dashoffset: 0; }
       }
       
       #solution-path path {
-        stroke-dasharray: 1000;
-        animation: drawLine 1.5s ease-in-out forwards;
+        stroke-dasharray: 5000;
+        animation: drawLine 2s ease-in-out forwards;
       }
       
       #status-messages {
@@ -650,17 +650,62 @@
           
           const solution = puzzleData.solutions[solutionIndex];
           const path = solution.path;
+          const pathLength = path.length;
           
           // Draw the solution path on the puzzle
           const svg = document.getElementById('puzzle');
           const solutionGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
           solutionGroup.setAttribute("id", "solution-path");
           
+          // For very long paths, use line segments instead of a single path
+          if (pathLength > 40) {
+            renderSegmentedPath(solutionGroup, path);
+          } else {
+            renderAnimatedPath(solutionGroup, path);
+          }
+          
+          svg.appendChild(solutionGroup);
+          
+          // Log path info for debugging
+          console.log(`Path length: ${pathLength} points`);
+        }
+        
+        // Render path as individual line segments for very long paths
+        function renderSegmentedPath(group, path) {
+          for (let i = 0; i < path.length - 1; i++) {
+            const startX = path[i].x * 41 + 52;
+            const startY = path[i].y * 41 + 52;
+            const endX = path[i + 1].x * 41 + 52;
+            const endY = path[i + 1].y * 41 + 52;
+            
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", startX);
+            line.setAttribute("y1", startY);
+            line.setAttribute("x2", endX);
+            line.setAttribute("y2", endY);
+            line.setAttribute("stroke", "#38b000");
+            line.setAttribute("stroke-width", "8");
+            line.setAttribute("stroke-linecap", "round");
+            line.setAttribute("stroke-linejoin", "round");
+            
+            // Add delay to create sequential appearance effect
+            line.style.animation = `fadeIn 0.05s ${i * 0.03}s both`;
+            line.style.opacity = "0";
+            
+            group.appendChild(line);
+          }
+        }
+        
+        // Render path as a single animated SVG path for normal-length paths
+        function renderAnimatedPath(group, path) {
           // Create a path element for the solution
           const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
           
           // Build path data
           let pathData = "";
+          let totalLength = 0;
+          let prevX = null, prevY = null;
+          
           path.forEach((point, index) => {
             const x = point.x * 41 + 52;
             const y = point.y * 41 + 52;
@@ -669,7 +714,14 @@
               pathData += `M ${x} ${y} `;
             } else {
               pathData += `L ${x} ${y} `;
+              // Calculate distance for better dash array sizing
+              const dx = x - prevX;
+              const dy = y - prevY;
+              totalLength += Math.sqrt(dx * dx + dy * dy);
             }
+            
+            prevX = x;
+            prevY = y;
           });
           
           pathElement.setAttribute("d", pathData);
@@ -679,8 +731,14 @@
           pathElement.setAttribute("stroke-linecap", "round");
           pathElement.setAttribute("stroke-linejoin", "round");
           
-          solutionGroup.appendChild(pathElement);
-          svg.appendChild(solutionGroup);
+          // Adjust animation for longer paths
+          if (path.length > 20) {
+            const dashArrayValue = Math.max(5000, totalLength * 1.5);
+            pathElement.style.strokeDasharray = dashArrayValue;
+            pathElement.style.animation = `drawLine ${Math.min(3, path.length / 10)}s ease-in-out forwards`;
+          }
+          
+          group.appendChild(pathElement);
         }
       });
     </script>
