@@ -330,6 +330,31 @@
           width: 100%;
         }
       }
+      
+      .github-link {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      
+      .github-button {
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 8px 16px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+      }
+      
+      .github-button:hover {
+        background-color: #24292e;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
     </style>
     <script type="text/javascript" src="engine/utilities.js"></script>
     <script type="text/javascript" src="engine/svg.js"></script>
@@ -351,6 +376,12 @@
     <input type="hidden" id="sens" value="1.0">
     <div class="container">
       <h1><i class="fas fa-puzzle-piece"></i> Witness Puzzle Solver</h1>
+      
+      <div class="github-link">
+        <a href="https://github.com/lkaesberg/TheWitnessDatasetVisualizer" target="_blank" rel="noopener noreferrer">
+          <button class="github-button"><i class="fab fa-github"></i> View on GitHub</button>
+        </a>
+      </div>
       
       <div id="puzzle-info-compact" class="info-compact" style="display: none;"></div>
       
