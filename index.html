@@ -574,49 +574,47 @@
           errorMessage.style.display = 'none';
           successMessage.style.display = 'none';
           
-          setTimeout(() => {
-            try {
-              const inputText = puzzleInput.value.trim();
-              if (!inputText) {
-                setLoading(false);
-                showMessage('error', 'Please enter a puzzle JSON string');
-                return;
-              }
-              
-              const puzzleData = JSON.parse(inputText);
-              createPuzzleFromData(puzzleData);
-              solutionControls.style.display = 'flex';
-              showMessage('success', 'Puzzle loaded successfully!');
-              
-              // Reset solution index
-              currentSolutionIndex = 0;
-              updateSolutionCounter();
-              
-              // Reset solved state
-              resetSolvedState();
-              
-              // Show all puzzle-related containers
-              statsContainer.style.display = 'flex';
-              puzzleInfoCompact.style.display = 'flex';
-              document.getElementById('puzzle-container').style.display = 'flex';
-              
-              // Start timer and reset attempts
-              startTimer();
-              resetAttempts();
-              
-              // Collapse input section after loading
-              inputContent.classList.add('collapsed');
-              const icon = toggleInputBtn.querySelector('i');
-              icon.classList.remove('fa-chevron-up');
-              icon.classList.add('fa-chevron-down');
-              
+          try {
+            const inputText = puzzleInput.value.trim();
+            if (!inputText) {
               setLoading(false);
-            } catch (error) {
-              console.error('Error parsing puzzle:', error);
-              showMessage('error', 'Error loading puzzle: ' + error.message);
-              setLoading(false);
+              showMessage('error', 'Please enter a puzzle JSON string');
+              return;
             }
-          }, 500); // Simulate processing time
+            
+            const puzzleData = JSON.parse(inputText);
+            createPuzzleFromData(puzzleData);
+            solutionControls.style.display = 'flex';
+            showMessage('success', 'Puzzle loaded successfully!');
+            
+            // Reset solution index
+            currentSolutionIndex = 0;
+            updateSolutionCounter();
+            
+            // Reset solved state
+            resetSolvedState();
+            
+            // Show all puzzle-related containers
+            statsContainer.style.display = 'flex';
+            puzzleInfoCompact.style.display = 'flex';
+            document.getElementById('puzzle-container').style.display = 'flex';
+            
+            // Start timer and reset attempts
+            startTimer();
+            resetAttempts();
+            
+            // Collapse input section after loading
+            inputContent.classList.add('collapsed');
+            const icon = toggleInputBtn.querySelector('i');
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+            
+            setLoading(false);
+          } catch (error) {
+            console.error('Error parsing puzzle:', error);
+            showMessage('error', 'Error loading puzzle: ' + error.message);
+            setLoading(false);
+          }
         });
         
         // Clear the puzzle and input
@@ -667,20 +665,18 @@
             showMessage('success', 'Showing solution for solved puzzle');
           }
           
-          setTimeout(() => {
-            if (currentPuzzle && currentPuzzle.solutions && currentPuzzle.solutions.length > 0) {
-              displaySolution(currentPuzzle, currentSolutionIndex);
-              
-              // Show next solution button if there are multiple solutions
-              if (currentPuzzle.solutions.length > 1) {
-                nextSolutionBtn.style.display = 'block';
-                updateSolutionCounter();
-              }
-            } else {
-              showMessage('error', 'No solutions available for this puzzle');
+          if (currentPuzzle && currentPuzzle.solutions && currentPuzzle.solutions.length > 0) {
+            displaySolution(currentPuzzle, currentSolutionIndex);
+            
+            // Show next solution button if there are multiple solutions
+            if (currentPuzzle.solutions.length > 1) {
+              nextSolutionBtn.style.display = 'block';
+              updateSolutionCounter();
             }
-            setLoading(false);
-          }, 500); // Simulate processing time
+          } else {
+            showMessage('error', 'No solutions available for this puzzle');
+          }
+          setLoading(false);
         });
         
         // Next solution
