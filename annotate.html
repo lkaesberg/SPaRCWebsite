@@ -1,0 +1,1585 @@
+<html xmlns="http://www.w3.org/2000/xhtml">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Witness Puzzle Annotator</title>
+    <link rel="stylesheet" type="text/css" href="data/style.css" id="stylesheet">
+    <link rel="icon" type="image/png" href="data/favicon.png">
+    <style>
+      :root {
+        --primary: #3a86ff;
+        --secondary: #8338ec;
+        --success: #38b000;
+        --dark: #333;
+        --light: #f8f9fa;
+        --border-radius: 8px;
+      }
+      
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f0f2f5;
+        color: var(--dark);
+        line-height: 1.6;
+      }
+      
+      h1 {
+        margin-bottom: 20px;
+        color: var(--primary);
+        font-weight: 600;
+        text-align: center;
+      }
+      
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+      }
+      
+      .input-section {
+        width: 100%;
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+      }
+      
+      .input-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background-color: var(--light);
+        cursor: pointer;
+      }
+      
+      .input-header h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      
+      .toggle-btn {
+        background: none;
+        border: none;
+        color: var(--dark);
+        cursor: pointer;
+        padding: 5px;
+      }
+      
+      #input-content {
+        transition: max-height 0.3s ease;
+        max-height: 300px;
+        overflow: hidden;
+      }
+      
+      #input-content.collapsed {
+        max-height: 0;
+      }
+      
+      .input-section h3 {
+        color: var(--dark);
+        margin-bottom: 0;
+      }
+      
+      textarea {
+        width: 100%;
+        height: 150px;
+        font-family: 'Consolas', monospace;
+        padding: 15px;
+        box-sizing: border-box;
+        border: none;
+        border-top: 1px solid #eee;
+        resize: none;
+        transition: border 0.3s ease;
+        font-size: 14px;
+      }
+      
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(58,134,255,0.2);
+      }
+      
+      .buttons {
+        display: flex;
+        gap: 15px;
+        padding: 10px 15px;
+        background-color: var(--light);
+        justify-content: flex-end;
+      }
+      
+      button {
+        padding: 8px 16px;
+        cursor: pointer;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+      
+      button:hover {
+        background-color: #2a76ef;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+      
+      button:active {
+        transform: translateY(0);
+      }
+      
+      #clear-puzzle {
+        background-color: #6c757d;
+      }
+      
+      #clear-puzzle:hover {
+        background-color: #5a6268;
+      }
+      
+      #show-solution, #next-solution {
+        background-color: var(--success);
+      }
+      
+      #show-solution:hover, #next-solution:hover {
+        background-color: #2b9348;
+      }
+      
+      #puzzle-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: 15px 0;
+        padding: 20px;
+        background-color: var(--light);
+        border-radius: var(--border-radius);
+        overflow: auto;
+      }
+      
+      #puzzle {
+        max-width: 100%;
+        height: auto;
+      }
+      
+      .info-compact {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 10px 15px;
+        background-color: var(--light);
+        border-radius: var(--border-radius);
+        font-size: 14px;
+        align-items: center;
+      }
+      
+      .info-compact .info-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      
+      .info-compact .info-label {
+        font-weight: 600;
+        color: var(--primary);
+      }
+      
+      .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: var(--light);
+        border-radius: var(--border-radius);
+        width: 100%;
+      }
+      
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      
+      .stat-item i {
+        color: var(--primary);
+        font-size: 18px;
+      }
+      
+      .solved-indicator {
+        color: var(--success);
+        font-weight: bold;
+      }
+      
+      .solved-indicator i {
+        color: var(--success);
+      }
+      
+      .failed-indicator {
+        color: #e63946;
+        font-weight: bold;
+      }
+      
+      .failed-indicator i {
+        color: #e63946;
+      }
+      
+      #timer {
+        font-family: 'Consolas', monospace;
+        letter-spacing: 1px;
+      }
+      
+      .solution-controls {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 15px;
+      }
+      
+      .solution-counter {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--dark);
+      }
+      
+      .loader {
+        display: none;
+        width: 24px;
+        height: 24px;
+        border: 3px solid var(--light);
+        border-bottom-color: var(--primary);
+        border-radius: 50%;
+        margin: 0 auto;
+        animation: rotation 1s linear infinite;
+      }
+      
+      @keyframes rotation {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .success-message {
+        color: var(--success);
+        text-align: center;
+        font-weight: 600;
+        margin: 10px 0;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      
+      .error-message {
+        color: #e63946;
+        text-align: center;
+        font-weight: 600;
+        margin: 10px 0;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      @keyframes drawLine {
+        from { stroke-dashoffset: 5000; }
+        to { stroke-dashoffset: 0; }
+      }
+      
+      #solution-path path {
+        stroke-dasharray: 5000;
+        animation: drawLine 2s ease-in-out forwards;
+      }
+      
+      #status-messages {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 40px;
+        gap: 10px;
+      }
+      
+      /* Dataset annotation specific styles */
+      .dataset-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: var(--light);
+        border-radius: var(--border-radius);
+        align-items: center;
+        justify-content: space-between;
+      }
+      
+      .dataset-nav {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      
+      .dataset-nav button {
+        min-width: 40px;
+      }
+      
+      .dataset-progress {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      
+      .progress-bar {
+        width: 200px;
+        height: 8px;
+        background-color: #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      
+      .progress-fill {
+        height: 100%;
+        background-color: var(--primary);
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+      
+      .file-upload {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+      }
+      
+      .file-upload input[type=file] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        min-width: 100%;
+        min-height: 100%;
+        font-size: 100px;
+        text-align: right;
+        filter: alpha(opacity=0);
+        opacity: 0;
+        outline: none;
+        cursor: pointer;
+        display: block;
+      }
+      
+      .dataset-info {
+        margin-top: 10px;
+        font-size: 14px;
+        color: var(--dark);
+        text-align: center;
+      }
+      
+      .export-container {
+        margin-top: 20px;
+        width: 100%;
+        text-align: center;
+      }
+      
+      #export-button {
+        background-color: var(--secondary);
+      }
+      
+      #export-button:hover {
+        background-color: #722bd4;
+      }
+      
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px;
+        }
+        
+        .info-compact {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        
+        .buttons {
+          flex-direction: column;
+        }
+        
+        .solution-controls {
+          flex-direction: column;
+          width: 100%;
+        }
+        
+        .dataset-controls {
+          flex-direction: column;
+        }
+        
+        .dataset-nav {
+          justify-content: center;
+          width: 100%;
+        }
+        
+        .dataset-progress {
+          justify-content: center;
+          width: 100%;
+        }
+      }
+      
+      .github-link {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      
+      .github-button {
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 8px 16px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+      }
+      
+      .github-button:hover {
+        background-color: #24292e;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+    </style>
+    <script type="text/javascript" src="engine/utilities.js"></script>
+    <script type="text/javascript" src="engine/svg.js"></script>
+    <script type="text/javascript" src="engine/polyominos.js"></script>
+    <script type="text/javascript" src="engine/puzzle.js"></script>
+    <script type="text/javascript" src="engine/solve.js"></script>
+    <script type="text/javascript" src="engine/validate.js"></script>
+    <script type="text/javascript" src="engine/display2.js"></script>
+    <script type="text/javascript" src="engine/trace2.js"></script>
+    <script type="text/javascript" src="engine/serializer.js"></script>
+    <script type="text/javascript" src="engine/custom_mechanics.js"></script>
+    <!-- Add js-yaml library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <!-- Add font awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <!-- Hidden elements required by the engine -->
+    <input type="hidden" id="sens" value="1.0">
+    <div class="container">
+      <h1><i class="fas fa-puzzle-piece"></i> Witness Puzzle Annotator</h1>
+      
+      <div class="github-link">
+        <a href="https://github.com/lkaesberg/TheWitnessDatasetVisualizer" target="_blank" rel="noopener noreferrer">
+          <button class="github-button"><i class="fab fa-github"></i> View on GitHub</button>
+        </a>
+      </div>
+      
+      <div class="input-section">
+        <div class="input-header">
+          <h3><i class="fas fa-database"></i> Dataset Input</h3>
+          <button id="toggle-input" class="toggle-btn"><i class="fas fa-chevron-up"></i></button>
+        </div>
+        <div id="input-content">
+          <div style="padding: 15px;">
+            <div style="margin-bottom: 15px; text-align: center;">
+              <div class="file-upload">
+                <button id="upload-file-btn"><i class="fas fa-file-upload"></i> Load Dataset</button>
+                <input type="file" id="upload-dataset" accept=".jsonl,.json" />
+              </div>
+            </div>
+            <div class="dataset-info" id="dataset-info"></div>
+          </div>
+          
+          <textarea id="puzzle-input" placeholder="Paste a single puzzle JSON string or the entire dataset in JSONL format..." style="display: none;"></textarea>
+          <div class="buttons">
+            <button id="load-puzzle" style="display: none;"><i class="fas fa-play"></i> Load Puzzle</button>
+            <button id="clear-dataset"><i class="fas fa-eraser"></i> Clear Dataset</button>
+          </div>
+        </div>
+      </div>
+      
+      <div id="dataset-controls" class="dataset-controls" style="display: none;">
+        <div class="dataset-progress">
+          <span id="progress-text">Puzzle 0 of 0</span>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <span id="completion-text">0% complete</span>
+        </div>
+        <button id="skip-puzzle" title="Skip this puzzle"><i class="fas fa-forward"></i> Skip Puzzle</button>
+      </div>
+      
+      <div id="puzzle-info-compact" class="info-compact" style="display: none;"></div>
+      
+      <div class="stats-container" id="stats-container" style="display: none;">
+        <div class="stat-item">
+          <i class="fas fa-clock"></i>
+          <span id="timer">00:00</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-redo-alt"></i>
+          <span id="attempts-counter">0</span> attempts
+        </div>
+        <div class="stat-item solved-indicator" style="display: none;" id="solved-indicator">
+          <i class="fas fa-check-circle"></i>
+          <span>Solved</span>
+        </div>
+        <div class="stat-item failed-indicator" style="display: none;" id="failed-indicator">
+          <i class="fas fa-times-circle"></i>
+          <span>Failed</span>
+        </div>
+      </div>
+      
+      <div id="status-messages">
+        <div class="loader" id="loading-indicator"></div>
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
+      </div>
+      
+      <div id="puzzle-container" style="display: none;">
+        <svg id="puzzle" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      
+      <div class="solution-controls" id="solution-controls" style="display: none;">
+        <button id="show-solution"><i class="fas fa-lightbulb"></i> Show Solution</button>
+        <button id="next-solution" style="display: none;"><i class="fas fa-forward"></i> Next Solution</button>
+        <div class="solution-counter" id="solution-counter"></div>
+      </div>
+      
+      <div class="export-container" id="export-container" style="display: none;">
+        <button id="export-button"><i class="fas fa-file-export"></i> Save Annotated Dataset</button>
+      </div>
+    </div>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Dataset handling variables
+        let dataset = [];
+        let currentPuzzleIndex = 0;
+        let originalDatasetSize = 0;
+        
+        // Current puzzle state variables
+        let currentPuzzle = null;
+        let currentSolutionIndex = 0;
+        let timerInterval = null;
+        let startTime = null;
+        let attemptCount = 0;
+        let puzzleSolved = false;
+        let puzzleFailed = false;
+        
+        // Store the original PLAY_SOUND function once
+        const originalPlaySound = window.PLAY_SOUND;
+        
+        // UI element references
+        const puzzleInput = document.getElementById('puzzle-input');
+        const loadPuzzleBtn = document.getElementById('load-puzzle');
+        const clearDatasetBtn = document.getElementById('clear-dataset');
+        const showSolutionBtn = document.getElementById('show-solution');
+        const nextSolutionBtn = document.getElementById('next-solution');
+        const solutionControls = document.getElementById('solution-controls');
+        const solutionCounter = document.getElementById('solution-counter');
+        const puzzleInfoCompact = document.getElementById('puzzle-info-compact');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        const toggleInputBtn = document.getElementById('toggle-input');
+        const inputContent = document.getElementById('input-content');
+        const timerElement = document.getElementById('timer');
+        const attemptsCounter = document.getElementById('attempts-counter');
+        const statsContainer = document.getElementById('stats-container');
+        const solvedIndicator = document.getElementById('solved-indicator');
+        const failedIndicator = document.getElementById('failed-indicator');
+        const uploadDataset = document.getElementById('upload-dataset');
+        const datasetInfo = document.getElementById('dataset-info');
+        const datasetControls = document.getElementById('dataset-controls');
+        const skipPuzzleBtn = document.getElementById('skip-puzzle');
+        const progressText = document.getElementById('progress-text');
+        const progressFill = document.getElementById('progress-fill');
+        const completionText = document.getElementById('completion-text');
+        const exportButton = document.getElementById('export-button');
+        const exportContainer = document.getElementById('export-container');
+        
+        // Load data from localStorage if available
+        loadFromLocalStorage();
+        
+        // Event listeners for file inputs
+        uploadDataset.addEventListener('change', handleDatasetUpload);
+        
+        // Dataset navigation event listeners
+        exportButton.addEventListener('click', exportAnnotatedData);
+        skipPuzzleBtn.addEventListener('click', skipCurrentPuzzle);
+        
+        // LocalStorage handling functions
+        function saveToLocalStorage() {
+          try {
+            const dataToSave = {
+              dataset: dataset,
+              currentPuzzleIndex: currentPuzzleIndex,
+              originalDatasetSize: originalDatasetSize,
+              lastUpdated: new Date().toISOString()
+            };
+            
+            // Split the data into chunks if it's too large
+            const jsonData = JSON.stringify(dataToSave);
+            
+            // Clear previous data
+            localStorage.removeItem('witnessAnnotatorData');
+            
+            // Store the data
+            localStorage.setItem('witnessAnnotatorData', jsonData);
+            
+            console.log('Saved annotation data to localStorage');
+          } catch (error) {
+            console.error('Error saving to localStorage:', error);
+            // If storing fails due to quota exceeded, show a warning
+            if (error.name === 'QuotaExceededError') {
+              showMessage('error', 'Warning: Dataset too large to save locally. Export your progress regularly!');
+            }
+          }
+        }
+        
+        function loadFromLocalStorage() {
+          try {
+            const savedData = localStorage.getItem('witnessAnnotatorData');
+            
+            if (!savedData) {
+              console.log('No saved data found in localStorage');
+              return false;
+            }
+            
+            // Parse the saved data
+            const parsedData = JSON.parse(savedData);
+            
+            // Load saved data
+            dataset = parsedData.dataset || [];
+            currentPuzzleIndex = parsedData.currentPuzzleIndex || 0;
+            originalDatasetSize = parsedData.originalDatasetSize || 0;
+            
+            console.log(`Loaded saved data from ${parsedData.lastUpdated}`);
+            
+            if (dataset.length > 0) {
+              // Find the first unlabeled puzzle
+              currentPuzzleIndex = findNextUnlabeledPuzzleIndex(-1);
+              
+              // Update UI and load the current puzzle
+              updateDatasetInfo();
+              loadCurrentPuzzle();
+              
+              // Show dataset controls
+              datasetControls.style.display = 'flex';
+              exportContainer.style.display = 'block';
+              
+              // Hide the initial input area
+              inputContent.classList.add('collapsed');
+              const icon = toggleInputBtn.querySelector('i');
+              icon.classList.remove('fa-chevron-up');
+              icon.classList.add('fa-chevron-down');
+              
+              showMessage('success', 'Loaded your saved progress!');
+              return true;
+            }
+            
+            return false;
+          } catch (error) {
+            console.error('Error loading from localStorage:', error);
+            return false;
+          }
+        }
+        
+        // Initialize annotation data in a puzzle if it doesn't exist
+        function ensureAnnotationData(puzzle) {
+          if (!puzzle.annotation) {
+            puzzle.annotation = {
+              completed: false,
+              skipped: false,
+              solved: false,
+              failed: false,
+              time_ms: 0,
+              attempts: 0,
+              puzzle_id: puzzle.id || `puzzle_${currentPuzzleIndex}`
+            };
+          }
+          return puzzle;
+        }
+        
+        // Timer functions
+        function startTimer() {
+          // Don't restart if already solved
+          if (puzzleSolved) return;
+          
+          // Reset timer
+          stopTimer();
+          startTime = Date.now();
+          updateTimer();
+          
+          timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        function stopTimer() {
+          if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+          }
+        }
+        
+        function updateTimer() {
+          if (!startTime) return;
+          
+          const elapsedTime = Date.now() - startTime;
+          const seconds = Math.floor((elapsedTime / 1000) % 60);
+          const minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
+          const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+          
+          if (hours > 0) {
+            timerElement.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+          } else {
+            timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+          }
+        }
+        
+        // Reset attempts counter
+        function resetAttempts() {
+          // Don't reset if already solved
+          if (puzzleSolved) return;
+          
+          attemptCount = 0;
+          attemptsCounter.textContent = attemptCount;
+        }
+        
+        // Increment attempts counter
+        function incrementAttempts() {
+          // Don't increment if already solved
+          if (puzzleSolved) return;
+          
+          attemptCount++;
+          attemptsCounter.textContent = attemptCount;
+        }
+        
+        // Mark puzzle as solved
+        function markAsSolved() {
+          if (puzzleSolved) return;
+          
+          // If the puzzle was already marked as failed, don't change the failed status
+          if (puzzleFailed) {
+            showMessage('success', 'Puzzle solved, but still marked as failed since solution was used first');
+            return;
+          }
+          
+          puzzleSolved = true;
+          solvedIndicator.style.display = 'flex';
+          
+          stopTimer();
+          saveCurrentPuzzleAnnotation();
+          
+          // Transform skip button to continue button
+          skipPuzzleBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue to Next Puzzle';
+          skipPuzzleBtn.title = "Continue to next puzzle";
+          
+          // No longer automatically move to next puzzle
+          showMessage('success', 'Puzzle solved correctly!');
+        }
+        
+        // Mark puzzle as failed (when solution is shown)
+        function markAsFailed() {
+          // If the puzzle was already solved correctly, don't mark it as failed
+          if (puzzleSolved) {
+            showMessage('success', 'Solution shown, but puzzle remains marked as solved correctly');
+            return;
+          }
+          
+          puzzleFailed = true;
+          failedIndicator.style.display = 'flex';
+          
+          // Hide solved indicator if it's showing
+          solvedIndicator.style.display = 'none';
+          
+          // Transform skip button to continue button
+          skipPuzzleBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue to Next Puzzle';
+          skipPuzzleBtn.title = "Continue to next puzzle";
+          
+          saveCurrentPuzzleAnnotation();
+        }
+        
+        // Reset solved state
+        function resetSolvedState() {
+          puzzleSolved = false;
+          puzzleFailed = false;
+          solvedIndicator.style.display = 'none';
+          failedIndicator.style.display = 'none';
+          
+          // Reset skip button text
+          if (skipPuzzleBtn) {
+            skipPuzzleBtn.innerHTML = '<i class="fas fa-forward"></i> Skip Puzzle';
+            skipPuzzleBtn.title = "Skip this puzzle";
+          }
+        }
+        
+        // Toggle input section
+        toggleInputBtn.addEventListener('click', function() {
+          inputContent.classList.toggle('collapsed');
+          const icon = toggleInputBtn.querySelector('i');
+          if (inputContent.classList.contains('collapsed')) {
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+          } else {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+          }
+        });
+        
+        // Helper function to show/hide loading
+        function setLoading(isLoading) {
+          loadingIndicator.style.display = isLoading ? 'block' : 'none';
+          loadPuzzleBtn.disabled = isLoading;
+          clearDatasetBtn.disabled = isLoading;
+          showSolutionBtn.disabled = isLoading;
+          nextSolutionBtn.disabled = isLoading;
+          skipPuzzleBtn.disabled = isLoading;
+          exportButton.disabled = isLoading;
+        }
+        
+        // Helper function to show messages
+        function showMessage(type, message) {
+          if (type === 'error') {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+            setTimeout(() => {
+              errorMessage.style.display = 'none';
+            }, 5000);
+          } else {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            setTimeout(() => {
+              successMessage.style.display = 'none';
+            }, 5000);
+          }
+        }
+        
+        // Dataset handling functions
+        async function handleDatasetUpload(event) {
+          setLoading(true);
+          try {
+            const file = event.target.files[0];
+            if (!file) {
+              setLoading(false);
+              return;
+            }
+            
+            const content = await file.text();
+            
+            // Process content as dataset
+            parseDataset(content);
+            
+            // Find the first unlabeled puzzle
+            currentPuzzleIndex = findNextUnlabeledPuzzleIndex(-1);
+            updateDatasetInfo();
+            loadCurrentPuzzle();
+            
+            // Show dataset controls
+            datasetControls.style.display = 'flex';
+            exportContainer.style.display = 'block';
+            
+            // Hide the initial input area after loading
+            inputContent.classList.add('collapsed');
+            const icon = toggleInputBtn.querySelector('i');
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+            
+            // Save the loaded dataset to localStorage
+            saveToLocalStorage();
+            
+            // Reset file input so the same file can be loaded again if needed
+            event.target.value = '';
+          } catch (error) {
+            console.error('Error loading dataset:', error);
+            showMessage('error', 'Error loading dataset: ' + error.message);
+            setLoading(false);
+          }
+        }
+        
+        function parseDataset(content) {
+          try {
+            let parsedData;
+            
+            // Check if content is a JSONL file (multiple JSON objects, one per line)
+            if (content.trim().includes('\n')) {
+              // Split by newlines and parse each line as a separate JSON object
+              parsedData = content.split('\n')
+                .filter(line => line.trim())
+                .map(line => JSON.parse(line));
+            } else {
+              try {
+                // Try to parse as a JSON object (could be a single puzzle or exported data)
+                const jsonObject = JSON.parse(content);
+                
+                // Check if it's an exported dataset with annotations
+                if (jsonObject.dataset) {
+                  // It's an exported dataset with annotations, use it directly
+                  parsedData = jsonObject.dataset;
+                  originalDatasetSize = parsedData.length;
+                  showMessage('success', 'Annotated dataset loaded with ' + parsedData.length + ' puzzles');
+                  dataset = parsedData;
+                  setLoading(false);
+                  return;
+                } else {
+                  // It's a single puzzle
+                  parsedData = [jsonObject];
+                }
+              } catch (e) {
+                throw new Error('Invalid JSON format');
+              }
+            }
+            
+            if (parsedData.length === 0) {
+              throw new Error('No valid puzzles found in the dataset');
+            }
+            
+            // Initialize annotation data for each puzzle if not present
+            dataset = parsedData.map(puzzle => ensureAnnotationData(puzzle));
+            originalDatasetSize = dataset.length;
+            
+            showMessage('success', `Dataset loaded with ${dataset.length} puzzles`);
+            setLoading(false);
+          } catch (error) {
+            console.error('Error parsing dataset:', error);
+            showMessage('error', 'Error parsing dataset: ' + error.message);
+            setLoading(false);
+          }
+        }
+        
+        function updateDatasetInfo() {
+          // Calculate completion statistics
+          const completed = dataset.filter(puzzle => 
+            puzzle.annotation && (puzzle.annotation.completed || puzzle.annotation.skipped)
+          ).length;
+          const completionPercentage = Math.round((completed / originalDatasetSize) * 100);
+          
+          // Update UI
+          datasetInfo.textContent = `Dataset: ${originalDatasetSize} puzzles, ${completed} annotated (${completionPercentage}% complete)`;
+          progressText.textContent = `Puzzle ${currentPuzzleIndex + 1} of ${originalDatasetSize}`;
+          progressFill.style.width = `${completionPercentage}%`;
+          completionText.textContent = `${completionPercentage}% complete`;
+        }
+        
+        // Find the next unlabeled puzzle index
+        function findNextUnlabeledPuzzleIndex(fromIndex) {
+          let nextIndex = fromIndex + 1;
+          
+          // Look for the next unlabeled puzzle
+          while (nextIndex < dataset.length) {
+            const puzzle = dataset[nextIndex];
+            if (!puzzle.annotation || !puzzle.annotation.completed) {
+              return nextIndex;
+            }
+            nextIndex++;
+          }
+          
+          // If we've reached the end, check if there are any unlabeled puzzles from the beginning
+          if (fromIndex > 0) {
+            nextIndex = 0;
+            while (nextIndex < fromIndex) {
+              const puzzle = dataset[nextIndex];
+              if (!puzzle.annotation || !puzzle.annotation.completed) {
+                return nextIndex;
+              }
+              nextIndex++;
+            }
+          }
+          
+          // If no unlabeled puzzles found, return the first index
+          return 0;
+        }
+        
+        // Move to the next unlabeled puzzle automatically
+        function moveToNextUnlabeledPuzzle() {
+          // Save current puzzle annotation if needed
+          saveCurrentPuzzleAnnotation();
+          
+          // Find the next unlabeled puzzle
+          const nextIndex = findNextUnlabeledPuzzleIndex(currentPuzzleIndex);
+          
+          // Check if we've annotated all puzzles
+          const allCompleted = dataset.every(puzzle => 
+            puzzle.annotation && puzzle.annotation.completed
+          );
+          
+          if (allCompleted) {
+            showMessage('success', 'All puzzles have been annotated!');
+            // Hide the puzzle container and only show the export button
+            document.getElementById('puzzle-container').style.display = 'none';
+            solutionControls.style.display = 'none';
+            statsContainer.style.display = 'none';
+            puzzleInfoCompact.style.display = 'none';
+          } else {
+            currentPuzzleIndex = nextIndex;
+            loadCurrentPuzzle();
+          }
+        }
+        
+        function skipCurrentPuzzle() {
+          // Mark the current puzzle as skipped only if it wasn't already solved or failed
+          if (dataset[currentPuzzleIndex]) {
+            const puzzle = dataset[currentPuzzleIndex];
+            ensureAnnotationData(puzzle);
+            
+            // Only mark as skipped if it wasn't already solved or failed
+            if (!puzzleSolved && !puzzleFailed) {
+              puzzle.annotation.skipped = true;
+              showMessage('success', 'Puzzle skipped');
+            } else {
+              showMessage('success', 'Moving to next puzzle');
+            }
+            
+            // Mark as completed in any case
+            puzzle.annotation.completed = true;
+          }
+          
+          moveToNextUnlabeledPuzzle();
+        }
+        
+        function saveCurrentPuzzleAnnotation() {
+          if (dataset.length === 0 || currentPuzzleIndex < 0 || currentPuzzleIndex >= dataset.length) {
+            return;
+          }
+          
+          // Calculate time spent
+          let timeMs = 0;
+          if (startTime) {
+            timeMs = Date.now() - startTime;
+          }
+          
+          // Get the current puzzle and ensure it has annotation data
+          const puzzle = dataset[currentPuzzleIndex];
+          ensureAnnotationData(puzzle);
+          
+          // Preserve the skipped flag if it was already set
+          const wasSkipped = puzzle.annotation.skipped;
+          
+          // Save the annotation data
+          puzzle.annotation.completed = puzzleSolved || puzzleFailed || wasSkipped;
+          puzzle.annotation.skipped = wasSkipped; // Preserve skipped status
+          puzzle.annotation.solved = puzzleSolved;
+          puzzle.annotation.failed = puzzleFailed;
+          puzzle.annotation.time_ms = timeMs;
+          puzzle.annotation.attempts = attemptCount;
+          
+          // Update dataset info
+          updateDatasetInfo();
+          
+          // Save to localStorage
+          saveToLocalStorage();
+        }
+        
+        function loadCurrentPuzzle() {
+          setLoading(true);
+          
+          try {
+            if (dataset.length === 0 || currentPuzzleIndex < 0 || currentPuzzleIndex >= dataset.length) {
+              showMessage('error', 'No puzzle available at this index');
+              setLoading(false);
+              return;
+            }
+            
+            // Get current puzzle and ensure it has annotation data
+            const puzzleData = dataset[currentPuzzleIndex];
+            ensureAnnotationData(puzzleData);
+            createPuzzleFromData(puzzleData);
+            
+            // Reset solution index
+            currentSolutionIndex = 0;
+            updateSolutionCounter();
+            
+            // Reset solved state
+            resetSolvedState();
+            
+            // Check if this puzzle was already annotated
+            const annotation = puzzleData.annotation;
+            if (annotation.completed) {
+              // If the puzzle was previously solved, update the indicators
+              if (annotation.solved && !annotation.failed) {
+                puzzleSolved = true;
+                solvedIndicator.style.display = 'flex';
+                
+                // Update button to continue
+                skipPuzzleBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue to Next Puzzle';
+                skipPuzzleBtn.title = "Continue to next puzzle";
+              } else if (annotation.failed) {
+                puzzleFailed = true;
+                failedIndicator.style.display = 'flex';
+                
+                // Update button to continue
+                skipPuzzleBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue to Next Puzzle';
+                skipPuzzleBtn.title = "Continue to next puzzle";
+              }
+              
+              // Show the attempts and time from the annotation
+              attemptCount = annotation.attempts;
+              attemptsCounter.textContent = attemptCount;
+              
+              // Display the saved time
+              const timeMs = annotation.time_ms;
+              const seconds = Math.floor((timeMs / 1000) % 60);
+              const minutes = Math.floor((timeMs / (1000 * 60)) % 60);
+              const hours = Math.floor(timeMs / (1000 * 60 * 60));
+              
+              if (hours > 0) {
+                timerElement.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+              } else {
+                timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+              }
+            } else {
+              // Start fresh with a new timer and reset attempts
+              startTimer();
+              resetAttempts();
+              
+              // Reset skip button text
+              skipPuzzleBtn.innerHTML = '<i class="fas fa-forward"></i> Skip Puzzle';
+              skipPuzzleBtn.title = "Skip this puzzle";
+            }
+            
+            // Show all puzzle-related containers
+            statsContainer.style.display = 'flex';
+            puzzleInfoCompact.style.display = 'flex';
+            document.getElementById('puzzle-container').style.display = 'flex';
+            solutionControls.style.display = 'flex';
+            
+            // Update dataset info
+            updateDatasetInfo();
+            
+            setLoading(false);
+          } catch (error) {
+            console.error('Error loading puzzle:', error);
+            showMessage('error', 'Error loading puzzle: ' + error.message);
+            setLoading(false);
+          }
+        }
+        
+        function exportAnnotatedData() {
+          try {
+            // Save the current puzzle annotation first
+            saveCurrentPuzzleAnnotation();
+            
+            // Convert dataset to JSONL format (one puzzle per line)
+            let jsonlOutput = '';
+            
+            // Add each puzzle as a single line of JSON
+            dataset.forEach(puzzle => {
+              // Create a copy to ensure we have the latest annotation data
+              jsonlOutput += JSON.stringify(puzzle) + '\n';
+            });
+            
+            // Create download link
+            const blob = new Blob([jsonlOutput], { type: 'application/jsonl' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            
+            // Create a more descriptive filename with date
+            const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+            link.download = `witness_puzzles_annotated_${date}.jsonl`;
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showMessage('success', 'Puzzles exported as JSONL successfully!');
+          } catch (error) {
+            console.error('Error exporting annotations:', error);
+            showMessage('error', 'Error saving annotations: ' + error.message);
+          }
+        }
+        
+        // Clear the dataset and UI
+        clearDatasetBtn.addEventListener('click', function() {
+          const svg = document.getElementById('puzzle');
+          while (svg.firstChild) svg.removeChild(svg.firstChild);
+          
+          // Clear dataset
+          dataset = [];
+          currentPuzzleIndex = 0;
+          currentPuzzle = null;
+          
+          // Reset UI
+          puzzleInput.value = '';
+          puzzleInfoCompact.innerHTML = '';
+          datasetInfo.textContent = '';
+          progressText.textContent = 'Puzzle 0 of 0';
+          progressFill.style.width = '0%';
+          completionText.textContent = '0% complete';
+          
+          // Hide UI elements
+          solutionControls.style.display = 'none';
+          nextSolutionBtn.style.display = 'none';
+          errorMessage.style.display = 'none';
+          successMessage.style.display = 'none';
+          statsContainer.style.display = 'none';
+          puzzleInfoCompact.style.display = 'none';
+          document.getElementById('puzzle-container').style.display = 'none';
+          datasetControls.style.display = 'none';
+          exportContainer.style.display = 'none';
+          
+          // Stop timer and reset attempts
+          stopTimer();
+          timerElement.textContent = '00:00';
+          resetAttempts();
+          
+          // Reset solved state
+          resetSolvedState();
+          
+          // Reset sound handler to original
+          window.PLAY_SOUND = originalPlaySound;
+          window.TRACE_COMPLETION_FUNC = null;
+          
+          // Clear localStorage data
+          localStorage.removeItem('witnessAnnotatorData');
+          
+          showMessage('success', 'Dataset cleared!');
+        });
+        
+        // Show solution
+        showSolutionBtn.addEventListener('click', function() {
+          setLoading(true);
+          
+          // Only mark as failed and stop timer if the puzzle wasn't already solved or failed
+          if (!puzzleSolved && !puzzleFailed) {
+            stopTimer();
+            
+            // Mark this as giving up on the current attempt - permanently mark as failed
+            markAsFailed();
+            showMessage('error', 'Using solution - attempt failed!');
+          } else {
+            // If the puzzle was already annotated, it's okay to show the solution
+            showMessage('success', 'Showing solution');
+          }
+          
+          if (currentPuzzle && currentPuzzle.solutions && currentPuzzle.solutions.length > 0) {
+            displaySolution(currentPuzzle, currentSolutionIndex);
+            
+            // Show next solution button if there are multiple solutions
+            if (currentPuzzle.solutions.length > 1) {
+              nextSolutionBtn.style.display = 'block';
+              updateSolutionCounter();
+            }
+          } else {
+            showMessage('error', 'No solutions available for this puzzle');
+          }
+          setLoading(false);
+        });
+        
+        // Next solution
+        nextSolutionBtn.addEventListener('click', function() {
+          if (!currentPuzzle || !currentPuzzle.solutions || currentPuzzle.solutions.length <= 1) return;
+          
+          currentSolutionIndex = (currentSolutionIndex + 1) % currentPuzzle.solutions.length;
+          displaySolution(currentPuzzle, currentSolutionIndex);
+          updateSolutionCounter();
+        });
+        
+        // Update solution counter
+        function updateSolutionCounter() {
+          if (currentPuzzle && currentPuzzle.solutions && currentPuzzle.solutions.length > 0) {
+            solutionCounter.textContent = `Solution ${currentSolutionIndex + 1} of ${currentPuzzle.solutions.length}`;
+          }
+        }
+        
+        // Create puzzle from the input data
+        function createPuzzleFromData(puzzleData) {
+          try {
+            // Store the whole puzzle data for solution display
+            currentPuzzle = puzzleData;
+            
+            // Clear previous puzzle if there was one
+            const svg = document.getElementById('puzzle');
+            while (svg.firstChild) svg.removeChild(svg.firstChild);
+            
+            // Extract dimensions and create puzzle
+            const width = puzzleData.grid_size.width;
+            const height = puzzleData.grid_size.height;
+            const puzzle = new Puzzle(width, height);
+            
+            // Parse YAML from text_visualization using js-yaml
+            const yamlData = jsyaml.load(puzzleData.text_visualization);
+            
+            // Set start point
+            const startX = yamlData.puzzle.start.x;
+            const startY = yamlData.puzzle.start.y;
+            puzzle.grid[startX][startY].start = true;
+            
+            // Set end point
+            const endX = yamlData.puzzle.end.x;
+            const endY = yamlData.puzzle.end.y;
+            
+            // Determine end direction based on position
+            let endDirection;
+            if (endX === 0) {
+              endDirection = "left";
+            } else if (endX === width * 2) {
+              endDirection = "right";
+            } else if (endY === 0) {
+              endDirection = "top";
+            } else if (endY === height * 2) {
+              endDirection = "bottom";
+            } else {
+              // Default fallback if not on an edge
+              endDirection = "left";
+            }
+            
+            puzzle.grid[endX][endY].end = endDirection;
+            
+            // Add puzzle elements
+            if (yamlData.puzzle.cells) {
+              yamlData.puzzle.cells.forEach(cell => {
+                const x = cell.position.x;
+                const y = cell.position.y;
+                
+                if (x >= 0 && y >= 0 && x < puzzle.width && y < puzzle.height) {
+                  if (cell.properties.type === 'poly' || cell.properties.type === 'ylop') {
+                    const polyId = cell.properties.polyshape;
+                    const polyshape = puzzleData.polyshapes[polyId];
+                    
+                    // Parse the ASCII polyshape into a numeric value
+                    let polyValue = 0;
+                    if (polyshape && typeof polyshape === 'string') {
+                      const rows = polyshape.split('\n');
+                      for (let y = 0; y < rows.length; y++) {
+                        for (let x = 0; x < rows[y].length; x++) {
+                          if (rows[x][y] === '█') {
+                            // Set the bit for this position in the polyomino
+                            polyValue |= (1 << (y * 4 + x));
+                          }
+                        }
+                      }
+                    }
+                    
+                    puzzle.grid[x][y] = {
+                      type: cell.properties.type,
+                      polyshape: polyValue || polyId, // Use parsed value or fall back to ID
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.type === 'square') {
+                    puzzle.grid[x][y] = {
+                      type: 'square',
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.type === 'star') {
+                    puzzle.grid[x][y] = {
+                      type: 'star',
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.type === 'triangle') {
+                    puzzle.grid[x][y] = {
+                      type: 'triangle',
+                      color: cell.properties.color,
+                      count: cell.properties.count
+                    };
+                  } else if (cell.properties.type === 'nega') {
+                    puzzle.grid[x][y] = {
+                      type: 'nega',
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.dot) {
+                    puzzle.grid[x][y] = {
+                      dot: window.DOT_BLACK,
+                      type: 'line',
+                      line: 0
+                    };
+                  } else if (cell.properties.gap) {
+                    puzzle.grid[x][y] = {
+                      gap: 1,
+                      type: 'line',
+                      line: 0
+                    };
+                  }
+                }
+              });
+            }
+            
+            // Reset the callbacks for the new puzzle
+            setupPuzzleCallbacks();
+            
+            // Draw the puzzle
+            window.draw(puzzle);
+            
+            // Ensure cursorPos element exists in the SVG
+            const cursorPosElement = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+            cursorPosElement.id = "cursorPos";
+            svg.appendChild(cursorPosElement);
+            
+            // Display compact puzzle info
+            puzzleInfoCompact.innerHTML = `
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-puzzle-piece"></i> Dimensions:</span>
+                <span>${width}x${height}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-star"></i> Difficulty:</span>
+                <span>${puzzleData.difficulty_level} (${puzzleData.difficulty_score.toFixed(1)})</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-hashtag"></i> ID:</span>
+                <span>${puzzleData.id}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-list-ol"></i> Solutions:</span>
+                <span>${puzzleData.solution_count}</span>
+              </div>
+            `;
+          } catch (error) {
+            console.error('Error creating puzzle:', error);
+            showMessage('error', 'Error creating puzzle: ' + error.message);
+          }
+        }
+        
+        // Setup callbacks for puzzle completion and sound handling
+        function setupPuzzleCallbacks() {
+          // Set up callback for correct solutions
+          window.TRACE_COMPLETION_FUNC = function(puzzle, path) {
+            // This is called when a puzzle is solved correctly
+            console.log('Puzzle solved correctly!');
+            
+            // Mark the puzzle as solved, but don't change failed state
+            markAsSolved();
+            
+            // Only show the success message if the puzzle wasn't previously failed
+            if (!puzzleFailed) {
+              showMessage('success', 'Puzzle solved correctly!');
+            } else {
+              // If the puzzle was already marked as failed, still acknowledge
+              // but remind that it's still considered failed
+              showMessage('error', 'Puzzle solved, but marked as failed due to using solution!');
+            }
+          };
+          
+          // Override the sound function to capture solution attempts
+          window.PLAY_SOUND = function(soundType) {
+            // Call the original function if it exists
+            if (originalPlaySound) originalPlaySound(soundType);
+            
+            // Track attempts based on sound type
+            if (soundType === 'fail') {
+              // Increment attempts counter on failed attempts
+              incrementAttempts();
+              console.log('Incorrect solution attempt');
+            }
+          };
+        }
+        
+        // Display a solution on the puzzle
+        function displaySolution(puzzleData, solutionIndex) {
+          if (!puzzleData.solutions || puzzleData.solutions.length === 0) return;
+          
+          // Remove previous solution if it exists
+          const existingSolution = document.getElementById('solution-path');
+          if (existingSolution) {
+            existingSolution.remove();
+          }
+          
+          const solution = puzzleData.solutions[solutionIndex];
+          const path = solution.path;
+          const pathLength = path.length;
+          
+          // Draw the solution path on the puzzle
+          const svg = document.getElementById('puzzle');
+          const solutionGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          solutionGroup.setAttribute("id", "solution-path");
+          
+          // For very long paths, use line segments instead of a single path
+          if (pathLength > 40) {
+            renderSegmentedPath(solutionGroup, path);
+          } else {
+            renderAnimatedPath(solutionGroup, path);
+          }
+          
+          svg.appendChild(solutionGroup);
+          
+          // Log path info for debugging
+          console.log(`Path length: ${pathLength} points`);
+        }
+        
+        // Render path as individual line segments for very long paths
+        function renderSegmentedPath(group, path) {
+          for (let i = 0; i < path.length - 1; i++) {
+            const startX = path[i].x * 41 + 52;
+            const startY = path[i].y * 41 + 52;
+            const endX = path[i + 1].x * 41 + 52;
+            const endY = path[i + 1].y * 41 + 52;
+            
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", startX);
+            line.setAttribute("y1", startY);
+            line.setAttribute("x2", endX);
+            line.setAttribute("y2", endY);
+            line.setAttribute("stroke", "#38b000");
+            line.setAttribute("stroke-width", "8");
+            line.setAttribute("stroke-linecap", "round");
+            line.setAttribute("stroke-linejoin", "round");
+            
+            // Add delay to create sequential appearance effect
+            line.style.animation = `fadeIn 0.05s ${i * 0.03}s both`;
+            line.style.opacity = "0";
+            
+            group.appendChild(line);
+          }
+        }
+        
+        // Render path as a single animated SVG path for normal-length paths
+        function renderAnimatedPath(group, path) {
+          // Create a path element for the solution
+          const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          
+          // Build path data
+          let pathData = "";
+          let totalLength = 0;
+          let prevX = null, prevY = null;
+          
+          path.forEach((point, index) => {
+            const x = point.x * 41 + 52;
+            const y = point.y * 41 + 52;
+            
+            if (index === 0) {
+              pathData += `M ${x} ${y} `;
+            } else {
+              pathData += `L ${x} ${y} `;
+              // Calculate distance for better dash array sizing
+              const dx = x - prevX;
+              const dy = y - prevY;
+              totalLength += Math.sqrt(dx * dx + dy * dy);
+            }
+            
+            prevX = x;
+            prevY = y;
+          });
+          
+          pathElement.setAttribute("d", pathData);
+          pathElement.setAttribute("stroke", "#38b000");
+          pathElement.setAttribute("stroke-width", "8");
+          pathElement.setAttribute("fill", "none");
+          pathElement.setAttribute("stroke-linecap", "round");
+          pathElement.setAttribute("stroke-linejoin", "round");
+          
+          // Adjust animation for longer paths
+          if (path.length > 20) {
+            const dashArrayValue = Math.max(5000, totalLength * 1.5);
+            pathElement.style.strokeDasharray = dashArrayValue;
+            pathElement.style.animation = `drawLine ${Math.min(3, path.length / 10)}s ease-in-out forwards`;
+          }
+          
+          group.appendChild(pathElement);
+        }
+      });
+    </script>
+  </body>
+</html>
