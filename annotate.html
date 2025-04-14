@@ -497,6 +497,10 @@
                 <input type="file" id="upload-dataset" accept=".jsonl,.json" />
               </div>
             </div>
+            <div style="margin-bottom: 15px; display: flex; align-items: center; justify-content: center;">
+              <input type="text" id="url-input" placeholder="Enter URL to JSONL file" style="width: 300px; padding: 8px; border-radius: var(--border-radius); border: 1px solid #ccc; margin-right: 10px;">
+              <button id="load-url-btn"><i class="fas fa-cloud-download-alt"></i> Load from URL</button>
+            </div>
             <div class="dataset-info" id="dataset-info"></div>
           </div>
           
@@ -608,16 +612,114 @@
         const completionText = document.getElementById('completion-text');
         const exportButton = document.getElementById('export-button');
         const exportContainer = document.getElementById('export-container');
+        const urlInput = document.getElementById('url-input');
+        const loadUrlBtn = document.getElementById('load-url-btn');
         
-        // Load data from localStorage if available
-        loadFromLocalStorage();
+        // Check for URL parameter 'url' on page load
+        checkUrlParameter();
+        
+        // If URL parameter is not present, check localStorage for saved data
+        if (!hasUrlParameter('url')) {
+          loadFromLocalStorage();
+        }
         
         // Event listeners for file inputs
         uploadDataset.addEventListener('change', handleDatasetUpload);
+        loadUrlBtn.addEventListener('click', handleUrlLoad);
         
         // Dataset navigation event listeners
         exportButton.addEventListener('click', exportAnnotatedData);
         skipPuzzleBtn.addEventListener('click', skipCurrentPuzzle);
+        
+        // Check if the URL contains a 'url' parameter
+        function hasUrlParameter(param) {
+          const urlParams = new URLSearchParams(window.location.search);
+          return urlParams.has(param);
+        }
+        
+        // Check for URL parameter and load dataset if present
+        function checkUrlParameter() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const datasetUrl = urlParams.get('url');
+          
+          if (datasetUrl) {
+            urlInput.value = datasetUrl;
+            
+            // Check if we have existing data before loading
+            if (localStorage.getItem('witnessAnnotatorData')) {
+              if (confirm("You have existing saved progress. Do you want to overwrite it with the dataset from URL?")) {
+                loadDatasetFromUrl(datasetUrl);
+              } else {
+                loadFromLocalStorage();
+                showMessage('error', 'Dataset from URL not loaded. Please try again.');
+              }
+            } else {
+              loadDatasetFromUrl(datasetUrl);
+            }
+          }
+        }
+        
+        // Handle loading dataset from URL input field
+        function handleUrlLoad() {
+          const url = urlInput.value.trim();
+          if (!url) {
+            showMessage('error', 'Please enter a URL to a JSONL file');
+            return;
+          }
+          
+          // Check if we have existing data before loading
+          if (localStorage.getItem('witnessAnnotatorData')) {
+            if (confirm("You have existing saved progress. Do you want to overwrite it with the dataset from URL?")) {
+              loadDatasetFromUrl(url);
+            } else {
+                loadFromLocalStorage();
+                showMessage('error', 'Dataset from URL not loaded. Please try again.');
+            }
+          } else {
+            loadDatasetFromUrl(url);
+          }
+        }
+        
+        // Load dataset from a URL
+        async function loadDatasetFromUrl(url) {
+          setLoading(true);
+          try {
+            showMessage('success', 'Fetching dataset from URL...');
+            
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            const content = await response.text();
+            parseDataset(content);
+            
+            // Find the first unlabeled puzzle
+            currentPuzzleIndex = findNextUnlabeledPuzzleIndex(-1);
+            updateDatasetInfo();
+            loadCurrentPuzzle();
+            
+            // Show dataset controls
+            datasetControls.style.display = 'flex';
+            exportContainer.style.display = 'block';
+            
+            // Hide the initial input area after loading
+            inputContent.classList.add('collapsed');
+            const icon = toggleInputBtn.querySelector('i');
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+            
+            // Save the loaded dataset to localStorage
+            saveToLocalStorage();
+            
+            showMessage('success', 'Dataset loaded from URL successfully!');
+            setLoading(false);
+          } catch (error) {
+            console.error('Error loading dataset from URL:', error);
+            showMessage('error', 'Error loading dataset from URL: ' + error.message);
+            setLoading(false);
+          }
+        }
         
         // LocalStorage handling functions
         function saveToLocalStorage() {
