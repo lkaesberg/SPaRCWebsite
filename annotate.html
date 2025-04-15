@@ -808,8 +808,11 @@
               failed: false,
               time_ms: 0,
               attempts: 0,
+              traced_path: null,
               puzzle_id: puzzle.id || `puzzle_${currentPuzzleIndex}`
             };
+          } else if (puzzle.annotation.traced_path === undefined) {
+            puzzle.annotation.traced_path = null;
           }
           return puzzle;
         }
@@ -1551,6 +1554,38 @@
           window.TRACE_COMPLETION_FUNC = function(puzzle, path) {
             // This is called when a puzzle is solved correctly
             console.log('Puzzle solved correctly!');
+            
+            // Save the user's traced path to the annotation data
+            if (dataset[currentPuzzleIndex] && dataset[currentPuzzleIndex].annotation) {
+              // Convert the traced path format to a more user-friendly format
+              // The first element in path is the starting point, the rest are directions
+              const startPoint = { x: path[0].x, y: path[0].y };
+              const tracedPath = [startPoint];
+              let currentX = startPoint.x;
+              let currentY = startPoint.y;
+              
+              // Process the direction values to build the full path
+              for (let i = 1; i < path.length; i++) {
+                // PATH_NONE = 0, PATH_LEFT = 1, PATH_RIGHT = 2, PATH_TOP = 3, PATH_BOTTOM = 4
+                if (path[i] === 1) { // LEFT
+                  currentX -= 1;
+                } else if (path[i] === 2) { // RIGHT
+                  currentX += 1;
+                } else if (path[i] === 3) { // TOP
+                  currentY -= 1;
+                } else if (path[i] === 4) { // BOTTOM
+                  currentY += 1;
+                }
+                // Don't add the endpoint direction (0)
+                if (path[i] !== 0) {
+                  tracedPath.push({ x: currentX, y: currentY });
+                }
+              }
+              
+              dataset[currentPuzzleIndex].annotation.traced_path = tracedPath;
+              // Save to localStorage
+              saveToLocalStorage();
+            }
             
             // Mark the puzzle as solved, but don't change failed state
             markAsSolved();
