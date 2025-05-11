@@ -2,7 +2,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Witness Puzzle Annotator</title>
+    <title>Witness Puzzle Solver</title>
     <link rel="stylesheet" type="text/css" href="visualizer/data/style.css" id="stylesheet">
     <link rel="icon" type="image/png" href="visualizer/data/favicon.png">
     <style>
@@ -311,93 +311,6 @@
         gap: 10px;
       }
       
-      /* Dataset annotation specific styles */
-      .dataset-controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        width: 100%;
-        margin-bottom: 20px;
-        padding: 15px;
-        background-color: var(--light);
-        border-radius: var(--border-radius);
-        align-items: center;
-        justify-content: space-between;
-      }
-      
-      .dataset-nav {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }
-      
-      .dataset-nav button {
-        min-width: 40px;
-      }
-      
-      .dataset-progress {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-      }
-      
-      .progress-bar {
-        width: 200px;
-        height: 8px;
-        background-color: #ddd;
-        border-radius: 4px;
-        overflow: hidden;
-      }
-      
-      .progress-fill {
-        height: 100%;
-        background-color: var(--primary);
-        width: 0%;
-        transition: width 0.3s ease;
-      }
-      
-      .file-upload {
-        position: relative;
-        overflow: hidden;
-        display: inline-block;
-      }
-      
-      .file-upload input[type=file] {
-        position: absolute;
-        top: 0;
-        right: 0;
-        min-width: 100%;
-        min-height: 100%;
-        font-size: 100px;
-        text-align: right;
-        filter: alpha(opacity=0);
-        opacity: 0;
-        outline: none;
-        cursor: pointer;
-        display: block;
-      }
-      
-      .dataset-info {
-        margin-top: 10px;
-        font-size: 14px;
-        color: var(--dark);
-        text-align: center;
-      }
-      
-      .export-container {
-        margin-top: 20px;
-        width: 100%;
-        text-align: center;
-      }
-      
-      #export-button {
-        background-color: var(--secondary);
-      }
-      
-      #export-button:hover {
-        background-color: #722bd4;
-      }
-      
       @media (max-width: 768px) {
         .container {
           padding: 20px;
@@ -414,20 +327,6 @@
         
         .solution-controls {
           flex-direction: column;
-          width: 100%;
-        }
-        
-        .dataset-controls {
-          flex-direction: column;
-        }
-        
-        .dataset-nav {
-          justify-content: center;
-          width: 100%;
-        }
-        
-        .dataset-progress {
-          justify-content: center;
           width: 100%;
         }
       }
@@ -476,51 +375,12 @@
     <!-- Hidden elements required by the engine -->
     <input type="hidden" id="sens" value="1.0">
     <div class="container">
-      <h1><i class="fas fa-puzzle-piece"></i> Witness Puzzle Annotator</h1>
+      <h1><i class="fas fa-puzzle-piece"></i> Witness Puzzle Solver</h1>
       
       <div class="github-link">
         <a href="https://github.com/lkaesberg/TheWitnessDatasetVisualizer" target="_blank" rel="noopener noreferrer">
           <button class="github-button"><i class="fab fa-github"></i> View on GitHub</button>
         </a>
-      </div>
-      
-      <div class="input-section">
-        <div class="input-header">
-          <h3><i class="fas fa-database"></i> Dataset Input</h3>
-          <button id="toggle-input" class="toggle-btn"><i class="fas fa-chevron-up"></i></button>
-        </div>
-        <div id="input-content">
-          <div style="padding: 15px;">
-            <div style="margin-bottom: 15px; text-align: center;">
-              <div class="file-upload">
-                <button id="upload-file-btn"><i class="fas fa-file-upload"></i> Load Dataset</button>
-                <input type="file" id="upload-dataset" accept=".jsonl,.json" />
-              </div>
-            </div>
-            <div style="margin-bottom: 15px; display: flex; align-items: center; justify-content: center;">
-              <input type="text" id="url-input" placeholder="Enter URL to JSONL file" style="width: 300px; padding: 8px; border-radius: var(--border-radius); border: 1px solid #ccc; margin-right: 10px;">
-              <button id="load-url-btn"><i class="fas fa-cloud-download-alt"></i> Load from URL</button>
-            </div>
-            <div class="dataset-info" id="dataset-info"></div>
-          </div>
-          
-          <textarea id="puzzle-input" placeholder="Paste a single puzzle JSON string or the entire dataset in JSONL format..." style="display: none;"></textarea>
-          <div class="buttons">
-            <button id="load-puzzle" style="display: none;"><i class="fas fa-play"></i> Load Puzzle</button>
-            <button id="clear-dataset"><i class="fas fa-eraser"></i> Clear Dataset</button>
-          </div>
-        </div>
-      </div>
-      
-      <div id="dataset-controls" class="dataset-controls" style="display: none;">
-        <div class="dataset-progress">
-          <span id="progress-text">Puzzle 0 of 0</span>
-          <div class="progress-bar">
-            <div class="progress-fill" id="progress-fill"></div>
-          </div>
-          <span id="completion-text">0% complete</span>
-        </div>
-        <button id="skip-puzzle" title="Skip this puzzle"><i class="fas fa-forward"></i> Skip Puzzle</button>
       </div>
       
       <div id="puzzle-info-compact" class="info-compact" style="display: none;"></div>
@@ -544,6 +404,20 @@
         </div>
       </div>
       
+      <div class="input-section">
+        <div class="input-header">
+          <h3><i class="fas fa-code"></i> Puzzle Input</h3>
+          <button id="toggle-input" class="toggle-btn"><i class="fas fa-chevron-up"></i></button>
+        </div>
+        <div id="input-content">
+          <textarea id="puzzle-input" placeholder="Paste your puzzle JSON string here..."></textarea>
+          <div class="buttons">
+            <button id="load-puzzle"><i class="fas fa-play"></i> Load Puzzle</button>
+            <button id="clear-puzzle"><i class="fas fa-eraser"></i> Clear</button>
+          </div>
+        </div>
+      </div>
+      
       <div id="status-messages">
         <div class="loader" id="loading-indicator"></div>
         <div id="error-message" class="error-message"></div>
@@ -559,20 +433,13 @@
         <button id="next-solution" style="display: none;"><i class="fas fa-forward"></i> Next Solution</button>
         <div class="solution-counter" id="solution-counter"></div>
       </div>
-      
-      <div class="export-container" id="export-container" style="display: none;">
-        <button id="export-button"><i class="fas fa-file-export"></i> Save Annotated Dataset</button>
-      </div>
     </div>
     
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // Dataset handling variables
-        let dataset = [];
-        let currentPuzzleIndex = 0;
-        let originalDatasetSize = 0;
+        // Sample puzzle for testing
+        const samplePuzzle = {"difficulty_level":5,"difficulty_score":5.8,"grid_size":{"height":2,"width":3},"id":"176d1e37ebbacac0","polyshapes":{"16":"·█··\n····\n····\n····"},"puzzle_array":[["+","+","+","+","+",".","+"],["S","N","+","P-R-16","+","o-B","+"],["+","+","+","+","+","+","+"],["+","N","+","N","+","o-B","+"],["+","+","E","+","+","+","+"]],"solution_count":1,"solutions":[{"index":0,"path":[{"x":0,"y":1},{"x":0,"y":0},{"x":1,"y":0},{"x":2,"y":0},{"x":2,"y":1},{"x":2,"y":2},{"x":3,"y":2},{"x":4,"y":2},{"x":4,"y":1},{"x":4,"y":0},{"x":5,"y":0},{"x":6,"y":0},{"x":6,"y":1},{"x":6,"y":2},{"x":6,"y":3},{"x":6,"y":4},{"x":5,"y":4},{"x":4,"y":4},{"x":3,"y":4},{"x":2,"y":4}],"pathLength":20}],"text_visualization":"puzzle:\n  dimensions:\n    width: 3\n    height: 2\n  start:\n    x: 0\n    y: 1\n  end:\n    x: 2\n    y: 4\n  cells:\n    - position:\n        x: 3\n        y: 1\n      properties:\n        type: \"poly\"\n        polyshape: 16\n        color: \"red\"\n    - position:\n        x: 5\n        y: 0\n      properties:\n        dot: 1\n        color: \"black\"\n    - position:\n        x: 5\n        y: 1\n      properties:\n        type: \"square\"\n        color: \"blue\"\n    - position:\n        x: 5\n        y: 3\n      properties:\n        type: \"square\"\n        color: \"blue\"\n"};
         
-        // Current puzzle state variables
         let currentPuzzle = null;
         let currentSolutionIndex = 0;
         let timerInterval = null;
@@ -584,10 +451,9 @@
         // Store the original PLAY_SOUND function once
         const originalPlaySound = window.PLAY_SOUND;
         
-        // UI element references
         const puzzleInput = document.getElementById('puzzle-input');
         const loadPuzzleBtn = document.getElementById('load-puzzle');
-        const clearDatasetBtn = document.getElementById('clear-dataset');
+        const clearPuzzleBtn = document.getElementById('clear-puzzle');
         const showSolutionBtn = document.getElementById('show-solution');
         const nextSolutionBtn = document.getElementById('next-solution');
         const solutionControls = document.getElementById('solution-controls');
@@ -603,219 +469,9 @@
         const statsContainer = document.getElementById('stats-container');
         const solvedIndicator = document.getElementById('solved-indicator');
         const failedIndicator = document.getElementById('failed-indicator');
-        const uploadDataset = document.getElementById('upload-dataset');
-        const datasetInfo = document.getElementById('dataset-info');
-        const datasetControls = document.getElementById('dataset-controls');
-        const skipPuzzleBtn = document.getElementById('skip-puzzle');
-        const progressText = document.getElementById('progress-text');
-        const progressFill = document.getElementById('progress-fill');
-        const completionText = document.getElementById('completion-text');
-        const exportButton = document.getElementById('export-button');
-        const exportContainer = document.getElementById('export-container');
-        const urlInput = document.getElementById('url-input');
-        const loadUrlBtn = document.getElementById('load-url-btn');
         
-        // Check for URL parameter 'url' on page load
-        checkUrlParameter();
-        
-        // If URL parameter is not present, check localStorage for saved data
-        if (!hasUrlParameter('url')) {
-          loadFromLocalStorage();
-        }
-        
-        // Event listeners for file inputs
-        uploadDataset.addEventListener('change', handleDatasetUpload);
-        loadUrlBtn.addEventListener('click', handleUrlLoad);
-        
-        // Dataset navigation event listeners
-        exportButton.addEventListener('click', exportAnnotatedData);
-        skipPuzzleBtn.addEventListener('click', skipCurrentPuzzle);
-        
-        // Check if the URL contains a 'url' parameter
-        function hasUrlParameter(param) {
-          const urlParams = new URLSearchParams(window.location.search);
-          return urlParams.has(param);
-        }
-        
-        // Check for URL parameter and load dataset if present
-        function checkUrlParameter() {
-          const urlParams = new URLSearchParams(window.location.search);
-          const datasetUrl = urlParams.get('url');
-          
-          if (datasetUrl) {
-            urlInput.value = datasetUrl;
-            
-            // Check if we have existing data before loading
-            if (localStorage.getItem('witnessAnnotatorData')) {
-              if (confirm("You have existing saved progress. Do you want to overwrite it with the dataset from URL?")) {
-                loadDatasetFromUrl(datasetUrl);
-              } else {
-                loadFromLocalStorage();
-                showMessage('error', 'Dataset from URL not loaded. Please try again.');
-              }
-            } else {
-              loadDatasetFromUrl(datasetUrl);
-            }
-          }
-        }
-        
-        // Handle loading dataset from URL input field
-        function handleUrlLoad() {
-          const url = urlInput.value.trim();
-          if (!url) {
-            showMessage('error', 'Please enter a URL to a JSONL file');
-            return;
-          }
-          
-          // Check if we have existing data before loading
-          if (localStorage.getItem('witnessAnnotatorData')) {
-            if (confirm("You have existing saved progress. Do you want to overwrite it with the dataset from URL?")) {
-              loadDatasetFromUrl(url);
-            } else {
-                loadFromLocalStorage();
-                showMessage('error', 'Dataset from URL not loaded. Please try again.');
-            }
-          } else {
-            loadDatasetFromUrl(url);
-          }
-        }
-        
-        // Load dataset from a URL
-        async function loadDatasetFromUrl(url) {
-          setLoading(true);
-          try {
-            showMessage('success', 'Fetching dataset from URL...');
-            
-            const response = await fetch(url);
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            
-            const content = await response.text();
-            parseDataset(content);
-            
-            // Find the first unlabeled puzzle
-            currentPuzzleIndex = findNextUnlabeledPuzzleIndex(-1);
-            updateDatasetInfo();
-            loadCurrentPuzzle();
-            
-            // Show dataset controls
-            datasetControls.style.display = 'flex';
-            exportContainer.style.display = 'block';
-            
-            // Hide the initial input area after loading
-            inputContent.classList.add('collapsed');
-            const icon = toggleInputBtn.querySelector('i');
-            icon.classList.remove('fa-chevron-up');
-            icon.classList.add('fa-chevron-down');
-            
-            // Save the loaded dataset to localStorage
-            saveToLocalStorage();
-            
-            showMessage('success', 'Dataset loaded from URL successfully!');
-            setLoading(false);
-          } catch (error) {
-            console.error('Error loading dataset from URL:', error);
-            showMessage('error', 'Error loading dataset from URL: ' + error.message);
-            setLoading(false);
-          }
-        }
-        
-        // LocalStorage handling functions
-        function saveToLocalStorage() {
-          try {
-            const dataToSave = {
-              dataset: dataset,
-              currentPuzzleIndex: currentPuzzleIndex,
-              originalDatasetSize: originalDatasetSize,
-              lastUpdated: new Date().toISOString()
-            };
-            
-            // Split the data into chunks if it's too large
-            const jsonData = JSON.stringify(dataToSave);
-            
-            // Clear previous data
-            localStorage.removeItem('witnessAnnotatorData');
-            
-            // Store the data
-            localStorage.setItem('witnessAnnotatorData', jsonData);
-            
-            console.log('Saved annotation data to localStorage');
-          } catch (error) {
-            console.error('Error saving to localStorage:', error);
-            // If storing fails due to quota exceeded, show a warning
-            if (error.name === 'QuotaExceededError') {
-              showMessage('error', 'Warning: Dataset too large to save locally. Export your progress regularly!');
-            }
-          }
-        }
-        
-        function loadFromLocalStorage() {
-          try {
-            const savedData = localStorage.getItem('witnessAnnotatorData');
-            
-            if (!savedData) {
-              console.log('No saved data found in localStorage');
-              return false;
-            }
-            
-            // Parse the saved data
-            const parsedData = JSON.parse(savedData);
-            
-            // Load saved data
-            dataset = parsedData.dataset || [];
-            currentPuzzleIndex = parsedData.currentPuzzleIndex || 0;
-            originalDatasetSize = parsedData.originalDatasetSize || 0;
-            
-            console.log(`Loaded saved data from ${parsedData.lastUpdated}`);
-            
-            if (dataset.length > 0) {
-              // Find the first unlabeled puzzle
-              currentPuzzleIndex = findNextUnlabeledPuzzleIndex(-1);
-              
-              // Update UI and load the current puzzle
-              updateDatasetInfo();
-              loadCurrentPuzzle();
-              
-              // Show dataset controls
-              datasetControls.style.display = 'flex';
-              exportContainer.style.display = 'block';
-              
-              // Hide the initial input area
-              inputContent.classList.add('collapsed');
-              const icon = toggleInputBtn.querySelector('i');
-              icon.classList.remove('fa-chevron-up');
-              icon.classList.add('fa-chevron-down');
-              
-              showMessage('success', 'Loaded your saved progress!');
-              return true;
-            }
-            
-            return false;
-          } catch (error) {
-            console.error('Error loading from localStorage:', error);
-            return false;
-          }
-        }
-        
-        // Initialize annotation data in a puzzle if it doesn't exist
-        function ensureAnnotationData(puzzle) {
-          if (!puzzle.annotation) {
-            puzzle.annotation = {
-              completed: false,
-              skipped: false,
-              solved: false,
-              failed: false,
-              time_ms: 0,
-              attempts: 0,
-              traced_path: null,
-              puzzle_id: puzzle.id || `puzzle_${currentPuzzleIndex}`
-            };
-          } else if (puzzle.annotation.traced_path === undefined) {
-            puzzle.annotation.traced_path = null;
-          }
-          return puzzle;
-        }
+        // Set sample puzzle in textarea
+        puzzleInput.value = JSON.stringify(samplePuzzle, null, 2);
         
         // Timer functions
         function startTimer() {
@@ -874,45 +530,24 @@
         function markAsSolved() {
           if (puzzleSolved) return;
           
-          // If the puzzle was already marked as failed, don't change the failed status
-          if (puzzleFailed) {
-            showMessage('success', 'Puzzle solved, but still marked as failed since solution was used first');
-            return;
+          puzzleSolved = true;
+          
+          // If the puzzle was previously marked as failed (solution was shown),
+          // maintain the failed state instead of showing solved
+          if (!puzzleFailed) {
+            solvedIndicator.style.display = 'flex';
           }
           
-          puzzleSolved = true;
-          solvedIndicator.style.display = 'flex';
-          
           stopTimer();
-          saveCurrentPuzzleAnnotation();
-          
-          // Transform skip button to continue button
-          skipPuzzleBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue to Next Puzzle';
-          skipPuzzleBtn.title = "Continue to next puzzle";
-          
-          // No longer automatically move to next puzzle
-          showMessage('success', 'Puzzle solved correctly!');
         }
         
         // Mark puzzle as failed (when solution is shown)
         function markAsFailed() {
-          // If the puzzle was already solved correctly, don't mark it as failed
-          if (puzzleSolved) {
-            showMessage('success', 'Solution shown, but puzzle remains marked as solved correctly');
-            return;
-          }
-          
           puzzleFailed = true;
           failedIndicator.style.display = 'flex';
           
           // Hide solved indicator if it's showing
           solvedIndicator.style.display = 'none';
-          
-          // Transform skip button to continue button
-          skipPuzzleBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue to Next Puzzle';
-          skipPuzzleBtn.title = "Continue to next puzzle";
-          
-          saveCurrentPuzzleAnnotation();
         }
         
         // Reset solved state
@@ -921,12 +556,6 @@
           puzzleFailed = false;
           solvedIndicator.style.display = 'none';
           failedIndicator.style.display = 'none';
-          
-          // Reset skip button text
-          if (skipPuzzleBtn) {
-            skipPuzzleBtn.innerHTML = '<i class="fas fa-forward"></i> Skip Puzzle';
-            skipPuzzleBtn.title = "Skip this puzzle";
-          }
         }
         
         // Toggle input section
@@ -946,11 +575,9 @@
         function setLoading(isLoading) {
           loadingIndicator.style.display = isLoading ? 'block' : 'none';
           loadPuzzleBtn.disabled = isLoading;
-          clearDatasetBtn.disabled = isLoading;
+          clearPuzzleBtn.disabled = isLoading;
           showSolutionBtn.disabled = isLoading;
           nextSolutionBtn.disabled = isLoading;
-          skipPuzzleBtn.disabled = isLoading;
-          exportButton.disabled = isLoading;
         }
         
         // Helper function to show messages
@@ -972,235 +599,24 @@
           }
         }
         
-        // Dataset handling functions
-        async function handleDatasetUpload(event) {
+        // Load puzzle from JSON
+        loadPuzzleBtn.addEventListener('click', function() {
           setLoading(true);
+          errorMessage.style.display = 'none';
+          successMessage.style.display = 'none';
+          
           try {
-            const file = event.target.files[0];
-            if (!file) {
+            const inputText = puzzleInput.value.trim();
+            if (!inputText) {
               setLoading(false);
+              showMessage('error', 'Please enter a puzzle JSON string');
               return;
             }
             
-            const content = await file.text();
-            
-            // Process content as dataset
-            parseDataset(content);
-            
-            // Find the first unlabeled puzzle
-            currentPuzzleIndex = findNextUnlabeledPuzzleIndex(-1);
-            updateDatasetInfo();
-            loadCurrentPuzzle();
-            
-            // Show dataset controls
-            datasetControls.style.display = 'flex';
-            exportContainer.style.display = 'block';
-            
-            // Hide the initial input area after loading
-            inputContent.classList.add('collapsed');
-            const icon = toggleInputBtn.querySelector('i');
-            icon.classList.remove('fa-chevron-up');
-            icon.classList.add('fa-chevron-down');
-            
-            // Save the loaded dataset to localStorage
-            saveToLocalStorage();
-            
-            // Reset file input so the same file can be loaded again if needed
-            event.target.value = '';
-          } catch (error) {
-            console.error('Error loading dataset:', error);
-            showMessage('error', 'Error loading dataset: ' + error.message);
-            setLoading(false);
-          }
-        }
-        
-        function parseDataset(content) {
-          try {
-            let parsedData;
-            
-            // Check if content is a JSONL file (multiple JSON objects, one per line)
-            if (content.trim().includes('\n')) {
-              // Split by newlines and parse each line as a separate JSON object
-              parsedData = content.split('\n')
-                .filter(line => line.trim())
-                .map(line => JSON.parse(line));
-            } else {
-              try {
-                // Try to parse as a JSON object (could be a single puzzle or exported data)
-                const jsonObject = JSON.parse(content);
-                
-                // Check if it's an exported dataset with annotations
-                if (jsonObject.dataset) {
-                  // It's an exported dataset with annotations, use it directly
-                  parsedData = jsonObject.dataset;
-                  originalDatasetSize = parsedData.length;
-                  showMessage('success', 'Annotated dataset loaded with ' + parsedData.length + ' puzzles');
-                  dataset = parsedData;
-                  setLoading(false);
-                  return;
-                } else {
-                  // It's a single puzzle
-                  parsedData = [jsonObject];
-                }
-              } catch (e) {
-                throw new Error('Invalid JSON format');
-              }
-            }
-            
-            if (parsedData.length === 0) {
-              throw new Error('No valid puzzles found in the dataset');
-            }
-            
-            // Initialize annotation data for each puzzle if not present
-            dataset = parsedData.map(puzzle => ensureAnnotationData(puzzle));
-            originalDatasetSize = dataset.length;
-            
-            showMessage('success', `Dataset loaded with ${dataset.length} puzzles`);
-            setLoading(false);
-          } catch (error) {
-            console.error('Error parsing dataset:', error);
-            showMessage('error', 'Error parsing dataset: ' + error.message);
-            setLoading(false);
-          }
-        }
-        
-        function updateDatasetInfo() {
-          // Calculate completion statistics
-          const completed = dataset.filter(puzzle => 
-            puzzle.annotation && (puzzle.annotation.completed || puzzle.annotation.skipped)
-          ).length;
-          const completionPercentage = Math.round((completed / originalDatasetSize) * 100);
-          
-          // Update UI
-          datasetInfo.textContent = `Dataset: ${originalDatasetSize} puzzles, ${completed} annotated (${completionPercentage}% complete)`;
-          progressText.textContent = `Puzzle ${currentPuzzleIndex + 1} of ${originalDatasetSize}`;
-          progressFill.style.width = `${completionPercentage}%`;
-          completionText.textContent = `${completionPercentage}% complete`;
-        }
-        
-        // Find the next unlabeled puzzle index
-        function findNextUnlabeledPuzzleIndex(fromIndex) {
-          let nextIndex = fromIndex + 1;
-          
-          // Look for the next unlabeled puzzle
-          while (nextIndex < dataset.length) {
-            const puzzle = dataset[nextIndex];
-            if (!puzzle.annotation || !puzzle.annotation.completed) {
-              return nextIndex;
-            }
-            nextIndex++;
-          }
-          
-          // If we've reached the end, check if there are any unlabeled puzzles from the beginning
-          if (fromIndex > 0) {
-            nextIndex = 0;
-            while (nextIndex < fromIndex) {
-              const puzzle = dataset[nextIndex];
-              if (!puzzle.annotation || !puzzle.annotation.completed) {
-                return nextIndex;
-              }
-              nextIndex++;
-            }
-          }
-          
-          // If no unlabeled puzzles found, return the first index
-          return 0;
-        }
-        
-        // Move to the next unlabeled puzzle automatically
-        function moveToNextUnlabeledPuzzle() {
-          // Save current puzzle annotation if needed
-          saveCurrentPuzzleAnnotation();
-          
-          // Find the next unlabeled puzzle
-          const nextIndex = findNextUnlabeledPuzzleIndex(currentPuzzleIndex);
-          
-          // Check if we've annotated all puzzles
-          const allCompleted = dataset.every(puzzle => 
-            puzzle.annotation && puzzle.annotation.completed
-          );
-          
-          if (allCompleted) {
-            showMessage('success', 'All puzzles have been annotated!');
-            // Hide the puzzle container and only show the export button
-            document.getElementById('puzzle-container').style.display = 'none';
-            solutionControls.style.display = 'none';
-            statsContainer.style.display = 'none';
-            puzzleInfoCompact.style.display = 'none';
-          } else {
-            currentPuzzleIndex = nextIndex;
-            loadCurrentPuzzle();
-          }
-        }
-        
-        function skipCurrentPuzzle() {
-          // Mark the current puzzle as skipped only if it wasn't already solved or failed
-          if (dataset[currentPuzzleIndex]) {
-            const puzzle = dataset[currentPuzzleIndex];
-            ensureAnnotationData(puzzle);
-            
-            // Only mark as skipped if it wasn't already solved or failed
-            if (!puzzleSolved && !puzzleFailed) {
-              puzzle.annotation.skipped = true;
-              showMessage('success', 'Puzzle skipped');
-            } else {
-              showMessage('success', 'Moving to next puzzle');
-            }
-            
-            // Mark as completed in any case
-            puzzle.annotation.completed = true;
-          }
-          
-          moveToNextUnlabeledPuzzle();
-        }
-        
-        function saveCurrentPuzzleAnnotation() {
-          if (dataset.length === 0 || currentPuzzleIndex < 0 || currentPuzzleIndex >= dataset.length) {
-            return;
-          }
-          
-          // Calculate time spent
-          let timeMs = 0;
-          if (startTime) {
-            timeMs = Date.now() - startTime;
-          }
-          
-          // Get the current puzzle and ensure it has annotation data
-          const puzzle = dataset[currentPuzzleIndex];
-          ensureAnnotationData(puzzle);
-          
-          // Preserve the skipped flag if it was already set
-          const wasSkipped = puzzle.annotation.skipped;
-          
-          // Save the annotation data
-          puzzle.annotation.completed = puzzleSolved || puzzleFailed || wasSkipped;
-          puzzle.annotation.skipped = wasSkipped; // Preserve skipped status
-          puzzle.annotation.solved = puzzleSolved;
-          puzzle.annotation.failed = puzzleFailed;
-          puzzle.annotation.time_ms = timeMs;
-          puzzle.annotation.attempts = attemptCount;
-          
-          // Update dataset info
-          updateDatasetInfo();
-          
-          // Save to localStorage
-          saveToLocalStorage();
-        }
-        
-        function loadCurrentPuzzle() {
-          setLoading(true);
-          
-          try {
-            if (dataset.length === 0 || currentPuzzleIndex < 0 || currentPuzzleIndex >= dataset.length) {
-              showMessage('error', 'No puzzle available at this index');
-              setLoading(false);
-              return;
-            }
-            
-            // Get current puzzle and ensure it has annotation data
-            const puzzleData = dataset[currentPuzzleIndex];
-            ensureAnnotationData(puzzleData);
+            const puzzleData = JSON.parse(inputText);
             createPuzzleFromData(puzzleData);
+            solutionControls.style.display = 'flex';
+            showMessage('success', 'Puzzle loaded successfully!');
             
             // Reset solution index
             currentSolutionIndex = 0;
@@ -1209,132 +625,45 @@
             // Reset solved state
             resetSolvedState();
             
-            // Check if this puzzle was already annotated
-            const annotation = puzzleData.annotation;
-            if (annotation.completed) {
-              // If the puzzle was previously solved, update the indicators
-              if (annotation.solved && !annotation.failed) {
-                puzzleSolved = true;
-                solvedIndicator.style.display = 'flex';
-                
-                // Update button to continue
-                skipPuzzleBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue to Next Puzzle';
-                skipPuzzleBtn.title = "Continue to next puzzle";
-              } else if (annotation.failed) {
-                puzzleFailed = true;
-                failedIndicator.style.display = 'flex';
-                
-                // Update button to continue
-                skipPuzzleBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue to Next Puzzle';
-                skipPuzzleBtn.title = "Continue to next puzzle";
-              }
-              
-              // Show the attempts and time from the annotation
-              attemptCount = annotation.attempts;
-              attemptsCounter.textContent = attemptCount;
-              
-              // Display the saved time
-              const timeMs = annotation.time_ms;
-              const seconds = Math.floor((timeMs / 1000) % 60);
-              const minutes = Math.floor((timeMs / (1000 * 60)) % 60);
-              const hours = Math.floor(timeMs / (1000 * 60 * 60));
-              
-              if (hours > 0) {
-                timerElement.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-              } else {
-                timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-              }
-            } else {
-              // Start fresh with a new timer and reset attempts
-              startTimer();
-              resetAttempts();
-              
-              // Reset skip button text
-              skipPuzzleBtn.innerHTML = '<i class="fas fa-forward"></i> Skip Puzzle';
-              skipPuzzleBtn.title = "Skip this puzzle";
-            }
-            
             // Show all puzzle-related containers
             statsContainer.style.display = 'flex';
             puzzleInfoCompact.style.display = 'flex';
             document.getElementById('puzzle-container').style.display = 'flex';
-            solutionControls.style.display = 'flex';
             
-            // Update dataset info
-            updateDatasetInfo();
+            // Start timer and reset attempts
+            startTimer();
+            resetAttempts();
+            
+            // Collapse input section after loading
+            inputContent.classList.add('collapsed');
+            const icon = toggleInputBtn.querySelector('i');
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
             
             setLoading(false);
           } catch (error) {
-            console.error('Error loading puzzle:', error);
+            console.error('Error parsing puzzle:', error);
             showMessage('error', 'Error loading puzzle: ' + error.message);
             setLoading(false);
           }
-        }
+        });
         
-        function exportAnnotatedData() {
-          try {
-            // Save the current puzzle annotation first
-            saveCurrentPuzzleAnnotation();
-            
-            // Convert dataset to JSONL format (one puzzle per line)
-            let jsonlOutput = '';
-            
-            // Add each puzzle as a single line of JSON
-            dataset.forEach(puzzle => {
-              // Create a copy to ensure we have the latest annotation data
-              jsonlOutput += JSON.stringify(puzzle) + '\n';
-            });
-            
-            // Create download link
-            const blob = new Blob([jsonlOutput], { type: 'application/jsonl' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            
-            // Create a more descriptive filename with date
-            const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-            link.download = `witness_puzzles_annotated_${date}.jsonl`;
-            
-            // Trigger download
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showMessage('success', 'Puzzles exported as JSONL successfully!');
-          } catch (error) {
-            console.error('Error exporting annotations:', error);
-            showMessage('error', 'Error saving annotations: ' + error.message);
-          }
-        }
-        
-        // Clear the dataset and UI
-        clearDatasetBtn.addEventListener('click', function() {
+        // Clear the puzzle and input
+        clearPuzzleBtn.addEventListener('click', function() {
           const svg = document.getElementById('puzzle');
           while (svg.firstChild) svg.removeChild(svg.firstChild);
-          
-          // Clear dataset
-          dataset = [];
-          currentPuzzleIndex = 0;
           currentPuzzle = null;
-          
-          // Reset UI
           puzzleInput.value = '';
           puzzleInfoCompact.innerHTML = '';
-          datasetInfo.textContent = '';
-          progressText.textContent = 'Puzzle 0 of 0';
-          progressFill.style.width = '0%';
-          completionText.textContent = '0% complete';
-          
-          // Hide UI elements
           solutionControls.style.display = 'none';
           nextSolutionBtn.style.display = 'none';
           errorMessage.style.display = 'none';
           successMessage.style.display = 'none';
+          
+          // Hide all puzzle-related containers
           statsContainer.style.display = 'none';
           puzzleInfoCompact.style.display = 'none';
           document.getElementById('puzzle-container').style.display = 'none';
-          datasetControls.style.display = 'none';
-          exportContainer.style.display = 'none';
           
           // Stop timer and reset attempts
           stopTimer();
@@ -1348,26 +677,23 @@
           window.PLAY_SOUND = originalPlaySound;
           window.TRACE_COMPLETION_FUNC = null;
           
-          // Clear localStorage data
-          localStorage.removeItem('witnessAnnotatorData');
-          
-          showMessage('success', 'Dataset cleared!');
+          showMessage('success', 'Cleared!');
         });
         
         // Show solution
         showSolutionBtn.addEventListener('click', function() {
           setLoading(true);
           
-          // Only mark as failed and stop timer if the puzzle wasn't already solved or failed
-          if (!puzzleSolved && !puzzleFailed) {
+          // Only mark as failed and stop timer if the puzzle wasn't already solved
+          if (!puzzleSolved) {
             stopTimer();
             
             // Mark this as giving up on the current attempt - permanently mark as failed
             markAsFailed();
             showMessage('error', 'Using solution - attempt failed!');
           } else {
-            // If the puzzle was already annotated, it's okay to show the solution
-            showMessage('success', 'Showing solution');
+            // If the puzzle was already solved, it's okay to show the solution
+            showMessage('success', 'Showing solution for solved puzzle');
           }
           
           if (currentPuzzle && currentPuzzle.solutions && currentPuzzle.solutions.length > 0) {
@@ -1554,38 +880,6 @@
           window.TRACE_COMPLETION_FUNC = function(puzzle, path) {
             // This is called when a puzzle is solved correctly
             console.log('Puzzle solved correctly!');
-            
-            // Save the user's traced path to the annotation data
-            if (dataset[currentPuzzleIndex] && dataset[currentPuzzleIndex].annotation) {
-              // Convert the traced path format to a more user-friendly format
-              // The first element in path is the starting point, the rest are directions
-              const startPoint = { x: path[0].x, y: path[0].y };
-              const tracedPath = [startPoint];
-              let currentX = startPoint.x;
-              let currentY = startPoint.y;
-              
-              // Process the direction values to build the full path
-              for (let i = 1; i < path.length; i++) {
-                // PATH_NONE = 0, PATH_LEFT = 1, PATH_RIGHT = 2, PATH_TOP = 3, PATH_BOTTOM = 4
-                if (path[i] === 1) { // LEFT
-                  currentX -= 1;
-                } else if (path[i] === 2) { // RIGHT
-                  currentX += 1;
-                } else if (path[i] === 3) { // TOP
-                  currentY -= 1;
-                } else if (path[i] === 4) { // BOTTOM
-                  currentY += 1;
-                }
-                // Don't add the endpoint direction (0)
-                if (path[i] !== 0) {
-                  tracedPath.push({ x: currentX, y: currentY });
-                }
-              }
-              
-              dataset[currentPuzzleIndex].annotation.traced_path = tracedPath;
-              // Save to localStorage
-              saveToLocalStorage();
-            }
             
             // Mark the puzzle as solved, but don't change failed state
             markAsSolved();

@@ -1,1016 +1,759 @@
-<html xmlns="http://www.w3.org/2000/xhtml">
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Witness Puzzle Solver</title>
-    <link rel="stylesheet" type="text/css" href="data/style.css" id="stylesheet">
-    <link rel="icon" type="image/png" href="data/favicon.png">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SPaRC – Spatial Pathfinding Reasoning Corpus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+      /* Base styles */
       :root {
-        --primary: #3a86ff;
-        --secondary: #8338ec;
-        --success: #38b000;
-        --dark: #333;
-        --light: #f8f9fa;
-        --border-radius: 8px;
+        --color-bg: #fafafa;
+        --color-text: #333;
+        --color-primary: #6366f1; /* Indigo */
+        --color-accent: #f43f5e; /* Rose */
+        --color-muted: #94a3b8; /* Slate */
+        --color-success: #10b981; /* Emerald */
+        --color-card: #ffffff;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.04), 0 10px 15px rgba(0, 0, 0, 0.04);
+        --radius-sm: 8px;
+        --radius: 12px;
+        --radius-lg: 16px;
+        --font-base: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Reset & globals */
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      html {
+        scroll-behavior: smooth;
       }
       
       body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: #f0f2f5;
-        color: var(--dark);
-        line-height: 1.6;
-      }
-      
-      h1 {
-        margin-bottom: 20px;
-        color: var(--primary);
-        font-weight: 600;
-        text-align: center;
-      }
-      
-      .container {
-        width: 100%;
-        max-width: 1200px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: white;
-        border-radius: var(--border-radius);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        padding: 30px;
-        margin-bottom: 30px;
-      }
-      
-      .input-section {
-        width: 100%;
-        margin-bottom: 20px;
-        border: 1px solid #eee;
-        border-radius: var(--border-radius);
-        overflow: hidden;
-      }
-      
-      .input-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 15px;
-        background-color: var(--light);
-        cursor: pointer;
-      }
-      
-      .input-header h3 {
-        margin: 0;
+        font-family: var(--font-base);
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        line-height: 1.7;
+        font-weight: 400;
         font-size: 16px;
+        margin: 0;
+        padding: 0;
       }
       
-      .toggle-btn {
-        background: none;
-        border: none;
-        color: var(--dark);
-        cursor: pointer;
-        padding: 5px;
-      }
-      
-      #input-content {
-        transition: max-height 0.3s ease;
-        max-height: 300px;
-        overflow: hidden;
-      }
-      
-      #input-content.collapsed {
-        max-height: 0;
-      }
-      
-      .input-section h3 {
-        color: var(--dark);
-        margin-bottom: 0;
-      }
-      
-      textarea {
-        width: 100%;
-        height: 150px;
-        font-family: 'Consolas', monospace;
-        padding: 15px;
-        box-sizing: border-box;
-        border: none;
-        border-top: 1px solid #eee;
-        resize: none;
-        transition: border 0.3s ease;
-        font-size: 14px;
-      }
-      
-      textarea:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 2px rgba(58,134,255,0.2);
-      }
-      
-      .buttons {
-        display: flex;
-        gap: 15px;
-        padding: 10px 15px;
-        background-color: var(--light);
-        justify-content: flex-end;
-      }
-      
-      button {
-        padding: 8px 16px;
-        cursor: pointer;
-        background-color: var(--primary);
-        color: white;
-        border: none;
-        border-radius: var(--border-radius);
-        font-weight: 600;
-        transition: all 0.2s ease;
-      }
-      
-      button:hover {
-        background-color: #2a76ef;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      }
-      
-      button:active {
-        transform: translateY(0);
-      }
-      
-      #clear-puzzle {
-        background-color: #6c757d;
-      }
-      
-      #clear-puzzle:hover {
-        background-color: #5a6268;
-      }
-      
-      #show-solution, #next-solution {
-        background-color: var(--success);
-      }
-      
-      #show-solution:hover, #next-solution:hover {
-        background-color: #2b9348;
-      }
-      
-      #puzzle-container {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        margin: 15px 0;
-        padding: 20px;
-        background-color: var(--light);
-        border-radius: var(--border-radius);
-        overflow: auto;
-      }
-      
-      #puzzle {
+      img {
         max-width: 100%;
         height: auto;
       }
       
-      .info-compact {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
+      a {
+        color: var(--color-primary);
+        text-decoration: none;
+        transition: var(--transition);
+      }
+      
+      a:hover {
+        color: var(--color-accent);
+      }
+      
+      /* Typography */
+      h1, h2, h3, h4, h5 {
+        font-weight: 600;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+      }
+      
+      h1 {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        letter-spacing: -0.03em;
+      }
+      
+      h2 {
+        font-size: clamp(1.8rem, 3vw, 2.2rem);
+        letter-spacing: -0.02em;
+      }
+      
+      h3 {
+        font-size: 1.5rem;
+        letter-spacing: -0.015em;
+      }
+      
+      p {
+        margin-bottom: 1.5rem;
+      }
+      
+      strong {
+        font-weight: 600;
+      }
+      
+      /* Layout */
+      .container {
         width: 100%;
-        margin-bottom: 20px;
-        padding: 10px 15px;
-        background-color: var(--light);
-        border-radius: var(--border-radius);
-        font-size: 14px;
-        align-items: center;
-      }
-      
-      .info-compact .info-item {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-      
-      .info-compact .info-label {
-        font-weight: 600;
-        color: var(--primary);
-      }
-      
-      .stats-container {
-        display: flex;
-        justify-content: center;
-        gap: 30px;
-        margin-bottom: 20px;
-        padding: 10px;
-        background-color: var(--light);
-        border-radius: var(--border-radius);
-        width: 100%;
-      }
-      
-      .stat-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 16px;
-        font-weight: 600;
-      }
-      
-      .stat-item i {
-        color: var(--primary);
-        font-size: 18px;
-      }
-      
-      .solved-indicator {
-        color: var(--success);
-        font-weight: bold;
-      }
-      
-      .solved-indicator i {
-        color: var(--success);
-      }
-      
-      .failed-indicator {
-        color: #e63946;
-        font-weight: bold;
-      }
-      
-      .failed-indicator i {
-        color: #e63946;
-      }
-      
-      #timer {
-        font-family: 'Consolas', monospace;
-        letter-spacing: 1px;
-      }
-      
-      .solution-controls {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-top: 15px;
-      }
-      
-      .solution-counter {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--dark);
-      }
-      
-      .loader {
-        display: none;
-        width: 24px;
-        height: 24px;
-        border: 3px solid var(--light);
-        border-bottom-color: var(--primary);
-        border-radius: 50%;
+        max-width: 1200px;
         margin: 0 auto;
-        animation: rotation 1s linear infinite;
+        padding: 0 1.5rem;
       }
       
-      @keyframes rotation {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 2rem;
       }
       
-      .success-message {
-        color: var(--success);
-        text-align: center;
-        font-weight: 600;
-        margin: 10px 0;
-        animation: fadeIn 0.5s ease-in-out;
-      }
-      
-      .error-message {
-        color: #e63946;
-        text-align: center;
-        font-weight: 600;
-        margin: 10px 0;
-        animation: fadeIn 0.5s ease-in-out;
-      }
-      
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-      
-      @keyframes drawLine {
-        from { stroke-dashoffset: 5000; }
-        to { stroke-dashoffset: 0; }
-      }
-      
-      #solution-path path {
-        stroke-dasharray: 5000;
-        animation: drawLine 2s ease-in-out forwards;
-      }
-      
-      #status-messages {
-        display: flex;
-        justify-content: center;
+      /* Components */
+      .btn {
+        display: inline-flex;
         align-items: center;
-        min-height: 40px;
-        gap: 10px;
-      }
-      
-      @media (max-width: 768px) {
-        .container {
-          padding: 20px;
-        }
-        
-        .info-compact {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-        
-        .buttons {
-          flex-direction: column;
-        }
-        
-        .solution-controls {
-          flex-direction: column;
-          width: 100%;
-        }
-      }
-      
-      .github-link {
-        display: flex;
         justify-content: center;
-        margin-bottom: 20px;
-      }
-      
-      .github-button {
-        background-color: #333;
+        background: var(--color-primary);
         color: white;
+        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-sm);
+        transition: var(--transition);
         border: none;
-        border-radius: var(--border-radius);
-        padding: 8px 16px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s ease;
+        cursor: pointer;
       }
       
-      .github-button:hover {
-        background-color: #24292e;
+      .btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        color: white;
+      }
+      
+      .btn-accent {
+        background: var(--color-accent);
+      }
+      
+      .btn-accent:hover {
+        box-shadow: 0 4px 12px rgba(244, 63, 94, 0.2);
+      }
+      
+      .card {
+        background: var(--color-card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        padding: 2rem;
+        transition: var(--transition);
+      }
+      
+      .card:hover {
+        box-shadow: var(--shadow);
+      }
+      
+      /* Header */
+      .site-header {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        padding: 6rem 0;
+        background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+        color: white;
+      }
+      
+      .site-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        z-index: 0;
+      }
+      
+      .header-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+      }
+      
+      .tagline {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        font-weight: 300;
+        opacity: 0.9;
+        max-width: 640px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      /* Navigation */
+      .nav-container {
+        background: white;
+        box-shadow: var(--shadow-sm);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      
+      .main-nav {
+        display: flex;
+        justify-content: center;
+        padding: 1rem 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .nav-list {
+        display: flex;
+        gap: 1.5rem;
+        list-style: none;
+      }
+      
+      .nav-item {
+        white-space: nowrap;
+      }
+      
+      .nav-link {
+        color: var(--color-text);
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--radius-sm);
+        transition: var(--transition);
+      }
+      
+      .nav-link:hover, .nav-link.active {
+        color: var(--color-primary);
+        background: rgba(99, 102, 241, 0.1);
+      }
+      
+      /* Main content */
+      .main-content {
+        padding: 4rem 0;
+      }
+      
+      .section {
+        margin-bottom: 4rem;
+      }
+      
+      .section-header {
+        margin-bottom: 2rem;
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      
+      .section-header::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #e2e8f0;
+        margin-left: 1rem;
+      }
+      
+      .section-title {
+        font-size: 1.8rem;
+        margin-bottom: 0;
+        color: var(--color-primary);
+      }
+      
+      /* Hero Grid */
+      .hero-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+      }
+      
+      .visual-card {
+        aspect-ratio: 16/9;
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        position: relative;
+      }
+      
+      .visual-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow);
+      }
+      
+      .visual-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      .placeholder-text {
+        color: var(--color-muted);
+        font-weight: 500;
+      }
+      
+      /* Stats Display */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin: 3rem 0;
+      }
+      
+      .stat-card {
+        text-align: center;
+        padding: 2rem;
+        background: white;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+      }
+      
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow);
+      }
+      
+      .stat-value {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--color-primary);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+      }
+      
+      .stat-label {
+        color: var(--color-muted);
+        font-weight: 500;
+      }
+      
+      /* Feature Cards */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+      }
+      
+      .feature-card {
+        background: white;
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        border-top: 4px solid var(--color-primary);
+      }
+      
+      .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow);
+      }
+      
+      .feature-card h3 {
+        margin-top: 0;
+        font-size: 1.25rem;
+      }
+      
+      /* Table Styles */
+      .table-container {
+        overflow-x: auto;
+        margin: 2rem 0;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+      }
+      
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+      }
+      
+      th, td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #f1f5f9;
+      }
+      
+      th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: var(--color-primary);
+      }
+      
+      tbody tr:hover {
+        background: #f8fafc;
+      }
+      
+      /* Code Blocks */
+      .code-block {
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 1.5rem;
+        border-radius: var(--radius);
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        font-family: 'SF Mono', 'Consolas', monospace;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+      
+      /* Citation */
+      .citation-block {
+        background: #f8fafc;
+        border-left: 4px solid var(--color-primary);
+        padding: 1.5rem;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        margin: 2rem 0;
+        font-family: 'SF Mono', 'Consolas', monospace;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+      
+      /* Footer */
+      .site-footer {
+        background: white;
+        padding: 4rem 0;
+        text-align: center;
+        color: var(--color-muted);
+        border-top: 1px solid #f1f5f9;
+      }
+      
+      .footer-content {
+        max-width: 640px;
+        margin: 0 auto;
+      }
+      
+      .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin: 1.5rem 0;
+      }
+      
+      /* Responsive */
+      @media (max-width: 768px) {
+        .grid {
+          gap: 1.5rem;
+        }
+        
+        .card {
+          padding: 1.5rem;
+        }
+        
+        .nav-list {
+          gap: 0.75rem;
+        }
+        
+        .site-header {
+          padding: 4rem 0;
+        }
       }
     </style>
-    <script type="text/javascript" src="engine/utilities.js"></script>
-    <script type="text/javascript" src="engine/svg.js"></script>
-    <script type="text/javascript" src="engine/polyominos.js"></script>
-    <script type="text/javascript" src="engine/puzzle.js"></script>
-    <script type="text/javascript" src="engine/solve.js"></script>
-    <script type="text/javascript" src="engine/validate.js"></script>
-    <script type="text/javascript" src="engine/display2.js"></script>
-    <script type="text/javascript" src="engine/trace2.js"></script>
-    <script type="text/javascript" src="engine/serializer.js"></script>
-    <script type="text/javascript" src="engine/custom_mechanics.js"></script>
-    <!-- Add js-yaml library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    <!-- Add font awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
   <body>
-    <!-- Hidden elements required by the engine -->
-    <input type="hidden" id="sens" value="1.0">
-    <div class="container">
-      <h1><i class="fas fa-puzzle-piece"></i> Witness Puzzle Solver</h1>
-      
-      <div class="github-link">
-        <a href="https://github.com/lkaesberg/TheWitnessDatasetVisualizer" target="_blank" rel="noopener noreferrer">
-          <button class="github-button"><i class="fab fa-github"></i> View on GitHub</button>
-        </a>
-      </div>
-      
-      <div id="puzzle-info-compact" class="info-compact" style="display: none;"></div>
-      
-      <div class="stats-container" id="stats-container" style="display: none;">
-        <div class="stat-item">
-          <i class="fas fa-clock"></i>
-          <span id="timer">00:00</span>
-        </div>
-        <div class="stat-item">
-          <i class="fas fa-redo-alt"></i>
-          <span id="attempts-counter">0</span> attempts
-        </div>
-        <div class="stat-item solved-indicator" style="display: none;" id="solved-indicator">
-          <i class="fas fa-check-circle"></i>
-          <span>Solved</span>
-        </div>
-        <div class="stat-item failed-indicator" style="display: none;" id="failed-indicator">
-          <i class="fas fa-times-circle"></i>
-          <span>Failed</span>
-        </div>
-      </div>
-      
-      <div class="input-section">
-        <div class="input-header">
-          <h3><i class="fas fa-code"></i> Puzzle Input</h3>
-          <button id="toggle-input" class="toggle-btn"><i class="fas fa-chevron-up"></i></button>
-        </div>
-        <div id="input-content">
-          <textarea id="puzzle-input" placeholder="Paste your puzzle JSON string here..."></textarea>
-          <div class="buttons">
-            <button id="load-puzzle"><i class="fas fa-play"></i> Load Puzzle</button>
-            <button id="clear-puzzle"><i class="fas fa-eraser"></i> Clear</button>
+    <!-- Header -->
+    <header class="site-header">
+      <div class="container">
+        <div class="header-content">
+          <h1>SPaRC</h1>
+          <p class="tagline">A Spatial Pathfinding Reasoning Corpus for grounding language models in spatial cognition</p>
+          <div class="authors">
+            Lars&nbsp;Benedikt&nbsp;Kaesberg,
+            Jan&nbsp;Philip&nbsp;Wahle,
+            Terry&nbsp;Ruas,
+            Bela&nbsp;Gipp<br />
+            <small>University of Göttingen, Germany</small>
+          </div>
+          <div>
+            <a href="#dataset" class="btn">Get the Dataset</a>
+            <a href="https://github.com/lkaesberg/SPaRC" class="btn btn-accent">View on GitHub</a>
           </div>
         </div>
       </div>
-      
-      <div id="status-messages">
-        <div class="loader" id="loading-indicator"></div>
-        <div id="error-message" class="error-message"></div>
-        <div id="success-message" class="success-message"></div>
-      </div>
-      
-      <div id="puzzle-container" style="display: none;">
-        <svg id="puzzle" xmlns="http://www.w3.org/2000/svg"></svg>
-      </div>
-      
-      <div class="solution-controls" id="solution-controls" style="display: none;">
-        <button id="show-solution"><i class="fas fa-lightbulb"></i> Show Solution</button>
-        <button id="next-solution" style="display: none;"><i class="fas fa-forward"></i> Next Solution</button>
-        <div class="solution-counter" id="solution-counter"></div>
+    </header>
+
+    <!-- Navigation -->
+    <div class="nav-container">
+      <div class="container">
+        <nav class="main-nav">
+          <ul class="nav-list">
+            <li class="nav-item"><a href="#overview" class="nav-link">Overview</a></li>
+            <li class="nav-item"><a href="#key-features" class="nav-link">Key Features</a></li>
+            <li class="nav-item"><a href="#example" class="nav-link">Example</a></li>
+            <li class="nav-item"><a href="#dataset" class="nav-link">Dataset</a></li>
+            <li class="nav-item"><a href="#results" class="nav-link">Results</a></li>
+            <li class="nav-item"><a href="#leaderboard" class="nav-link">Leaderboard</a></li>
+            <li class="nav-item"><a href="#tools" class="nav-link">Tools</a></li>
+            <li class="nav-item"><a href="#citation" class="nav-link">Citation</a></li>
+            <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
+          </ul>
+        </nav>
       </div>
     </div>
-    
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // Sample puzzle for testing
-        const samplePuzzle = {"difficulty_level":5,"difficulty_score":5.8,"grid_size":{"height":2,"width":3},"id":"176d1e37ebbacac0","polyshapes":{"16":"·█··\n····\n····\n····"},"puzzle_array":[["+","+","+","+","+",".","+"],["S","N","+","P-R-16","+","o-B","+"],["+","+","+","+","+","+","+"],["+","N","+","N","+","o-B","+"],["+","+","E","+","+","+","+"]],"solution_count":1,"solutions":[{"index":0,"path":[{"x":0,"y":1},{"x":0,"y":0},{"x":1,"y":0},{"x":2,"y":0},{"x":2,"y":1},{"x":2,"y":2},{"x":3,"y":2},{"x":4,"y":2},{"x":4,"y":1},{"x":4,"y":0},{"x":5,"y":0},{"x":6,"y":0},{"x":6,"y":1},{"x":6,"y":2},{"x":6,"y":3},{"x":6,"y":4},{"x":5,"y":4},{"x":4,"y":4},{"x":3,"y":4},{"x":2,"y":4}],"pathLength":20}],"text_visualization":"puzzle:\n  dimensions:\n    width: 3\n    height: 2\n  start:\n    x: 0\n    y: 1\n  end:\n    x: 2\n    y: 4\n  cells:\n    - position:\n        x: 3\n        y: 1\n      properties:\n        type: \"poly\"\n        polyshape: 16\n        color: \"red\"\n    - position:\n        x: 5\n        y: 0\n      properties:\n        dot: 1\n        color: \"black\"\n    - position:\n        x: 5\n        y: 1\n      properties:\n        type: \"square\"\n        color: \"blue\"\n    - position:\n        x: 5\n        y: 3\n      properties:\n        type: \"square\"\n        color: \"blue\"\n"};
-        
-        let currentPuzzle = null;
-        let currentSolutionIndex = 0;
-        let timerInterval = null;
-        let startTime = null;
-        let attemptCount = 0;
-        let puzzleSolved = false;
-        let puzzleFailed = false;
-        
-        // Store the original PLAY_SOUND function once
-        const originalPlaySound = window.PLAY_SOUND;
-        
-        const puzzleInput = document.getElementById('puzzle-input');
-        const loadPuzzleBtn = document.getElementById('load-puzzle');
-        const clearPuzzleBtn = document.getElementById('clear-puzzle');
-        const showSolutionBtn = document.getElementById('show-solution');
-        const nextSolutionBtn = document.getElementById('next-solution');
-        const solutionControls = document.getElementById('solution-controls');
-        const solutionCounter = document.getElementById('solution-counter');
-        const puzzleInfoCompact = document.getElementById('puzzle-info-compact');
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const errorMessage = document.getElementById('error-message');
-        const successMessage = document.getElementById('success-message');
-        const toggleInputBtn = document.getElementById('toggle-input');
-        const inputContent = document.getElementById('input-content');
-        const timerElement = document.getElementById('timer');
-        const attemptsCounter = document.getElementById('attempts-counter');
-        const statsContainer = document.getElementById('stats-container');
-        const solvedIndicator = document.getElementById('solved-indicator');
-        const failedIndicator = document.getElementById('failed-indicator');
-        
-        // Set sample puzzle in textarea
-        puzzleInput.value = JSON.stringify(samplePuzzle, null, 2);
-        
-        // Timer functions
-        function startTimer() {
-          // Don't restart if already solved
-          if (puzzleSolved) return;
-          
-          // Reset timer
-          stopTimer();
-          startTime = Date.now();
-          updateTimer();
-          
-          timerInterval = setInterval(updateTimer, 1000);
-        }
-        
-        function stopTimer() {
-          if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-          }
-        }
-        
-        function updateTimer() {
-          if (!startTime) return;
-          
-          const elapsedTime = Date.now() - startTime;
-          const seconds = Math.floor((elapsedTime / 1000) % 60);
-          const minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
-          const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
-          
-          if (hours > 0) {
-            timerElement.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-          } else {
-            timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-          }
-        }
-        
-        // Reset attempts counter
-        function resetAttempts() {
-          // Don't reset if already solved
-          if (puzzleSolved) return;
-          
-          attemptCount = 0;
-          attemptsCounter.textContent = attemptCount;
-        }
-        
-        // Increment attempts counter
-        function incrementAttempts() {
-          // Don't increment if already solved
-          if (puzzleSolved) return;
-          
-          attemptCount++;
-          attemptsCounter.textContent = attemptCount;
-        }
-        
-        // Mark puzzle as solved
-        function markAsSolved() {
-          if (puzzleSolved) return;
-          
-          puzzleSolved = true;
-          
-          // If the puzzle was previously marked as failed (solution was shown),
-          // maintain the failed state instead of showing solved
-          if (!puzzleFailed) {
-            solvedIndicator.style.display = 'flex';
-          }
-          
-          stopTimer();
-        }
-        
-        // Mark puzzle as failed (when solution is shown)
-        function markAsFailed() {
-          puzzleFailed = true;
-          failedIndicator.style.display = 'flex';
-          
-          // Hide solved indicator if it's showing
-          solvedIndicator.style.display = 'none';
-        }
-        
-        // Reset solved state
-        function resetSolvedState() {
-          puzzleSolved = false;
-          puzzleFailed = false;
-          solvedIndicator.style.display = 'none';
-          failedIndicator.style.display = 'none';
-        }
-        
-        // Toggle input section
-        toggleInputBtn.addEventListener('click', function() {
-          inputContent.classList.toggle('collapsed');
-          const icon = toggleInputBtn.querySelector('i');
-          if (inputContent.classList.contains('collapsed')) {
-            icon.classList.remove('fa-chevron-up');
-            icon.classList.add('fa-chevron-down');
-          } else {
-            icon.classList.remove('fa-chevron-down');
-            icon.classList.add('fa-chevron-up');
-          }
-        });
-        
-        // Helper function to show/hide loading
-        function setLoading(isLoading) {
-          loadingIndicator.style.display = isLoading ? 'block' : 'none';
-          loadPuzzleBtn.disabled = isLoading;
-          clearPuzzleBtn.disabled = isLoading;
-          showSolutionBtn.disabled = isLoading;
-          nextSolutionBtn.disabled = isLoading;
-        }
-        
-        // Helper function to show messages
-        function showMessage(type, message) {
-          if (type === 'error') {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-            successMessage.style.display = 'none';
-            setTimeout(() => {
-              errorMessage.style.display = 'none';
-            }, 5000);
-          } else {
-            successMessage.textContent = message;
-            successMessage.style.display = 'block';
-            errorMessage.style.display = 'none';
-            setTimeout(() => {
-              successMessage.style.display = 'none';
-            }, 5000);
-          }
-        }
-        
-        // Load puzzle from JSON
-        loadPuzzleBtn.addEventListener('click', function() {
-          setLoading(true);
-          errorMessage.style.display = 'none';
-          successMessage.style.display = 'none';
-          
-          try {
-            const inputText = puzzleInput.value.trim();
-            if (!inputText) {
-              setLoading(false);
-              showMessage('error', 'Please enter a puzzle JSON string');
-              return;
-            }
-            
-            const puzzleData = JSON.parse(inputText);
-            createPuzzleFromData(puzzleData);
-            solutionControls.style.display = 'flex';
-            showMessage('success', 'Puzzle loaded successfully!');
-            
-            // Reset solution index
-            currentSolutionIndex = 0;
-            updateSolutionCounter();
-            
-            // Reset solved state
-            resetSolvedState();
-            
-            // Show all puzzle-related containers
-            statsContainer.style.display = 'flex';
-            puzzleInfoCompact.style.display = 'flex';
-            document.getElementById('puzzle-container').style.display = 'flex';
-            
-            // Start timer and reset attempts
-            startTimer();
-            resetAttempts();
-            
-            // Collapse input section after loading
-            inputContent.classList.add('collapsed');
-            const icon = toggleInputBtn.querySelector('i');
-            icon.classList.remove('fa-chevron-up');
-            icon.classList.add('fa-chevron-down');
-            
-            setLoading(false);
-          } catch (error) {
-            console.error('Error parsing puzzle:', error);
-            showMessage('error', 'Error loading puzzle: ' + error.message);
-            setLoading(false);
-          }
-        });
-        
-        // Clear the puzzle and input
-        clearPuzzleBtn.addEventListener('click', function() {
-          const svg = document.getElementById('puzzle');
-          while (svg.firstChild) svg.removeChild(svg.firstChild);
-          currentPuzzle = null;
-          puzzleInput.value = '';
-          puzzleInfoCompact.innerHTML = '';
-          solutionControls.style.display = 'none';
-          nextSolutionBtn.style.display = 'none';
-          errorMessage.style.display = 'none';
-          successMessage.style.display = 'none';
-          
-          // Hide all puzzle-related containers
-          statsContainer.style.display = 'none';
-          puzzleInfoCompact.style.display = 'none';
-          document.getElementById('puzzle-container').style.display = 'none';
-          
-          // Stop timer and reset attempts
-          stopTimer();
-          timerElement.textContent = '00:00';
-          resetAttempts();
-          
-          // Reset solved state
-          resetSolvedState();
-          
-          // Reset sound handler to original
-          window.PLAY_SOUND = originalPlaySound;
-          window.TRACE_COMPLETION_FUNC = null;
-          
-          showMessage('success', 'Cleared!');
-        });
-        
-        // Show solution
-        showSolutionBtn.addEventListener('click', function() {
-          setLoading(true);
-          
-          // Only mark as failed and stop timer if the puzzle wasn't already solved
-          if (!puzzleSolved) {
-            stopTimer();
-            
-            // Mark this as giving up on the current attempt - permanently mark as failed
-            markAsFailed();
-            showMessage('error', 'Using solution - attempt failed!');
-          } else {
-            // If the puzzle was already solved, it's okay to show the solution
-            showMessage('success', 'Showing solution for solved puzzle');
-          }
-          
-          if (currentPuzzle && currentPuzzle.solutions && currentPuzzle.solutions.length > 0) {
-            displaySolution(currentPuzzle, currentSolutionIndex);
-            
-            // Show next solution button if there are multiple solutions
-            if (currentPuzzle.solutions.length > 1) {
-              nextSolutionBtn.style.display = 'block';
-              updateSolutionCounter();
-            }
-          } else {
-            showMessage('error', 'No solutions available for this puzzle');
-          }
-          setLoading(false);
-        });
-        
-        // Next solution
-        nextSolutionBtn.addEventListener('click', function() {
-          if (!currentPuzzle || !currentPuzzle.solutions || currentPuzzle.solutions.length <= 1) return;
-          
-          currentSolutionIndex = (currentSolutionIndex + 1) % currentPuzzle.solutions.length;
-          displaySolution(currentPuzzle, currentSolutionIndex);
-          updateSolutionCounter();
-        });
-        
-        // Update solution counter
-        function updateSolutionCounter() {
-          if (currentPuzzle && currentPuzzle.solutions && currentPuzzle.solutions.length > 0) {
-            solutionCounter.textContent = `Solution ${currentSolutionIndex + 1} of ${currentPuzzle.solutions.length}`;
-          }
-        }
-        
-        // Create puzzle from the input data
-        function createPuzzleFromData(puzzleData) {
-          try {
-            // Store the whole puzzle data for solution display
-            currentPuzzle = puzzleData;
-            
-            // Clear previous puzzle if there was one
-            const svg = document.getElementById('puzzle');
-            while (svg.firstChild) svg.removeChild(svg.firstChild);
-            
-            // Extract dimensions and create puzzle
-            const width = puzzleData.grid_size.width;
-            const height = puzzleData.grid_size.height;
-            const puzzle = new Puzzle(width, height);
-            
-            // Parse YAML from text_visualization using js-yaml
-            const yamlData = jsyaml.load(puzzleData.text_visualization);
-            
-            // Set start point
-            const startX = yamlData.puzzle.start.x;
-            const startY = yamlData.puzzle.start.y;
-            puzzle.grid[startX][startY].start = true;
-            
-            // Set end point
-            const endX = yamlData.puzzle.end.x;
-            const endY = yamlData.puzzle.end.y;
-            
-            // Determine end direction based on position
-            let endDirection;
-            if (endX === 0) {
-              endDirection = "left";
-            } else if (endX === width * 2) {
-              endDirection = "right";
-            } else if (endY === 0) {
-              endDirection = "top";
-            } else if (endY === height * 2) {
-              endDirection = "bottom";
-            } else {
-              // Default fallback if not on an edge
-              endDirection = "left";
-            }
-            
-            puzzle.grid[endX][endY].end = endDirection;
-            
-            // Add puzzle elements
-            if (yamlData.puzzle.cells) {
-              yamlData.puzzle.cells.forEach(cell => {
-                const x = cell.position.x;
-                const y = cell.position.y;
-                
-                if (x >= 0 && y >= 0 && x < puzzle.width && y < puzzle.height) {
-                  if (cell.properties.type === 'poly' || cell.properties.type === 'ylop') {
-                    const polyId = cell.properties.polyshape;
-                    const polyshape = puzzleData.polyshapes[polyId];
-                    
-                    // Parse the ASCII polyshape into a numeric value
-                    let polyValue = 0;
-                    if (polyshape && typeof polyshape === 'string') {
-                      const rows = polyshape.split('\n');
-                      for (let y = 0; y < rows.length; y++) {
-                        for (let x = 0; x < rows[y].length; x++) {
-                          if (rows[x][y] === '█') {
-                            // Set the bit for this position in the polyomino
-                            polyValue |= (1 << (y * 4 + x));
-                          }
-                        }
-                      }
-                    }
-                    
-                    puzzle.grid[x][y] = {
-                      type: cell.properties.type,
-                      polyshape: polyValue || polyId, // Use parsed value or fall back to ID
-                      color: cell.properties.color
-                    };
-                  } else if (cell.properties.type === 'square') {
-                    puzzle.grid[x][y] = {
-                      type: 'square',
-                      color: cell.properties.color
-                    };
-                  } else if (cell.properties.type === 'star') {
-                    puzzle.grid[x][y] = {
-                      type: 'star',
-                      color: cell.properties.color
-                    };
-                  } else if (cell.properties.type === 'triangle') {
-                    puzzle.grid[x][y] = {
-                      type: 'triangle',
-                      color: cell.properties.color,
-                      count: cell.properties.count
-                    };
-                  } else if (cell.properties.type === 'nega') {
-                    puzzle.grid[x][y] = {
-                      type: 'nega',
-                      color: cell.properties.color
-                    };
-                  } else if (cell.properties.dot) {
-                    puzzle.grid[x][y] = {
-                      dot: window.DOT_BLACK,
-                      type: 'line',
-                      line: 0
-                    };
-                  } else if (cell.properties.gap) {
-                    puzzle.grid[x][y] = {
-                      gap: 1,
-                      type: 'line',
-                      line: 0
-                    };
-                  }
-                }
-              });
-            }
-            
-            // Reset the callbacks for the new puzzle
-            setupPuzzleCallbacks();
-            
-            // Draw the puzzle
-            window.draw(puzzle);
-            
-            // Ensure cursorPos element exists in the SVG
-            const cursorPosElement = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-            cursorPosElement.id = "cursorPos";
-            svg.appendChild(cursorPosElement);
-            
-            // Display compact puzzle info
-            puzzleInfoCompact.innerHTML = `
-              <div class="info-item">
-                <span class="info-label"><i class="fas fa-puzzle-piece"></i> Dimensions:</span>
-                <span>${width}x${height}</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label"><i class="fas fa-star"></i> Difficulty:</span>
-                <span>${puzzleData.difficulty_level} (${puzzleData.difficulty_score.toFixed(1)})</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label"><i class="fas fa-hashtag"></i> ID:</span>
-                <span>${puzzleData.id}</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label"><i class="fas fa-list-ol"></i> Solutions:</span>
-                <span>${puzzleData.solution_count}</span>
-              </div>
-            `;
-          } catch (error) {
-            console.error('Error creating puzzle:', error);
-            showMessage('error', 'Error creating puzzle: ' + error.message);
-          }
-        }
-        
-        // Setup callbacks for puzzle completion and sound handling
-        function setupPuzzleCallbacks() {
-          // Set up callback for correct solutions
-          window.TRACE_COMPLETION_FUNC = function(puzzle, path) {
-            // This is called when a puzzle is solved correctly
-            console.log('Puzzle solved correctly!');
-            
-            // Mark the puzzle as solved, but don't change failed state
-            markAsSolved();
-            
-            // Only show the success message if the puzzle wasn't previously failed
-            if (!puzzleFailed) {
-              showMessage('success', 'Puzzle solved correctly!');
-            } else {
-              // If the puzzle was already marked as failed, still acknowledge
-              // but remind that it's still considered failed
-              showMessage('error', 'Puzzle solved, but marked as failed due to using solution!');
-            }
-          };
-          
-          // Override the sound function to capture solution attempts
-          window.PLAY_SOUND = function(soundType) {
-            // Call the original function if it exists
-            if (originalPlaySound) originalPlaySound(soundType);
-            
-            // Track attempts based on sound type
-            if (soundType === 'fail') {
-              // Increment attempts counter on failed attempts
-              incrementAttempts();
-              console.log('Incorrect solution attempt');
-            }
-          };
-        }
-        
-        // Display a solution on the puzzle
-        function displaySolution(puzzleData, solutionIndex) {
-          if (!puzzleData.solutions || puzzleData.solutions.length === 0) return;
-          
-          // Remove previous solution if it exists
-          const existingSolution = document.getElementById('solution-path');
-          if (existingSolution) {
-            existingSolution.remove();
-          }
-          
-          const solution = puzzleData.solutions[solutionIndex];
-          const path = solution.path;
-          const pathLength = path.length;
-          
-          // Draw the solution path on the puzzle
-          const svg = document.getElementById('puzzle');
-          const solutionGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-          solutionGroup.setAttribute("id", "solution-path");
-          
-          // For very long paths, use line segments instead of a single path
-          if (pathLength > 40) {
-            renderSegmentedPath(solutionGroup, path);
-          } else {
-            renderAnimatedPath(solutionGroup, path);
-          }
-          
-          svg.appendChild(solutionGroup);
-          
-          // Log path info for debugging
-          console.log(`Path length: ${pathLength} points`);
-        }
-        
-        // Render path as individual line segments for very long paths
-        function renderSegmentedPath(group, path) {
-          for (let i = 0; i < path.length - 1; i++) {
-            const startX = path[i].x * 41 + 52;
-            const startY = path[i].y * 41 + 52;
-            const endX = path[i + 1].x * 41 + 52;
-            const endY = path[i + 1].y * 41 + 52;
-            
-            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            line.setAttribute("x1", startX);
-            line.setAttribute("y1", startY);
-            line.setAttribute("x2", endX);
-            line.setAttribute("y2", endY);
-            line.setAttribute("stroke", "#38b000");
-            line.setAttribute("stroke-width", "8");
-            line.setAttribute("stroke-linecap", "round");
-            line.setAttribute("stroke-linejoin", "round");
-            
-            // Add delay to create sequential appearance effect
-            line.style.animation = `fadeIn 0.05s ${i * 0.03}s both`;
-            line.style.opacity = "0";
-            
-            group.appendChild(line);
-          }
-        }
-        
-        // Render path as a single animated SVG path for normal-length paths
-        function renderAnimatedPath(group, path) {
-          // Create a path element for the solution
-          const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          
-          // Build path data
-          let pathData = "";
-          let totalLength = 0;
-          let prevX = null, prevY = null;
-          
-          path.forEach((point, index) => {
-            const x = point.x * 41 + 52;
-            const y = point.y * 41 + 52;
-            
-            if (index === 0) {
-              pathData += `M ${x} ${y} `;
-            } else {
-              pathData += `L ${x} ${y} `;
-              // Calculate distance for better dash array sizing
-              const dx = x - prevX;
-              const dy = y - prevY;
-              totalLength += Math.sqrt(dx * dx + dy * dy);
-            }
-            
-            prevX = x;
-            prevY = y;
-          });
-          
-          pathElement.setAttribute("d", pathData);
-          pathElement.setAttribute("stroke", "#38b000");
-          pathElement.setAttribute("stroke-width", "8");
-          pathElement.setAttribute("fill", "none");
-          pathElement.setAttribute("stroke-linecap", "round");
-          pathElement.setAttribute("stroke-linejoin", "round");
-          
-          // Adjust animation for longer paths
-          if (path.length > 20) {
-            const dashArrayValue = Math.max(5000, totalLength * 1.5);
-            pathElement.style.strokeDasharray = dashArrayValue;
-            pathElement.style.animation = `drawLine ${Math.min(3, path.length / 10)}s ease-in-out forwards`;
-          }
-          
-          group.appendChild(pathElement);
-        }
-      });
-    </script>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container">
+        <!-- Hero Grid -->
+        <div class="hero-grid">
+          <div class="visual-card">
+            <span class="placeholder-text">Grid Visualization</span>
+          </div>
+          <div class="visual-card">
+            <span class="placeholder-text">Path Planning Example</span>
+          </div>
+          <div class="visual-card">
+            <span class="placeholder-text">Model Performance Comparison</span>
+          </div>
+        </div>
+
+        <!-- Key Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">1,000</div>
+            <div class="stat-label">Unique Puzzles</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">98%</div>
+            <div class="stat-label">Human Success Rate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">41%</div>
+            <div class="stat-label">Best AI Performance</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">15+</div>
+            <div class="stat-label">Steps Per Solution</div>
+          </div>
+        </div>
+
+        <!-- Overview Section -->
+        <section id="overview" class="section">
+          <div class="section-header">
+            <h2 class="section-title">Overview</h2>
+          </div>
+          <p>
+            Existing multi‑step reasoning benchmarks often conflate symbolic tasks
+            with surface‑level linguistic pattern matching, leaving fundamental
+            spatial reasoning abilities under‑explored. We introduce <strong>SPaRC</strong>, a
+            corpus of 1,000 two‑dimensional grid puzzles that require joint
+            <em>path‑planning</em>, <em>rule satisfaction</em>, and <em>numeric‑geometric
+            arithmetic</em>. Humans solve 98% of puzzles in &lt; 20 seconds on
+            average, whereas state‑of‑the‑art language‑vision models achieve only
+            17–41% accuracy—underscoring a significant reasoning gap.
+          </p>
+        </section>
+
+        <!-- Key Features Section -->
+        <section id="key-features" class="section">
+          <div class="section-header">
+            <h2 class="section-title">Key Features</h2>
+          </div>
+          <div class="features-grid">
+            <div class="feature-card">
+              <h3>Grounded Spatial Reasoning</h3>
+              <p>Puzzles combine symbolic clues with geometric constraints for true spatial reasoning challenges.</p>
+            </div>
+            <div class="feature-card">
+              <h3>Long‑Horizon Planning</h3>
+              <p>Typical solutions require 15 or more sequential steps, testing genuine planning capabilities.</p>
+            </div>
+            <div class="feature-card">
+              <h3>Rule Diversity</h3>
+              <p>Includes arithmetic, region membership, obstacle negotiation, parity rules and other constraints.</p>
+            </div>
+            <div class="feature-card">
+              <h3>Human‑Verifiable</h3>
+              <p>Each puzzle has a single gold solution grid and natural‑language rationale for verification.</p>
+            </div>
+            <div class="feature-card">
+              <h3>Open &amp; Extensible</h3>
+              <p>Released under CC‑BY‑4.0 with generation scripts to synthesize new puzzles for research.</p>
+            </div>
+            <div class="feature-card">
+              <h3>Reproducible Evaluation</h3>
+              <p>Standardized evaluation harness facilitates fair comparison between different approaches.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Example Section -->
+        <section id="example" class="section">
+          <div class="section-header">
+            <h2 class="section-title">Example Puzzle</h2>
+          </div>
+          <div class="card">
+            <div class="visual-card" style="max-width: 500px; margin: 0 auto 2rem;">
+              <span class="placeholder-text">Example puzzle visualization</span>
+            </div>
+            <h3>Puzzle Description:</h3>
+            <p>
+              <em>"Start at cell (2, 2). Move north until you reach a gray cell. Then proceed east exactly three steps, avoiding obstacles. Finally, reach any border cell divisible by 2."</em>
+            </p>
+            <h3>Solution Path:</h3>
+            <p>
+              <em>A valid solution requires carefully following the natural language instructions while respecting grid constraints and mathematical properties of cells.</em>
+            </p>
+          </div>
+        </section>
+
+        <!-- Dataset Section -->
+        <section id="dataset" class="section">
+          <div class="section-header">
+            <h2 class="section-title">Dataset</h2>
+          </div>
+          <p>
+            The SPaRC dataset is openly hosted on HuggingFace with a detailed <code>dataset_card</code>,
+            structured in <code>train</code>, <code>validation</code>, and <code>test</code> splits with corresponding rationales.
+          </p>
+          <div class="card">
+            <h3>Download Options</h3>
+            <p>
+              <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" class="btn">HuggingFace Dataset</a>
+              <a href="/sparc_dataset_v1.zip" class="btn btn-accent">Direct Download (4.2 MB)</a>
+            </p>
+            <div class="code-block">pip install datasets
+from datasets import load_dataset
+
+dataset = load_dataset("lkaesberg/SPaRC", split="test")
+print(dataset[0]["puzzle"])
+print(dataset[0]["rationale"])</div>
+          </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results" class="section">
+          <div class="section-header">
+            <h2 class="section-title">Results</h2>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Parameters</th>
+                  <th>Modality</th>
+                  <th>Accuracy</th>
+                  <th>Avg. Steps</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>LLama‑3‑8B&nbsp;+ CoT‑GPT‑4</td>
+                  <td>8B</td>
+                  <td>Text‑only</td>
+                  <td>41.2%</td>
+                  <td>34.7</td>
+                </tr>
+                <tr>
+                  <td>GPT‑4o‑Vision</td>
+                  <td>—</td>
+                  <td>Vision + Text</td>
+                  <td>39.8%</td>
+                  <td>28.3</td>
+                </tr>
+                <tr>
+                  <td>ReAct + Search</td>
+                  <td>13B</td>
+                  <td>Text‑only</td>
+                  <td>24.5%</td>
+                  <td>42.1</td>
+                </tr>
+                <tr>
+                  <td><strong>Human</strong></td>
+                  <td>—</td>
+                  <td>Vision</td>
+                  <td><strong>97.9%</strong></td>
+                  <td>18.7</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Leaderboard Section -->
+        <section id="leaderboard" class="section">
+          <div class="section-header">
+            <h2 class="section-title">Leaderboard</h2>
+          </div>
+          <p>
+            Submit your model's <code>predictions.jsonl</code> to our leaderboard to compare with state-of-the-art approaches.
+          </p>
+          <div class="visual-card" style="height: 300px;">
+            <span class="placeholder-text">Leaderboard will appear here</span>
+          </div>
+          <div class="card" style="margin-top: 1.5rem; text-align: center;">
+            <a href="https://paperswithcode.com/sota/spatial-reasoning-on-sparc?p=spatial-pathfinding-reasoning-corpus" class="btn">View Current Leaderboard</a>
+          </div>
+        </section>
+
+        <!-- Tools Section -->
+        <section id="tools" class="section">
+          <div class="section-header">
+            <h2 class="section-title">Tools &amp; Resources</h2>
+          </div>
+          <div class="features-grid">
+            <div class="feature-card">
+              <h3>Puzzle Visualizer</h3>
+              <p>Step through any puzzle frame-by-frame with our interactive visualization tool.</p>
+              <a href="/visualizer.html" class="btn">Open Visualizer</a>
+            </div>
+            <div class="feature-card">
+              <h3>Annotation Interface</h3>
+              <p>Contribute to the project by labeling crowdsourced puzzle rationales.</p>
+              <a href="/annotate.html" class="btn">Start Annotating</a>
+            </div>
+            <div class="feature-card">
+              <h3>Live Playground</h3>
+              <p>Solve puzzles directly in your browser and compare with AI solutions.</p>
+              <a href="/playground.html" class="btn">Try Puzzles</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Citation Section -->
+        <section id="citation" class="section">
+          <div class="section-header">
+            <h2 class="section-title">Citation</h2>
+          </div>
+          <div class="citation-block">@inproceedings{kaesberg2025sparc,
+  title     = {SPaRC: A Spatial Pathfinding Reasoning Corpus},
+  author    = {Kaesberg, Lars Benedikt and Wahle, Jan Philip and Ruas, Terry and Gipp, Bela},
+  booktitle = {Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  year      = {2025},
+  url       = {https://huggingface.co/datasets/lkaesberg/SPaRC}
+}</div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section">
+          <div class="section-header">
+            <h2 class="section-title">Contact</h2>
+          </div>
+          <div class="card" style="text-align: center;">
+            <p>For questions, feedback, or collaboration opportunities:</p>
+            <p><a href="mailto:sparc@cs.uni-goettingen.de">sparc@cs.uni-goettingen.de</a></p>
+            <div style="margin-top: 2rem;">
+              <a href="https://github.com/lkaesberg/SPaRC" class="btn">GitHub Repository</a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-content">
+          <p>Released under <a href="https://creativecommons.org/licenses/by/4.0/">CC‑BY‑4.0</a> · © 2025 SPaRC Authors</p>
+          <div class="footer-links">
+            <a href="https://github.com/lkaesberg/SPaRC">GitHub</a>
+            <a href="https://huggingface.co/datasets/lkaesberg/SPaRC">HuggingFace</a>
+            <a href="https://paperswithcode.com/sota/spatial-reasoning-on-sparc">Papers With Code</a>
+          </div>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

@@ -77,10 +77,10 @@ window.settings = new Proxy({}, proxy.init())
 var relative = ''
 if (window.location.href.includes('/play/')) relative = '../'
 var tracks = {
-  'start':   new Audio(src = relative + 'data/panel_start_tracing.aac'),
-  'success': new Audio(src = relative + 'data/panel_success.aac'),
-  'fail':    new Audio(src = relative + 'data/panel_failure.aac'),
-  'abort':   new Audio(src = relative + 'data/panel_abort_tracing.aac'),
+  'start':   new Audio(src = relative + 'visualizer/data/panel_start_tracing.aac'),
+  'success': new Audio(src = relative + 'visualizer/data/panel_success.aac'),
+  'fail':    new Audio(src = relative + 'visualizer/data/panel_failure.aac'),
+  'abort':   new Audio(src = relative + 'visualizer/data/panel_abort_tracing.aac'),
 }
 
 var currentAudio = null
