@@ -1145,7 +1145,7 @@ pip install datasets
 from datasets import load_dataset
 
 # Login using e.g. `huggingface-cli login` to access this dataset
-ds = load_dataset("lkaesberg/SPaRC", "all")
+ds = load_dataset("lkaesberg/SPaRC", "all", split="test")
 
 # Access puzzle data
 puzzle = ds[0]
