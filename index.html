@@ -153,9 +153,33 @@
         position: relative;
         width: 100%;
         overflow: hidden;
-        padding: 6rem 0;
-        background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+        padding: 4rem 0;
+        background: linear-gradient(135deg, #6366f1 0%, #818cf8 40%, #a5b4fc 100%);
         color: white;
+      }
+      
+      @keyframes float {
+        0% { transform: translateY(0px) translateX(0px); }
+        50% { transform: translateY(-20px) translateX(10px); }
+        100% { transform: translateY(0px) translateX(0px); }
+      }
+      
+      @keyframes float-reverse {
+        0% { transform: translateY(0px) translateX(0px); }
+        50% { transform: translateY(20px) translateX(-10px); }
+        100% { transform: translateY(0px) translateX(0px); }
+      }
+      
+      @keyframes pulse {
+        0% { opacity: 0.5; }
+        50% { opacity: 0.8; }
+        100% { opacity: 0.5; }
+      }
+      
+      @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
       }
       
       .site-header::before {
@@ -165,7 +189,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2V6h4V4H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         z-index: 0;
       }
       
@@ -173,16 +197,229 @@
         position: relative;
         z-index: 1;
         text-align: center;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      
+      /* Particle animation - enhanced */
+      .particle-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 0;
+        opacity: 0.7;
+      }
+      
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        pointer-events: none;
+      }
+      
+      .particle-1 {
+        width: 400px;
+        height: 400px;
+        top: -100px;
+        right: -100px;
+        animation: float 15s ease-in-out infinite, pulse 8s ease-in-out infinite;
+      }
+      
+      .particle-2 {
+        width: 300px;
+        height: 300px;
+        bottom: -80px;
+        left: -80px;
+        animation: float-reverse 18s ease-in-out infinite, pulse 10s ease-in-out infinite;
+      }
+      
+      .particle-3 {
+        width: 200px;
+        height: 200px;
+        top: 40%;
+        right: 25%;
+        animation: float 12s ease-in-out infinite, pulse 6s ease-in-out infinite;
+      }
+      
+      /* Title styling */
+      .header-title {
+        margin: 0;
+        font-size: 4.5rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(to right, #ffffff, #e0e7ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      
+      .title-highlight {
+        position: relative;
+        display: inline-block;
+      }
+      
+      .title-highlight::after {
+        content: "";
+        position: absolute;
+        bottom: 0.1em;
+        left: 0;
+        width: 100%;
+        height: 0.15em;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
       }
       
       .tagline {
         font-size: 1.2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         font-weight: 300;
+        opacity: 0.95;
+        line-height: 1.5;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Header meta section - combines stats and authors */
+      .header-meta {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius);
+        backdrop-filter: blur(5px);
+      }
+      
+      .authors {
+        font-size: 0.9rem;
+        font-weight: 400;
         opacity: 0.9;
-        max-width: 640px;
-        margin-left: auto;
-        margin-right: auto;
+        line-height: 1.5;
+        text-align: left;
+        padding-left: 1.5rem;
+        border-left: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      .authors small {
+        display: block;
+        font-size: 0.8rem;
+        opacity: 0.8;
+      }
+      
+      /* Header stats */
+      .header-stats {
+        display: flex;
+        gap: 1.5rem;
+      }
+      
+      .header-stat {
+        text-align: center;
+      }
+      
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+        color: white;
+      }
+      
+      .stat-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      /* Header buttons */
+      .header-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+      }
+      
+      .header-btn {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.7rem 1.5rem;
+        font-weight: 500;
+        font-size: 1rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+      }
+      
+      .header-btn-primary {
+        background-color: white;
+        color: var(--color-primary);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+      
+      .header-btn-primary:hover {
+        box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+      }
+      
+      .header-btn-secondary {
+        background-color: rgba(255, 255, 255, 0.15);
+        color: white;
+        backdrop-filter: blur(5px);
+      }
+      
+      .header-btn-secondary:hover {
+        background-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+      }
+      
+      /* Responsive styles for header */
+      @media (max-width: 768px) {
+        .site-header {
+          padding: 2rem 0;
+        }
+        
+        .header-title {
+          font-size: 3.5rem;
+        }
+        
+        .tagline {
+          font-size: 1rem;
+        }
+        
+        .header-meta {
+          flex-direction: column;
+          gap: 1rem;
+        }
+        
+        .authors {
+          padding-left: 0;
+          border-left: none;
+          text-align: center;
+          padding-top: 1rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header-stats {
+        width: 100%;
+          justify-content: center;
+        }
+        
+        .stat-number {
+          font-size: 1.8rem;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .header-buttons {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
       }
       
       /* Navigation */
@@ -258,7 +495,7 @@
       /* Hero Grid */
       .hero-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(12, 1fr);
         gap: 1.5rem;
         margin-bottom: 3rem;
       }
@@ -284,7 +521,8 @@
       .visual-card img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
+        padding: 1rem;
       }
       
       .placeholder-text {
@@ -297,16 +535,20 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 1.5rem;
-        margin: 3rem 0;
+        margin: 1rem 0 4rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        padding: 2rem;
+        border-radius: var(--radius-lg);
       }
       
       .stat-card {
         text-align: center;
-        padding: 2rem;
         background: white;
         border-radius: var(--radius);
         box-shadow: var(--shadow-sm);
         transition: var(--transition);
+        padding: 2rem;
+        border-top: 4px solid var(--color-primary);
       }
       
       .stat-card:hover {
@@ -315,7 +557,7 @@
       }
       
       .stat-value {
-        font-size: 3rem;
+        font-size: 2.5rem;
         font-weight: 700;
         color: var(--color-primary);
         line-height: 1;
@@ -323,8 +565,9 @@
       }
       
       .stat-label {
-        color: var(--color-muted);
+        color: var(--color-text);
         font-weight: 500;
+        font-size: 1.1rem;
       }
       
       /* Feature Cards */
@@ -344,8 +587,8 @@
       }
       
       .feature-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow);
+        transform: translateY(-7px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
       }
       
       .feature-card h3 {
@@ -394,7 +637,26 @@
         margin: 1.5rem 0;
         font-family: 'SF Mono', 'Consolas', monospace;
         font-size: 0.9rem;
-        line-height: 1.5;
+        line-height: 1.6;
+        white-space: pre;
+        tab-size: 2;
+      }
+      
+      .code-block .comment {
+        color: #94a3b8;
+        font-style: italic;
+      }
+      
+      .code-block .keyword {
+        color: #c084fc;
+      }
+      
+      .code-block .string {
+        color: #4ade80;
+      }
+      
+      .code-block .function {
+        color: #60a5fa;
       }
       
       /* Citation */
@@ -431,22 +693,145 @@
         margin: 1.5rem 0;
       }
       
-      /* Responsive */
+      /* Results visualization */
+      .results-visual img {
+        max-width: 100%;
+        height: auto;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+      }
+      
+      /* Tool visualization */
+      .tool-image {
+        width: 100%;
+        height: auto;
+        border-radius: var(--radius);
+        margin: 1rem 0;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+      }
+      
+      .tool-image:hover {
+        transform: scale(1.02);
+        box-shadow: var(--shadow);
+      }
+      
+      /* Add new hover styles */
+      .visual-card {
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      
+      .visual-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow);
+      }
+      
+      .card-overlay {
+        transition: opacity 0.3s ease;
+      }
+      
+      .visual-card:hover .card-overlay {
+        opacity: 1;
+      }
+      
+      .feature-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow);
+      }
+      
+      .btn {
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+      }
+      
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+      }
+      
+      /* Add image zoom effect on hover */
+      .feature-card .image-container {
+        overflow: hidden;
+      }
+      
+      .feature-card .image-container img {
+        transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+      
+      .feature-card:hover .image-container img {
+        transform: scale(1.05);
+      }
+      
+      /* Add gradient overlay on images */
+      .feature-card .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 40%);
+        pointer-events: none;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+      }
+      
+      .feature-card:hover .image-overlay {
+        opacity: 0.4;
+      }
+      
+      /* Responsive styles for hero grid */
+      @media (max-width: 1024px) {
+        .hero-grid {
+          grid-template-columns: repeat(6, 1fr);
+        }
+        
+        .hero-grid .visual-card:nth-child(1) {
+          grid-column: span 6;
+        }
+        
+        .hero-grid .visual-card:nth-child(2) {
+          grid-column: span 6;
+        }
+        
+        .hero-grid .visual-card:nth-child(3),
+        .hero-grid .visual-card:nth-child(4),
+        .hero-grid .visual-card:nth-child(5) {
+          grid-column: span 2;
+        }
+      }
+      
       @media (max-width: 768px) {
-        .grid {
-          gap: 1.5rem;
+        .hero-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
         }
         
-        .card {
-          padding: 1.5rem;
+        .hero-grid .visual-card:nth-child(1),
+        .hero-grid .visual-card:nth-child(2) {
+          grid-column: span 2;
         }
         
-        .nav-list {
-          gap: 0.75rem;
+        .hero-grid .visual-card:nth-child(3),
+        .hero-grid .visual-card:nth-child(4),
+        .hero-grid .visual-card:nth-child(5) {
+          grid-column: span 1;
         }
         
-        .site-header {
-          padding: 4rem 0;
+        .example-content {
+          grid-template-columns: 1fr;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .hero-grid .visual-card:nth-child(3),
+        .hero-grid .visual-card:nth-child(4),
+        .hero-grid .visual-card:nth-child(5) {
+          grid-column: span 2;
         }
       }
     </style>
@@ -454,22 +839,65 @@
   <body>
     <!-- Header -->
     <header class="site-header">
+      <div class="particle-container">
+        <div class="particle particle-1"></div>
+        <div class="particle particle-2"></div>
+        <div class="particle particle-3"></div>
+      </div>
       <div class="container">
         <div class="header-content">
-          <h1>SPaRC</h1>
-          <p class="tagline">A Spatial Pathfinding Reasoning Corpus for grounding language models in spatial cognition</p>
-          <div class="authors">
-            Lars&nbsp;Benedikt&nbsp;Kaesberg,
-            Jan&nbsp;Philip&nbsp;Wahle,
-            Terry&nbsp;Ruas,
-            Bela&nbsp;Gipp<br />
-            <small>University of Göttingen, Germany</small>
+          <h1 class="header-title" style="font-size: 5.5rem; margin-bottom: 1rem; position: relative; display: inline-block; background: linear-gradient(90deg, #ffffff, #e0e7ff, #ffffff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 6s ease infinite; text-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);">
+            <span class="title-highlight" style="position: relative; z-index: 2;">SPaRC</span>
+            <div style="position: absolute; bottom: 15px; left: 0; width: 100%; height: 10px; background: rgba(255, 255, 255, 0.2); border-radius: 5px; z-index: 1;"></div>
+          </h1>
+          <p class="tagline" style="font-size: 1.3rem; max-width: 700px; margin: 0 auto 2rem; line-height: 1.6; color: rgba(255, 255, 255, 0.95); text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); font-weight: 400;">
+            A Spatial Pathfinding and Reasoning Corpus for grounding language models in spatial cognition
+          </p>
+          
+          <div class="header-meta" style="display: flex; justify-content: center; align-items: center; gap: 2rem; margin-bottom: 2rem; padding: 1.5rem 2rem; background: rgba(255, 255, 255, 0.12); border-radius: var(--radius-lg); backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="header-stats" style="display: flex; gap: 2rem;">
+              <div class="header-stat" style="text-align: center; position: relative;">
+                <div class="stat-number" style="font-size: 2.5rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">1,000</div>
+                <div class="stat-label" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; opacity: 0.9;">Puzzles</div>
+              </div>
+              <div class="header-stat" style="text-align: center; position: relative;">
+                <div class="stat-number" style="font-size: 2.5rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">98%</div>
+                <div class="stat-label" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; opacity: 0.9;">Human Success</div>
+              </div>
+              <div class="header-stat" style="text-align: center; position: relative;">
+                <div class="stat-number" style="font-size: 2.5rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">15.8%</div>
+                <div class="stat-label" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; opacity: 0.9;">AI Success</div>
+              </div>
+            </div>
+            
+            <div class="authors" style="text-align: left; padding-left: 2rem; border-left: 1px solid rgba(255, 255, 255, 0.2); line-height: 1.7; font-size: 0.95rem;">
+              <div style="font-weight: 500; margin-bottom: 0.2rem; color: rgba(255, 255, 255, 0.95);">
+                Lars&nbsp;Benedikt&nbsp;Kaesberg,
+                Jan&nbsp;Philip&nbsp;Wahle,
+                Terry&nbsp;Ruas,
+                Bela&nbsp;Gipp
+              </div>
+              <div style="font-size: 0.85rem; opacity: 0.8;">University of Göttingen, Germany</div>
+            </div>
           </div>
-          <div>
-            <a href="#dataset" class="btn">Get the Dataset</a>
-            <a href="https://github.com/lkaesberg/SPaRC" class="btn btn-accent">View on GitHub</a>
+          
+          <div class="header-buttons" style="display: flex; gap: 1.2rem; justify-content: center;">
+            <a href="#dataset" class="header-btn header-btn-primary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.9rem 2rem; font-weight: 600; font-size: 1rem; border-radius: 30px; transition: all 0.3s ease; background: #ffffff; color: var(--color-primary); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Get the Dataset
+            </a>
+            <a href="https://github.com/lkaesberg/SPaRC" class="header-btn header-btn-secondary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.9rem 2rem; font-weight: 600; font-size: 1rem; border-radius: 30px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.15); color: white; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.2);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+              View on GitHub
+            </a>
           </div>
         </div>
+      </div>
+      
+      <div style="position: absolute; bottom: -2px; left: 0; width: 100%; z-index: 1;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" fill="#ffffff" preserveAspectRatio="none" style="display: block; width: 100%; height: 70px;">
+          <path d="M0,32L80,42.7C160,53,320,75,480,75C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,100L1360,100C1280,100,1120,100,960,100C800,100,640,100,480,100C320,100,160,100,80,100L0,100Z"></path>
+        </svg>
       </div>
     </header>
 
@@ -482,7 +910,6 @@
             <li class="nav-item"><a href="#key-features" class="nav-link">Key Features</a></li>
             <li class="nav-item"><a href="#example" class="nav-link">Example</a></li>
             <li class="nav-item"><a href="#dataset" class="nav-link">Dataset</a></li>
-            <li class="nav-item"><a href="#results" class="nav-link">Results</a></li>
             <li class="nav-item"><a href="#leaderboard" class="nav-link">Leaderboard</a></li>
             <li class="nav-item"><a href="#tools" class="nav-link">Tools</a></li>
             <li class="nav-item"><a href="#citation" class="nav-link">Citation</a></li>
@@ -490,41 +917,76 @@
           </ul>
         </nav>
       </div>
-    </div>
+      </div>
 
     <!-- Main Content -->
     <main class="main-content">
       <div class="container">
         <!-- Hero Grid -->
-        <div class="hero-grid">
-          <div class="visual-card">
-            <span class="placeholder-text">Grid Visualization</span>
+        <div class="hero-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
+          <!-- Main visualization - keep this important image -->
+          <div style="grid-column: span 5; display: flex; flex-direction: column; box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden;">
+            <div class="visual-card" style="height: 360px; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; position: relative;">
+              <img src="graphics/images/teaser.png" alt="SPaRC Grid Visualization" style="width: 100%; height: 100%; object-fit: contain; background-color: #ffffff; padding: 1rem;" />
+            </div>
+            <div style="padding: 0.75rem; background: rgba(99, 102, 241, 0.95); color: white; font-weight: 500; text-align: center; border-radius: 0 0 var(--radius) var(--radius);">
+              Grid Format
+            </div>
           </div>
-          <div class="visual-card">
-            <span class="placeholder-text">Path Planning Example</span>
+          
+          <!-- Performance chart - keep this key visualization -->
+          <div style="grid-column: span 7; display: flex; flex-direction: column; box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden;">
+            <div class="visual-card" style="height: 360px; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; position: relative;">
+              <img src="graphics/figure2_solve_rates.png" alt="Model Performance Comparison" style="width: 100%; height: 100%; object-fit: contain; background-color: #ffffff; padding: 0.5rem;" />
+            </div>
+            <div style="padding: 0.75rem; background: rgba(16, 185, 129, 0.95); color: white; font-weight: 500; text-align: center; border-radius: 0 0 var(--radius) var(--radius);">
+              Performance
+            </div>
           </div>
-          <div class="visual-card">
-            <span class="placeholder-text">Model Performance Comparison</span>
+          
+          <!-- Remove the three smaller puzzle images from the second row, replace with text cards -->
+          <div class="feature-card" style="grid-column: span 4; background: #1e293b; color: white; border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid rgba(244, 63, 94, 0.85);">
+            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.75rem;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <h3 style="margin: 0;">Stars Puzzle</h3>
+            </div>
+            <p style="margin: 0;">Stars must be separated by different regions in valid solutions</p>
+          </div>
+          
+          <div class="feature-card" style="grid-column: span 4; background: #1e293b; color: white; border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid rgba(234, 179, 8, 0.85);">
+            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.75rem;"><path d="M3 20h18L12 3z"></path></svg>
+              <h3 style="margin: 0;">Triangles Puzzle</h3>
+            </div>
+            <p style="margin: 0;">Triangles indicate number of elements must match in their region</p>
+          </div>
+          
+          <div class="feature-card" style="grid-column: span 4; background: #1e293b; color: white; border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid rgba(79, 70, 229, 0.85);">
+            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.75rem;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+              <h3 style="margin: 0;">Dots Puzzle</h3>
+            </div>
+            <p style="margin: 0;">Dots must be covered by a path exactly once to solve the puzzle</p>
           </div>
         </div>
 
         <!-- Key Stats -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-value">1,000</div>
-            <div class="stat-label">Unique Puzzles</div>
+        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin: 1rem 0 4rem; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 2rem; border-radius: var(--radius-lg);">
+          <div class="stat-card" style="text-align: center; background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: var(--transition); padding: 2rem; border-top: 4px solid var(--color-primary);">
+            <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-primary); line-height: 1; margin-bottom: 0.5rem;">1,000</div>
+            <div style="color: var(--color-text); font-weight: 500; font-size: 1.1rem;">Unique Puzzles</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-value">98%</div>
-            <div class="stat-label">Human Success Rate</div>
+          <div class="stat-card" style="text-align: center; background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: var(--transition); padding: 2rem; border-top: 4px solid #10b981;">
+            <div style="font-size: 2.5rem; font-weight: 700; color: #10b981; line-height: 1; margin-bottom: 0.5rem;">98%</div>
+            <div style="color: var(--color-text); font-weight: 500; font-size: 1.1rem;">Human Success Rate</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-value">41%</div>
-            <div class="stat-label">Best AI Performance</div>
+          <div class="stat-card" style="text-align: center; background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: var(--transition); padding: 2rem; border-top: 4px solid var(--color-accent);">
+            <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-accent); line-height: 1; margin-bottom: 0.5rem;">15.8%</div>
+            <div style="color: var(--color-text); font-weight: 500; font-size: 1.1rem;">Best AI Performance</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-value">15+</div>
-            <div class="stat-label">Steps Per Solution</div>
+          <div class="stat-card" style="text-align: center; background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: var(--transition); padding: 2rem; border-top: 4px solid #7c3aed;">
+            <div style="font-size: 2.5rem; font-weight: 700; color: #7c3aed; line-height: 1; margin-bottom: 0.5rem;">15+</div>
+            <div style="color: var(--color-text); font-weight: 500; font-size: 1.1rem;">Steps Per Solution</div>
           </div>
         </div>
 
@@ -533,17 +995,17 @@
           <div class="section-header">
             <h2 class="section-title">Overview</h2>
           </div>
-          <p>
-            Existing multi‑step reasoning benchmarks often conflate symbolic tasks
-            with surface‑level linguistic pattern matching, leaving fundamental
-            spatial reasoning abilities under‑explored. We introduce <strong>SPaRC</strong>, a
-            corpus of 1,000 two‑dimensional grid puzzles that require joint
-            <em>path‑planning</em>, <em>rule satisfaction</em>, and <em>numeric‑geometric
+        <p>
+          Existing multi‑step reasoning benchmarks often conflate symbolic tasks
+          with surface‑level linguistic pattern matching, leaving fundamental
+          spatial reasoning abilities under‑explored. We introduce <strong>SPaRC</strong>, a
+          corpus of 1,000 two‑dimensional grid puzzles that require joint
+          <em>path‑planning</em>, <em>rule satisfaction</em>, and <em>numeric‑geometric
             arithmetic</em>. Humans solve 98% of puzzles in &lt; 20 seconds on
-            average, whereas state‑of‑the‑art language‑vision models achieve only
-            17–41% accuracy—underscoring a significant reasoning gap.
-          </p>
-        </section>
+          average, whereas state‑of‑the‑art language‑vision models achieve only
+            1–16% accuracy—underscoring a significant reasoning gap.
+        </p>
+      </section>
 
         <!-- Key Features Section -->
         <section id="key-features" class="section">
@@ -576,101 +1038,122 @@
               <p>Standardized evaluation harness facilitates fair comparison between different approaches.</p>
             </div>
           </div>
-        </section>
+      </section>
 
         <!-- Example Section -->
         <section id="example" class="section">
           <div class="section-header">
             <h2 class="section-title">Example Puzzle</h2>
           </div>
-          <div class="card">
-            <div class="visual-card" style="max-width: 500px; margin: 0 auto 2rem;">
-              <span class="placeholder-text">Example puzzle visualization</span>
+          <div class="card" style="background: linear-gradient(to bottom, #ffffff, #f8fafc); overflow: hidden; border: none; box-shadow: var(--shadow);">
+            <div class="example-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+              <div>
+                <h3 style="margin-top: 0; color: var(--color-primary);">Puzzle Description</h3>
+                <p style="font-style: italic; color: var(--color-text); margin-bottom: 2rem;">
+                  "Start at the marked position. Navigate through the grid while adhering to the rules defined by the colored elements. Find a valid path to the exit point while satisfying all constraints."
+                </p>
+                
+                <div style="margin-bottom: 2rem;">
+                  <div class="puzzle-controls" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                    <button id="show-solution-btn" class="btn btn-accent" style="display: flex; align-items: center; gap: 0.5rem;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
+                      Show Solution
+                    </button>
+                    <button id="randomize-puzzle-btn" class="btn" style="display: flex; align-items: center; gap: 0.5rem;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"></path></svg>
+                      Random Puzzle
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="puzzle-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; background: #f1f5f9; padding: 1.5rem; border-radius: var(--radius-sm);">
+                  <div class="stat-item">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); margin-bottom: 0.25rem;">Puzzle ID</div>
+                    <div id="puzzle-id" style="font-size: 1rem; font-weight: 600; font-family: 'SF Mono', monospace;"></div>
+                  </div>
+                  <div class="stat-item">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); margin-bottom: 0.25rem;">Difficulty</div>
+                    <div id="puzzle-difficulty" style="font-size: 1rem; font-weight: 600;"></div>
+                  </div>
+                  <div class="stat-item">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); margin-bottom: 0.25rem;">Grid Size</div>
+                    <div id="puzzle-grid-size" style="font-size: 1rem; font-weight: 600;"></div>
+                  </div>
+                  <div class="stat-item">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); margin-bottom: 0.25rem;">Solution Length</div>
+                    <div id="puzzle-path-length" style="font-size: 1rem; font-weight: 600;"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 10px 25px -5px rgba(17, 24, 39, 0.5); height: 100%;">
+                <!-- Glow effects -->
+                <div style="position: absolute; width: 300px; height: 300px; background: rgba(16, 185, 129, 0.05); border-radius: 50%; filter: blur(40px);"></div>
+                <div style="position: absolute; width: 250px; height: 250px; background: rgba(99, 102, 241, 0.05); border-radius: 50%; filter: blur(40px);"></div>
+                
+                <!-- Puzzle container with fixed dimensions -->
+                <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 350px;">
+                  <div id="puzzle-container" style="width: 350px; height: 350px; position: relative; display: flex; align-items: center; justify-content: center;">
+                    <svg id="puzzle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" style="width: 100%; height: 100%; filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));"></svg>
+                  </div>
+                </div>
+                
+                <!-- Information text -->
+                <div style="margin-top: 1.5rem; text-align: center; color: white; font-size: 0.9rem; width: 100%;">
+                  <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.1); padding: 0.5rem 1rem; border-radius: 20px; backdrop-filter: blur(5px);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
+                    <span>Click "Show Solution" to visualize the optimal path</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <h3>Puzzle Description:</h3>
-            <p>
-              <em>"Start at cell (2, 2). Move north until you reach a gray cell. Then proceed east exactly three steps, avoiding obstacles. Finally, reach any border cell divisible by 2."</em>
-            </p>
-            <h3>Solution Path:</h3>
-            <p>
-              <em>A valid solution requires carefully following the natural language instructions while respecting grid constraints and mathematical properties of cells.</em>
-            </p>
           </div>
-        </section>
+      </section>
 
         <!-- Dataset Section -->
         <section id="dataset" class="section">
           <div class="section-header">
             <h2 class="section-title">Dataset</h2>
           </div>
-          <p>
-            The SPaRC dataset is openly hosted on HuggingFace with a detailed <code>dataset_card</code>,
-            structured in <code>train</code>, <code>validation</code>, and <code>test</code> splits with corresponding rationales.
-          </p>
-          <div class="card">
-            <h3>Download Options</h3>
-            <p>
-              <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" class="btn">HuggingFace Dataset</a>
-              <a href="/sparc_dataset_v1.zip" class="btn btn-accent">Direct Download (4.2 MB)</a>
-            </p>
-            <div class="code-block">pip install datasets
+          <div style="display: flex; align-items: center; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.03) 100%); padding: 1.5rem; border-radius: var(--radius);">
+            <div style="flex: 1;">
+              <p style="font-size: 1.1rem; line-height: 1.5; margin: 0;">
+                The SPaRC dataset contains 1,000 spatial reasoning puzzles with the complete "all" set 
+                available on <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" style="font-weight: 500; text-decoration: underline;" target="_blank">HuggingFace</a>.
+              </p>
+            </div>
+            <div style="margin-left: 2rem;">
+              <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" target="_blank" style="display: inline-flex; align-items: center; text-decoration: none; color: var(--color-primary); font-weight: 500;">
+                <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg" alt="HuggingFace" style="height: 32px; margin-right: 0.75rem;">
+                <span>Browse on HuggingFace</span>
+              </a>
+            </div>
+          </div>
+          
+          <div class="card" style="background: #1e293b; color: #e2e8f0; box-shadow: var(--shadow); overflow: hidden; padding: 0;">
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center;">
+                <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg" alt="HuggingFace" style="height: 24px; margin-right: 0.75rem;">
+                <h4 style="margin: 0; color: white; font-size: 1.1rem;">HuggingFace Usage</h4>
+              </div>
+              <div>
+                <span style="font-size: 0.8rem; opacity: 0.7;">Python</span>
+              </div>
+            </div>
+            <div class="code-block" style="margin: 0; border-radius: 0; padding: 1.5rem; background: transparent;"># Install and import
+pip install datasets
 from datasets import load_dataset
 
-dataset = load_dataset("lkaesberg/SPaRC", split="test")
-print(dataset[0]["puzzle"])
-print(dataset[0]["rationale"])</div>
-          </div>
-        </section>
+# Login using e.g. `huggingface-cli login` to access this dataset
+ds = load_dataset("lkaesberg/SPaRC", "all")
 
-        <!-- Results Section -->
-        <section id="results" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Results</h2>
+# Access puzzle data
+puzzle = ds[0]
+print(puzzle["id"])                # Puzzle identifier
+print(puzzle["difficulty_level"])  # Difficulty (1-5)
+print(puzzle["grid_size"])         # Grid dimensions</div>
           </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Model</th>
-                  <th>Parameters</th>
-                  <th>Modality</th>
-                  <th>Accuracy</th>
-                  <th>Avg. Steps</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>LLama‑3‑8B&nbsp;+ CoT‑GPT‑4</td>
-                  <td>8B</td>
-                  <td>Text‑only</td>
-                  <td>41.2%</td>
-                  <td>34.7</td>
-                </tr>
-                <tr>
-                  <td>GPT‑4o‑Vision</td>
-                  <td>—</td>
-                  <td>Vision + Text</td>
-                  <td>39.8%</td>
-                  <td>28.3</td>
-                </tr>
-                <tr>
-                  <td>ReAct + Search</td>
-                  <td>13B</td>
-                  <td>Text‑only</td>
-                  <td>24.5%</td>
-                  <td>42.1</td>
-                </tr>
-                <tr>
-                  <td><strong>Human</strong></td>
-                  <td>—</td>
-                  <td>Vision</td>
-                  <td><strong>97.9%</strong></td>
-                  <td>18.7</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
+      </section>
 
         <!-- Leaderboard Section -->
         <section id="leaderboard" class="section">
@@ -678,53 +1161,215 @@ print(dataset[0]["rationale"])</div>
             <h2 class="section-title">Leaderboard</h2>
           </div>
           <p>
-            Submit your model's <code>predictions.jsonl</code> to our leaderboard to compare with state-of-the-art approaches.
+            Model performance on SPaRC puzzles by difficulty level. Performance generally decreases sharply as difficulty increases.
           </p>
-          <div class="visual-card" style="height: 300px;">
-            <span class="placeholder-text">Leaderboard will appear here</span>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>All</th>
+                  <th>Level 1</th>
+                  <th>Level 2</th>
+                  <th>Level 3</th>
+                  <th>Level 4</th>
+                  <th>Level 5</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="human-row" style="background-color: rgba(16, 185, 129, 0.1);">
+                  <td><strong>Human</strong></td>
+                  <td><strong>97.9%</strong></td>
+                  <td>99.8%</td>
+                  <td>99.2%</td>
+                  <td>98.4%</td>
+                  <td>96.4%</td>
+                  <td>95.7%</td>
+                </tr>
+                <tr style="background-color: #f8fafc;">
+                  <td colspan="7"><strong>Reasoning Models</strong></td>
+                </tr>
+                <tr>
+                  <td><img src="graphics/images/logos/openai.png" alt="OpenAI" width="16px" style="vertical-align: middle; margin-right: 6px;"> o4-mini</td>
+                  <td><strong>15.8%</strong></td>
+                  <td><strong>47.7%</strong></td>
+                  <td><strong>19.5%</strong></td>
+                  <td><strong>10.7%</strong></td>
+                  <td><strong>1.2%</strong></td>
+                  <td><strong>1.1%</strong></td>
+                </tr>
+                <tr>
+                  <td><img src="graphics/images/logos/openai.png" alt="OpenAI" width="16px" style="vertical-align: middle; margin-right: 6px;"> o3-mini</td>
+                  <td>8.2%</td>
+                  <td>29.1%</td>
+                  <td>10.2%</td>
+                  <td>2.5%</td>
+                  <td>1.2%</td>
+                  <td>0.0%</td>
+                </tr>
+                <tr>
+                  <td><img src="graphics/images/logos/qwen.png" alt="Qwen" width="16px" style="vertical-align: middle; margin-right: 6px;"> QwQ 32B</td>
+                  <td>5.8%</td>
+                  <td>20.9%</td>
+                  <td>5.9%</td>
+                  <td>2.5%</td>
+                  <td>1.2%</td>
+                  <td>0.0%</td>
+                </tr>
+                <tr>
+                  <td><img src="graphics/images/logos/deepseek.png" alt="DeepSeek" width="16px" style="vertical-align: middle; margin-right: 6px;"> R1 70B</td>
+                  <td>4.0%</td>
+                  <td>17.4%</td>
+                  <td>2.5%</td>
+                  <td>1.7%</td>
+                  <td>0.0%</td>
+                  <td>0.0%</td>
+                </tr>
+                <tr style="background-color: #f8fafc;">
+                  <td colspan="7"><strong>Instruction Models</strong></td>
+                </tr>
+                <tr>
+                  <td><img src="graphics/images/logos/openai.png" alt="OpenAI" width="16px" style="vertical-align: middle; margin-right: 6px;"> GPT-4.1</td>
+                  <td>1.6%</td>
+                  <td>7.0%</td>
+                  <td>0.8%</td>
+                  <td>0.8%</td>
+                  <td>0.0%</td>
+                  <td>0.0%</td>
+                </tr>
+                <tr>
+                  <td><img src="graphics/images/logos/google.png" alt="Google" width="16px" style="vertical-align: middle; margin-right: 6px;"> Gemma-3 27B</td>
+                  <td>1.2%</td>
+                  <td>3.5%</td>
+                  <td>0.8%</td>
+                  <td>0.8%</td>
+                  <td>0.0%</td>
+                  <td>1.1%</td>
+                </tr>
+                <tr>
+                  <td><img src="graphics/images/logos/qwen.png" alt="Qwen" width="16px" style="vertical-align: middle; margin-right: 6px;"> Qwen 2.5 72B</td>
+                  <td>0.4%</td>
+                  <td>0.0%</td>
+                  <td>1.7%</td>
+                  <td>0.0%</td>
+                  <td>0.0%</td>
+                  <td>0.0%</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="card" style="margin-top: 1.5rem; text-align: center;">
-            <a href="https://paperswithcode.com/sota/spatial-reasoning-on-sparc?p=spatial-pathfinding-reasoning-corpus" class="btn">View Current Leaderboard</a>
+
+          <!-- Keep just this one key visualization image -->
+          <div style="text-align: center; margin: 2rem 0; display: none;">
+            <img src="graphics/figure_radar_error_types_selected.png" alt="Model Performance Comparison" style="max-width: 700px; width: 100%; border-radius: var(--radius); box-shadow: var(--shadow-sm);" />
+            <p class="caption" style="margin-top: 0.5rem; color: var(--color-muted); font-size: 0.9rem;">
+              Figure: Error analysis by model type and reasoning category
+            </p>
           </div>
-        </section>
+
+          <!-- Error Analysis Figure - Dedicated section with improved styling -->
+          <div style="margin: 3rem 0; background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;">
+            <div style="background: linear-gradient(to right, rgba(99, 102, 241, 0.08), rgba(16, 185, 129, 0.08)); padding: 1.5rem; border-bottom: 1px solid #f1f5f9;">
+              <h3 style="margin: 0; color: var(--color-text); font-size: 1.4rem;">Model Error Analysis</h3>
+              <p style="margin: 0.5rem 0 0; color: var(--color-muted); font-size: 1rem;">Breakdown of error types across different model families</p>
+            </div>
+            
+            <div style="padding: 2rem; text-align: center;">
+              <img src="graphics/figure_radar_error_types_seaborn.png" alt="Error Analysis by Model Type" style="max-width: 800px; width: 100%; height: auto; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);" />
+            </div>
+            
+            <div style="padding: 0 2rem 2rem; text-align: center; color: var(--color-muted); font-size: 0.95rem; max-width: 800px; margin: 0 auto;">
+              <p>The radar chart shows different failure modes across model types. Reasoning models show better performance on baseline spatial tasks but struggle with complex rule interactions, while instruction-tuned models have more balanced but weaker performance overall.</p>
+            </div>
+          </div>
+      </section>
 
         <!-- Tools Section -->
         <section id="tools" class="section">
           <div class="section-header">
             <h2 class="section-title">Tools &amp; Resources</h2>
           </div>
-          <div class="features-grid">
-            <div class="feature-card">
-              <h3>Puzzle Visualizer</h3>
-              <p>Step through any puzzle frame-by-frame with our interactive visualization tool.</p>
-              <a href="/visualizer.html" class="btn">Open Visualizer</a>
+          <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+            <!-- Puzzle Visualizer -->
+            <div class="feature-card" style="background: white; border-radius: var(--radius); padding: 1.5rem; overflow: hidden; box-shadow: var(--shadow); border: none; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column;">
+              <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(99, 102, 241, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                </div>
+                <div>
+                  <h3 style="margin: 0; font-size: 1.25rem; color: var(--color-text);">Puzzle Visualizer</h3>
+                  <div style="font-size: 0.85rem; color: var(--color-primary); font-weight: 500;">Interactive Tool</div>
+                </div>
+              </div>
+              
+              <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid var(--color-primary); font-size: 0.9rem; color: var(--color-text); opacity: 0.9; flex-grow: 1;">
+                <p>Step through any puzzle frame-by-frame with our interactive visualization tool. Allows examining solutions, rules, and constraints.</p>
+              </div>
+              
+              <a href="/visualizer.html" class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                Open Visualizer
+              </a>
             </div>
-            <div class="feature-card">
-              <h3>Annotation Interface</h3>
-              <p>Contribute to the project by labeling crowdsourced puzzle rationales.</p>
-              <a href="/annotate.html" class="btn">Start Annotating</a>
+            
+            <!-- Annotation Interface -->
+            <div class="feature-card" style="background: white; border-radius: var(--radius); padding: 1.5rem; overflow: hidden; box-shadow: var(--shadow); border: none; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column;">
+              <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(244, 63, 94, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </div>
+                <div>
+                  <h3 style="margin: 0; font-size: 1.25rem; color: var(--color-text);">Annotation Interface</h3>
+                  <div style="font-size: 0.85rem; color: var(--color-accent); font-weight: 500;">Research Tool</div>
+                </div>
+              </div>
+              
+              <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid var(--color-accent); font-size: 0.9rem; color: var(--color-text); opacity: 0.9; flex-grow: 1;">
+                <p>Contribute to the project by labeling crowdsourced puzzle rationales and helping improve the benchmark dataset.</p>
+              </div>
+              
+              <a href="/annotate.html" class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Start Annotating
+              </a>
             </div>
-            <div class="feature-card">
-              <h3>Live Playground</h3>
-              <p>Solve puzzles directly in your browser and compare with AI solutions.</p>
-              <a href="/playground.html" class="btn">Try Puzzles</a>
+            
+            <!-- Live Playground -->
+            <div class="feature-card" style="background: white; border-radius: var(--radius); padding: 1.5rem; overflow: hidden; box-shadow: var(--shadow); border: none; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column;">
+              <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                </div>
+                <div>
+                  <h3 style="margin: 0; font-size: 1.25rem; color: var(--color-text);">Live Playground</h3>
+                  <div style="font-size: 0.85rem; color: #10b981; font-weight: 500;">Interactive</div>
+                </div>
+              </div>
+              
+              <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #10b981; font-size: 0.9rem; color: var(--color-text); opacity: 0.9; flex-grow: 1;">
+                <p>Solve puzzles directly in your browser and compare your solutions with those generated by various AI models.</p>
+              </div>
+              
+              <a href="/playground.html" class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                Try Puzzles
+              </a>
             </div>
           </div>
-        </section>
+      </section>
 
         <!-- Citation Section -->
         <section id="citation" class="section">
           <div class="section-header">
             <h2 class="section-title">Citation</h2>
           </div>
-          <div class="citation-block">@inproceedings{kaesberg2025sparc,
+          <div class="citation-block">@article{kaesberg2025sparc,
   title     = {SPaRC: A Spatial Pathfinding Reasoning Corpus},
   author    = {Kaesberg, Lars Benedikt and Wahle, Jan Philip and Ruas, Terry and Gipp, Bela},
-  booktitle = {Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
   year      = {2025},
   url       = {https://huggingface.co/datasets/lkaesberg/SPaRC}
 }</div>
-        </section>
+      </section>
 
         <!-- Contact Section -->
         <section id="contact" class="section">
@@ -738,7 +1383,7 @@ print(dataset[0]["rationale"])</div>
               <a href="https://github.com/lkaesberg/SPaRC" class="btn">GitHub Repository</a>
             </div>
           </div>
-        </section>
+      </section>
       </div>
     </main>
 
@@ -755,5 +1400,459 @@ print(dataset[0]["rationale"])</div>
         </div>
       </div>
     </footer>
+
+    <!-- Hidden elements required by the puzzle engine -->
+    <input type="hidden" id="sens" value="1.0">
+
+    <!-- Add necessary scripts for puzzle visualization -->
+    <script type="text/javascript" src="visualizer/engine/utilities.js"></script>
+    <script type="text/javascript" src="visualizer/engine/svg.js"></script>
+    <script type="text/javascript" src="visualizer/engine/polyominos.js"></script>
+    <script type="text/javascript" src="visualizer/engine/puzzle.js"></script>
+    <script type="text/javascript" src="visualizer/engine/solve.js"></script>
+    <script type="text/javascript" src="visualizer/engine/validate.js"></script>
+    <script type="text/javascript" src="visualizer/engine/display2.js"></script>
+    <script type="text/javascript" src="visualizer/engine/trace2.js"></script>
+    <script type="text/javascript" src="visualizer/engine/serializer.js"></script>
+    <script type="text/javascript" src="visualizer/engine/custom_mechanics.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Keep one sample puzzle as a fallback
+        const fallbackPuzzle = {"difficulty_level":5,"difficulty_score":5.8,"grid_size":{"height":2,"width":3},"id":"176d1e37ebbacac0","polyshapes":{"16":"·█··\n····\n····\n····"},"puzzle_array":[["+","+","+","+","+",".","+"],["S","N","+","P-R-16","+","o-B","+"],["+","+","+","+","+","+","+"],["+","N","+","N","+","o-B","+"],["+","+","E","+","+","+","+"]],"solution_count":1,"solutions":[{"index":0,"path":[{"x":0,"y":1},{"x":0,"y":0},{"x":1,"y":0},{"x":2,"y":0},{"x":2,"y":1},{"x":2,"y":2},{"x":3,"y":2},{"x":4,"y":2},{"x":4,"y":1},{"x":4,"y":0},{"x":5,"y":0},{"x":6,"y":0},{"x":6,"y":1},{"x":6,"y":2},{"x":6,"y":3},{"x":6,"y":4},{"x":5,"y":4},{"x":4,"y":4},{"x":3,"y":4},{"x":2,"y":4}],"pathLength":20}],"text_visualization":"puzzle:\n  dimensions:\n    width: 3\n    height: 2\n  start:\n    x: 0\n    y: 1\n  end:\n    x: 2\n    y: 4\n  cells:\n    - position:\n        x: 3\n        y: 1\n      properties:\n        type: \"poly\"\n        polyshape: 16\n        color: \"red\"\n    - position:\n        x: 5\n        y: 0\n      properties:\n        dot: 1\n        color: \"black\"\n    - position:\n        x: 5\n        y: 1\n      properties:\n        type: \"square\"\n        color: \"blue\"\n    - position:\n        x: 5\n        y: 3\n      properties:\n        type: \"square\"\n        color: \"blue\"\n"};
+        
+        let currentPuzzle = fallbackPuzzle;
+        let solutionVisible = false;
+        let puzzlesCache = [];
+        let isLoadingPuzzle = false;
+        
+        // Get DOM elements
+        const showSolutionBtn = document.getElementById('show-solution-btn');
+        const randomizePuzzleBtn = document.getElementById('randomize-puzzle-btn');
+        
+        // Add event listeners to buttons
+        if (showSolutionBtn) {
+          showSolutionBtn.addEventListener('click', toggleSolution);
+        }
+        
+        if (randomizePuzzleBtn) {
+          randomizePuzzleBtn.addEventListener('click', loadRandomPuzzle);
+        }
+        
+        // Toggle solution visibility
+        function toggleSolution() {
+          if (solutionVisible) {
+            // Remove solution
+            const existingSolution = document.getElementById('solution-path');
+            if (existingSolution) {
+              existingSolution.remove();
+            }
+            solutionVisible = false;
+            showSolutionBtn.innerHTML = '<i class="fas fa-lightbulb" style="margin-right: 0.5rem;"></i> Show Solution';
+          } else {
+            // Show solution
+            displaySolution(currentPuzzle, 0);
+            solutionVisible = true;
+            showSolutionBtn.innerHTML = '<i class="fas fa-eye-slash" style="margin-right: 0.5rem;"></i> Hide Solution';
+          }
+        }
+        
+        // Load a random puzzle from the dataset
+        function loadRandomPuzzle() {
+          // Don't load a new puzzle if we're still loading one
+          if (isLoadingPuzzle) return;
+          
+          isLoadingPuzzle = true;
+          
+          // Disable the button and show loading indicator
+          if (randomizePuzzleBtn) {
+            randomizePuzzleBtn.disabled = true;
+            randomizePuzzleBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 0.5rem;"></i> Loading...';
+          }
+          
+          // If we have cached puzzles, use one of them
+          if (puzzlesCache.length > 0) {
+            // Get a random puzzle from the cache
+            const randomIndex = Math.floor(Math.random() * puzzlesCache.length);
+            const puzzleData = puzzlesCache[randomIndex];
+            
+            // Remove the used puzzle from cache
+            puzzlesCache.splice(randomIndex, 1);
+            
+            // Update current puzzle
+            currentPuzzle = puzzleData;
+            
+            // Reset solution visibility
+            solutionVisible = false;
+            if (showSolutionBtn) {
+              showSolutionBtn.innerHTML = '<i class="fas fa-lightbulb" style="margin-right: 0.5rem;"></i> Show Solution';
+            }
+            
+            // Load the puzzle
+            createPuzzleFromData(puzzleData);
+            
+            // Enable the button
+            if (randomizePuzzleBtn) {
+              randomizePuzzleBtn.disabled = false;
+              randomizePuzzleBtn.innerHTML = '<i class="fas fa-random" style="margin-right: 0.5rem;"></i> Random Dataset Puzzle';
+            }
+            
+            isLoadingPuzzle = false;
+          } else {
+            // Load the dataset file
+            fetch('puzzle_all_test.jsonl')
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`Network response was not ok: ${response.status}`);
+                }
+                return response.text();
+              })
+              .then(data => {
+                // Split the file into lines
+                const lines = data.split('\n').filter(line => line.trim().length > 0);
+                
+                // Cache some random puzzles for future use (up to 10)
+                puzzlesCache = [];
+                const maxCache = Math.min(10, lines.length);
+                
+                for (let i = 0; i < maxCache; i++) {
+                  const randomLineIndex = Math.floor(Math.random() * lines.length);
+                  try {
+                    const puzzleJson = lines[randomLineIndex];
+                    const puzzleData = JSON.parse(puzzleJson);
+                    
+                    // Only use the first as the current puzzle
+                    if (i === 0) {
+                      // Update current puzzle
+                      currentPuzzle = puzzleData;
+                      
+                      // Reset solution visibility
+                      solutionVisible = false;
+                      if (showSolutionBtn) {
+                        showSolutionBtn.innerHTML = '<i class="fas fa-lightbulb" style="margin-right: 0.5rem;"></i> Show Solution';
+                      }
+                      
+                      // Load the puzzle
+                      createPuzzleFromData(puzzleData);
+                    } else {
+                      // Cache the rest
+                      puzzlesCache.push(puzzleData);
+                    }
+                  } catch (err) {
+                    console.error('Error parsing puzzle JSON:', err);
+                  }
+                }
+                
+                // Enable the button
+                if (randomizePuzzleBtn) {
+                  randomizePuzzleBtn.disabled = false;
+                  randomizePuzzleBtn.innerHTML = '<i class="fas fa-random" style="margin-right: 0.5rem;"></i> Random Dataset Puzzle';
+                }
+                
+                isLoadingPuzzle = false;
+              })
+              .catch(error => {
+                console.error('Error loading dataset:', error);
+                
+                // Fallback to the default puzzle
+                currentPuzzle = fallbackPuzzle;
+                createPuzzleFromData(fallbackPuzzle);
+                
+                // Enable the button
+                if (randomizePuzzleBtn) {
+                  randomizePuzzleBtn.disabled = false;
+                  randomizePuzzleBtn.innerHTML = '<i class="fas fa-random" style="margin-right: 0.5rem;"></i> Random Dataset Puzzle';
+                }
+                
+                isLoadingPuzzle = false;
+              });
+          }
+        }
+        
+        // Format polyshapes data properly
+        function parsePolyshapes(polyshapesData) {
+          // If it's already an object, return it
+          if (typeof polyshapesData === 'object' && !Array.isArray(polyshapesData) && polyshapesData !== null) {
+            return polyshapesData;
+          }
+          
+          // If it's a string, try to parse it as JSON
+          if (typeof polyshapesData === 'string') {
+            try {
+              return JSON.parse(polyshapesData);
+            } catch (e) {
+              // If it can't be parsed, return null
+              return null;
+            }
+          }
+          
+          // Default return
+          return null;
+        }
+        
+        // Update puzzle stats
+        function updatePuzzleStats(puzzleData) {
+          // Update puzzle ID
+          const puzzleIdElement = document.getElementById('puzzle-id');
+          if (puzzleIdElement) {
+            puzzleIdElement.textContent = puzzleData.id;
+          }
+          
+          // Update difficulty
+          const puzzleDifficultyElement = document.getElementById('puzzle-difficulty');
+          if (puzzleDifficultyElement) {
+            puzzleDifficultyElement.textContent = `Level ${puzzleData.difficulty_level} (${puzzleData.difficulty_score.toFixed(1)})`;
+          }
+          
+          // Update grid size
+          const puzzleGridSizeElement = document.getElementById('puzzle-grid-size');
+          if (puzzleGridSizeElement) {
+            puzzleGridSizeElement.textContent = `${puzzleData.grid_size.width}×${puzzleData.grid_size.height}`;
+          }
+          
+          // Update path length
+          const puzzlePathLengthElement = document.getElementById('puzzle-path-length');
+          if (puzzlePathLengthElement && puzzleData.solutions && puzzleData.solutions.length > 0) {
+            puzzlePathLengthElement.textContent = `${puzzleData.solutions[0].pathLength} steps`;
+          }
+        }
+        
+        // Create puzzle from the input data
+        function createPuzzleFromData(puzzleData) {
+          try {
+            // Clear previous puzzle if there was one
+            const svg = document.getElementById('puzzle');
+            while (svg && svg.firstChild) svg.removeChild(svg.firstChild);
+            
+            // Extract dimensions and create puzzle
+            const width = puzzleData.grid_size.width;
+            const height = puzzleData.grid_size.height;
+            const puzzle = new Puzzle(width, height);
+            
+            // Parse YAML from text_visualization using js-yaml
+            const yamlData = jsyaml.load(puzzleData.text_visualization);
+            
+            // Set start point
+            const startX = yamlData.puzzle.start.x;
+            const startY = yamlData.puzzle.start.y;
+            puzzle.grid[startX][startY].start = true;
+            
+            // Set end point
+            const endX = yamlData.puzzle.end.x;
+            const endY = yamlData.puzzle.end.y;
+            
+            // Determine end direction based on position
+            let endDirection;
+            if (endX === 0) {
+              endDirection = "left";
+            } else if (endX === width * 2) {
+              endDirection = "right";
+            } else if (endY === 0) {
+              endDirection = "top";
+            } else if (endY === height * 2) {
+              endDirection = "bottom";
+            } else {
+              // Default fallback if not on an edge
+              endDirection = "left";
+            }
+            
+            puzzle.grid[endX][endY].end = endDirection;
+            
+            // Parse polyshapes if in JSON string format
+            const polyshapes = typeof puzzleData.polyshapes === 'string' ? 
+                               parsePolyshapes(puzzleData.polyshapes) : 
+                               puzzleData.polyshapes;
+            
+            // Add puzzle elements
+            if (yamlData.puzzle.cells) {
+              yamlData.puzzle.cells.forEach(cell => {
+                const x = cell.position.x;
+                const y = cell.position.y;
+                
+                if (x >= 0 && y >= 0 && x < puzzle.width && y < puzzle.height) {
+                  if (cell.properties.type === 'poly' || cell.properties.type === 'ylop') {
+                    const polyId = cell.properties.polyshape;
+                    const polyshape = polyshapes && polyshapes[polyId];
+                    
+                    // Parse the ASCII polyshape into a numeric value
+                    let polyValue = 0;
+                    if (polyshape && typeof polyshape === 'string') {
+                      const rows = polyshape.split('\n');
+                      for (let y = 0; y < rows.length; y++) {
+                        for (let x = 0; x < rows[y].length; x++) {
+                          if (rows[x][y] === '█') {
+                            // Set the bit for this position in the polyomino
+                            polyValue |= (1 << (y * 4 + x));
+                          }
+                        }
+                      }
+                    }
+                    
+                    puzzle.grid[x][y] = {
+                      type: cell.properties.type,
+                      polyshape: polyValue || polyId, // Use parsed value or fall back to ID
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.type === 'square') {
+                    puzzle.grid[x][y] = {
+                      type: 'square',
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.type === 'star') {
+                    puzzle.grid[x][y] = {
+                      type: 'star',
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.type === 'triangle') {
+                    puzzle.grid[x][y] = {
+                      type: 'triangle',
+                      color: cell.properties.color,
+                      count: cell.properties.count
+                    };
+                  } else if (cell.properties.type === 'nega') {
+                    puzzle.grid[x][y] = {
+                      type: 'nega',
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.dot) {
+                    puzzle.grid[x][y] = {
+                      dot: window.DOT_BLACK,
+                      type: 'line',
+                      line: 0
+                    };
+                  } else if (cell.properties.gap) {
+                    puzzle.grid[x][y] = {
+                      gap: 1,
+                      type: 'line',
+                      line: 0
+                    };
+                  }
+                }
+              });
+            }
+            
+            // Make sure the puzzle container is visible
+            const puzzleContainer = document.getElementById('puzzle-container');
+            if (puzzleContainer) {
+              puzzleContainer.style.display = 'flex';
+            }
+            
+            // Update the puzzle stats
+            updatePuzzleStats(puzzleData);
+            
+            // Safety checks before using potentially dangerous functions
+            if (typeof window.draw === 'function') {
+              // Draw the puzzle
+              window.draw(puzzle);
+              
+              // Make sure cursorPos element exists
+              if (svg) {
+                let cursorPosElement = document.getElementById('cursorPos');
+                if (!cursorPosElement) {
+                  cursorPosElement = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+                  cursorPosElement.id = "cursorPos";
+                  svg.appendChild(cursorPosElement);
+                }
+              }
+            } else {
+              console.error('window.draw function not found. Puzzle scripts may not be loaded correctly.');
+            }
+          } catch (error) {
+            console.error('Error creating puzzle:', error);
+          }
+        }
+        
+        // Display a solution on the puzzle
+        function displaySolution(puzzleData, solutionIndex) {
+          if (!puzzleData.solutions || puzzleData.solutions.length === 0) return;
+          
+          // Remove previous solution if it exists
+          const existingSolution = document.getElementById('solution-path');
+          if (existingSolution) {
+            existingSolution.remove();
+          }
+          
+          const solution = puzzleData.solutions[solutionIndex];
+          const path = solution.path;
+          
+          // Draw the solution path on the puzzle
+          const svg = document.getElementById('puzzle');
+          if (!svg) return;
+          
+          const solutionGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          solutionGroup.setAttribute("id", "solution-path");
+          
+          // Create a path element for the solution
+          const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          
+          // Build path data
+          let pathData = "";
+          path.forEach((point, index) => {
+            const x = point.x * 41 + 52;
+            const y = point.y * 41 + 52;
+            
+            if (index === 0) {
+              pathData += `M ${x} ${y} `;
+            } else {
+              pathData += `L ${x} ${y} `;
+            }
+          });
+          
+          pathElement.setAttribute("d", pathData);
+          pathElement.setAttribute("stroke", "#38b000");
+          pathElement.setAttribute("stroke-width", "8");
+          pathElement.setAttribute("stroke-linecap", "round");
+          pathElement.setAttribute("stroke-linejoin", "round");
+          pathElement.setAttribute("fill", "none");
+          pathElement.setAttribute("stroke-dasharray", "5000");
+          pathElement.setAttribute("stroke-dashoffset", "5000");
+          pathElement.style.animation = "drawLine 3s ease-in-out forwards";
+          
+          solutionGroup.appendChild(pathElement);
+          svg.appendChild(solutionGroup);
+          
+          // Add animation
+          if (!document.getElementById('drawLineAnimation')) {
+            const style = document.createElement('style');
+            style.id = 'drawLineAnimation';
+            style.textContent = `
+              @keyframes drawLine {
+                to {
+                  stroke-dashoffset: 0;
+                }
+              }
+            `;
+            document.head.appendChild(style);
+          }
+        }
+        
+        // Override potentially problematic functions with safer versions for this page
+        window.PLAY_SOUND = function(soundType) {
+          // No-op function for sounds
+          console.log('Sound would play:', soundType);
+        };
+        
+        window.TRACE_COMPLETION_FUNC = function(puzzle, path) {
+          // No-op function for trace completion
+          console.log('Puzzle solved!');
+        };
+        
+        // Initialize when DOM is loaded
+        setTimeout(() => {
+          try {
+            // Initialize with the initial puzzle
+            createPuzzleFromData(currentPuzzle);
+            
+            // Preload some puzzles for faster randomization
+            setTimeout(() => {
+              loadRandomPuzzle();
+            }, 1000);
+          } catch (e) {
+            console.error('Error initializing puzzle:', e);
+          }
+        }, 500);
+      });
+    </script>
   </body>
 </html>
