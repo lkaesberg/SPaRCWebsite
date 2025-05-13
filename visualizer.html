@@ -411,6 +411,11 @@
         </div>
         <div id="input-content">
           <textarea id="puzzle-input" placeholder="Paste your puzzle JSON string here..."></textarea>
+          <div id="id-input-container" style="padding: 15px; border-top: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <label for="puzzle-id" style="font-weight: 600; font-size: 14px;"><i class="fas fa-hashtag"></i> Or load by ID:</label>
+            <input type="text" id="puzzle-id" placeholder="Enter puzzle ID" style="padding: 8px; border: 1px solid #ddd; border-radius: var(--border-radius); flex-grow: 1;">
+            <button id="load-by-id"><i class="fas fa-search"></i> Load</button>
+          </div>
           <div class="buttons">
             <button id="load-puzzle"><i class="fas fa-play"></i> Load Puzzle</button>
             <button id="clear-puzzle"><i class="fas fa-eraser"></i> Clear</button>
@@ -452,7 +457,9 @@
         const originalPlaySound = window.PLAY_SOUND;
         
         const puzzleInput = document.getElementById('puzzle-input');
+        const puzzleIdInput = document.getElementById('puzzle-id');
         const loadPuzzleBtn = document.getElementById('load-puzzle');
+        const loadByIdBtn = document.getElementById('load-by-id');
         const clearPuzzleBtn = document.getElementById('clear-puzzle');
         const showSolutionBtn = document.getElementById('show-solution');
         const nextSolutionBtn = document.getElementById('next-solution');
@@ -598,6 +605,87 @@
             }, 5000);
           }
         }
+        
+        // Load puzzle by ID
+        loadByIdBtn.addEventListener('click', function() {
+          const puzzleId = puzzleIdInput.value.trim();
+          if (!puzzleId) {
+            showMessage('error', 'Please enter a puzzle ID');
+            return;
+          }
+          
+          setLoading(true);
+          errorMessage.style.display = 'none';
+          successMessage.style.display = 'none';
+          
+          // Fetch the puzzle_all_test.jsonl file
+          fetch('puzzle_all_test.jsonl')
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to fetch puzzle data file');
+              }
+              return response.text();
+            })
+            .then(data => {
+              // Split the file by lines and parse each line as JSON
+              const lines = data.trim().split('\n');
+              let foundPuzzle = null;
+              
+              // Search for the puzzle with matching ID
+              for (const line of lines) {
+                try {
+                  const puzzleData = JSON.parse(line);
+                  if (puzzleData.id === puzzleId) {
+                    foundPuzzle = puzzleData;
+                    break;
+                  }
+                } catch (e) {
+                  console.error('Error parsing JSONL line:', e);
+                }
+              }
+              
+              if (foundPuzzle) {
+                // Update the textarea with the found puzzle
+                puzzleInput.value = JSON.stringify(foundPuzzle, null, 2);
+                
+                // Load the puzzle
+                createPuzzleFromData(foundPuzzle);
+                solutionControls.style.display = 'flex';
+                showMessage('success', `Puzzle ID ${puzzleId} loaded successfully!`);
+                
+                // Reset solution index
+                currentSolutionIndex = 0;
+                updateSolutionCounter();
+                
+                // Reset solved state
+                resetSolvedState();
+                
+                // Show all puzzle-related containers
+                statsContainer.style.display = 'flex';
+                puzzleInfoCompact.style.display = 'flex';
+                document.getElementById('puzzle-container').style.display = 'flex';
+                
+                // Start timer and reset attempts
+                startTimer();
+                resetAttempts();
+                
+                // Collapse input section after loading
+                inputContent.classList.add('collapsed');
+                const icon = toggleInputBtn.querySelector('i');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+              } else {
+                showMessage('error', `Puzzle with ID ${puzzleId} not found`);
+              }
+              
+              setLoading(false);
+            })
+            .catch(error => {
+              console.error('Error loading puzzle by ID:', error);
+              showMessage('error', 'Error loading puzzle: ' + error.message);
+              setLoading(false);
+            });
+        });
         
         // Load puzzle from JSON
         loadPuzzleBtn.addEventListener('click', function() {
