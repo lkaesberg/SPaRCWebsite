@@ -2,81 +2,167 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Witness Puzzle Annotator</title>
+    <title>SPaRC Puzzle Annotator</title>
     <link rel="stylesheet" type="text/css" href="visualizer/data/style.css" id="stylesheet">
     <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
     <link rel="shortcut icon" href="/favicon/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
     <link rel="manifest" href="/favicon/site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+      /* Updated color scheme to match index.html more closely */
       :root {
-        --primary: #3a86ff;
-        --secondary: #8338ec;
-        --success: #38b000;
-        --dark: #333;
-        --light: #f8f9fa;
-        --border-radius: 8px;
+        --color-bg: #fafafa;
+        --color-text: #333;
+        --color-primary: #6366f1; /* Indigo */
+        --color-secondary: #818cf8; /* Lighter indigo */
+        --color-accent: #f43f5e; /* Rose */
+        --color-muted: #94a3b8; /* Slate */
+        --color-success: #10b981; /* Emerald */
+        --color-card: #ffffff;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 10px 15px rgba(0, 0, 0, 0.04);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.05), 0 20px 48px rgba(0, 0, 0, 0.06);
+        --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+        --radius-sm: 8px;
+        --radius: 12px;
+        --radius-lg: 16px;
+        --radius-full: 9999px;
+        --font-base: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --compact-spacing: 0.75rem;
+      }
+      
+      html {
+        overflow-x: hidden;
+        width: 100%;
+        scroll-behavior: smooth;
       }
       
       body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        width: 100%;
+        position: relative;
+        overflow-x: clip;
+        font-family: var(--font-base);
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        line-height: 1.7;
+        font-weight: 400;
+        font-size: 18px;
         margin: 0;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: #f0f2f5;
-        color: var(--dark);
-        line-height: 1.6;
+        padding: 0;
+        background-image: radial-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+        background-size: 25px 25px;
+      }
+      
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      
+      a {
+        color: var(--color-primary);
+        text-decoration: none;
+        transition: var(--transition);
+      }
+      
+      a:hover {
+        color: var(--color-accent);
+      }
+      
+      /* Typography */
+      h1, h2, h3, h4, h5 {
+        font-weight: 600;
+        line-height: 1.2;
+        margin-bottom: 1rem;
       }
       
       h1 {
-        margin-bottom: 20px;
-        color: var(--primary);
-        font-weight: 600;
-        text-align: center;
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        letter-spacing: -0.03em;
       }
       
+      h2 {
+        font-size: clamp(1.8rem, 3vw, 2.2rem);
+        letter-spacing: -0.02em;
+      }
+      
+      h3 {
+        font-size: 1.5rem;
+        letter-spacing: -0.015em;
+      }
+      
+      /* Layout */
       .container {
         width: 100%;
         max-width: 1200px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: white;
-        border-radius: var(--border-radius);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        padding: 30px;
-        margin-bottom: 30px;
+        margin: 0 auto 2rem;
+        padding: 1.5rem 1.5rem;
+        background-color: var(--color-card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg), 
+                    0 1px 2px rgba(99, 102, 241, 0.1), 
+                    0 0 0 1px rgba(226, 232, 240, 0.8);
+        position: relative;
+        overflow: hidden;
       }
       
       .input-section {
         width: 100%;
-        margin-bottom: 20px;
-        border: 1px solid #eee;
-        border-radius: var(--border-radius);
+        margin-bottom: 1.25rem;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: var(--radius);
         overflow: hidden;
+        transition: box-shadow 0.3s ease;
+        box-shadow: var(--shadow-sm);
+        background-color: var(--color-card);
+      }
+      
+      .input-section:hover {
+        box-shadow: var(--shadow), 0 0 0 1px rgba(99, 102, 241, 0.2);
       }
       
       .input-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px 15px;
-        background-color: var(--light);
+        padding: 0.85rem 1.25rem;
+        background-color: var(--color-bg);
         cursor: pointer;
+        transition: background-color 0.3s ease;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+      }
+      
+      .input-header:hover {
+        background-color: rgba(99, 102, 241, 0.04);
       }
       
       .input-header h3 {
         margin: 0;
-        font-size: 16px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .input-header h3 i {
+        color: var(--color-primary);
       }
       
       .toggle-btn {
         background: none;
         border: none;
-        color: var(--dark);
+        color: var(--color-text);
         cursor: pointer;
         padding: 5px;
       }
@@ -91,19 +177,14 @@
         max-height: 0;
       }
       
-      .input-section h3 {
-        color: var(--dark);
-        margin-bottom: 0;
-      }
-      
       textarea {
         width: 100%;
-        height: 150px;
+        height: 120px;
         font-family: 'Consolas', monospace;
         padding: 15px;
         box-sizing: border-box;
         border: none;
-        border-top: 1px solid #eee;
+        border-top: 1px solid rgba(226, 232, 240, 0.8);
         resize: none;
         transition: border 0.3s ease;
         font-size: 14px;
@@ -111,135 +192,217 @@
       
       textarea:focus {
         outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 2px rgba(58,134,255,0.2);
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
       }
       
+      /* Style for all button containers to ensure consistency */
+      .button-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin: 0.75rem 0;
+      }
+      
+      /* Better styling for input buttons */
       .buttons {
         display: flex;
-        gap: 15px;
-        padding: 10px 15px;
-        background-color: var(--light);
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        padding: 0.75rem 1.25rem;
+        background-color: var(--color-bg);
         justify-content: flex-end;
+        align-items: center;
       }
       
       button {
-        padding: 8px 16px;
-        cursor: pointer;
-        background-color: var(--primary);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(to bottom, var(--color-primary), #5558e6);
         color: white;
+        font-weight: 500;
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+        border-radius: var(--radius-full);
+        transition: all 0.3s ease;
         border: none;
-        border-radius: var(--border-radius);
-        font-weight: 600;
-        transition: all 0.2s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        gap: 0.5rem;
+        letter-spacing: 0.01em;
+        box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
       }
       
       button:hover {
-        background-color: #2a76ef;
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 6px 15px rgba(99, 102, 241, 0.25);
       }
       
       button:active {
-        transform: translateY(0);
+        transform: translateY(-1px);
+      }
+      
+      button::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: scale(0);
+        opacity: 0;
+        border-radius: var(--radius);
+        transition: all 0.4s ease;
+      }
+      
+      button:hover::after {
+        transform: scale(1);
+        opacity: 1;
       }
       
       #clear-puzzle {
-        background-color: #6c757d;
+        background: linear-gradient(to bottom, var(--color-muted), #7f8ea7);
+        box-shadow: 0 4px 10px rgba(148, 163, 184, 0.2);
       }
       
       #clear-puzzle:hover {
-        background-color: #5a6268;
+        box-shadow: 0 6px 15px rgba(148, 163, 184, 0.25);
       }
       
       #show-solution, #next-solution {
-        background-color: var(--success);
+        background: linear-gradient(to bottom, var(--color-success), #0ca678);
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
       }
       
       #show-solution:hover, #next-solution:hover {
-        background-color: #2b9348;
+        box-shadow: 0 6px 15px rgba(16, 185, 129, 0.25);
       }
       
       #puzzle-container {
         width: 100%;
         display: flex;
         justify-content: center;
-        margin: 15px 0;
-        padding: 20px;
-        background-color: var(--light);
-        border-radius: var(--border-radius);
+        margin: 1.25rem 0;
+        padding: 1.5rem;
+        background-color: white;
+        border-radius: var(--radius-lg);
         overflow: auto;
+        box-shadow: var(--shadow-inner);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+      }
+      
+      #puzzle-container:hover {
+        box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.06);
       }
       
       #puzzle {
-        max-width: 100%;
-        height: auto;
+        max-height: 75vh;
       }
       
       .info-compact {
         display: flex;
         flex-wrap: wrap;
-        gap: 15px;
+        gap: 0.75rem;
         width: 100%;
-        margin-bottom: 20px;
-        padding: 10px 15px;
-        background-color: var(--light);
-        border-radius: var(--border-radius);
-        font-size: 14px;
+        margin-bottom: 1.25rem;
+        padding: 1rem 1.25rem;
+        background-color: var(--color-bg);
+        border-radius: var(--radius);
+        font-size: 0.95rem;
         align-items: center;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(226, 232, 240, 0.6);
+      }
+      
+      .info-compact:hover {
+        box-shadow: var(--shadow);
       }
       
       .info-compact .info-item {
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--radius-sm);
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+      
+      .info-compact .info-item:hover {
+        transform: translateY(-2px);
+        background-color: white;
+        box-shadow: var(--shadow-sm);
       }
       
       .info-compact .info-label {
         font-weight: 600;
-        color: var(--primary);
+        color: var(--color-primary);
       }
       
       .stats-container {
         display: flex;
         justify-content: center;
-        gap: 30px;
-        margin-bottom: 20px;
-        padding: 10px;
-        background-color: var(--light);
-        border-radius: var(--border-radius);
+        gap: 1.5rem;
+        margin-bottom: 1.25rem;
+        padding: 1rem 1.25rem;
+        background-color: var(--color-bg);
+        border-radius: var(--radius);
         width: 100%;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+      }
+      
+      .stats-container:hover {
+        box-shadow: var(--shadow);
       }
       
       .stat-item {
         display: flex;
         align-items: center;
-        gap: 8px;
-        font-size: 16px;
-        font-weight: 600;
+        gap: 0.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: transform 0.3s ease;
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--radius-full);
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+      
+      .stat-item:hover {
+        transform: translateY(-2px);
+        background-color: white;
+        box-shadow: var(--shadow-sm);
       }
       
       .stat-item i {
-        color: var(--primary);
-        font-size: 18px;
+        color: var(--color-primary);
+        font-size: 1.125rem;
       }
       
       .solved-indicator {
-        color: var(--success);
-        font-weight: bold;
+        color: var(--color-success);
+        font-weight: 600;
+        background-color: rgba(16, 185, 129, 0.1);
       }
       
       .solved-indicator i {
-        color: var(--success);
+        color: var(--color-success);
       }
       
       .failed-indicator {
-        color: #e63946;
-        font-weight: bold;
+        color: var(--color-accent);
+        font-weight: 600;
+        background-color: rgba(244, 63, 94, 0.1);
       }
       
       .failed-indicator i {
-        color: #e63946;
+        color: var(--color-accent);
       }
       
       #timer {
@@ -250,88 +413,89 @@
       .solution-controls {
         display: flex;
         align-items: center;
-        gap: 15px;
-        margin-top: 15px;
+        gap: 0.75rem;
+        margin-top: 1rem;
       }
       
       .solution-counter {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--dark);
+        font-size: 1rem; /* Increased */
+        font-weight: 500;
+        color: var(--color-text);
       }
       
       .loader {
         display: none;
-        width: 24px;
-        height: 24px;
-        border: 3px solid var(--light);
-        border-bottom-color: var(--primary);
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(226, 232, 240, 0.8);
         border-radius: 50%;
-        margin: 0 auto;
-        animation: rotation 1s linear infinite;
+        border-top-color: var(--color-primary);
+        animation: spin 1s ease-in-out infinite;
       }
       
-      @keyframes rotation {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
+      .success-message, .error-message {
+        font-weight: 500;
+        text-align: center;
+        margin: 0.75rem 0;
+        padding: 0.75rem 1.25rem;
+        border-radius: var(--radius-full);
+        transform: translateY(0);
+        animation: slideIn 0.4s ease-out;
+        box-shadow: var(--shadow-sm);
+        font-size: 1rem;
       }
       
       .success-message {
-        color: var(--success);
-        text-align: center;
-        font-weight: 600;
-        margin: 10px 0;
-        animation: fadeIn 0.5s ease-in-out;
+        color: var(--color-success);
+        background-color: rgba(16, 185, 129, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.2);
       }
       
       .error-message {
-        color: #e63946;
-        text-align: center;
-        font-weight: 600;
-        margin: 10px 0;
-        animation: fadeIn 0.5s ease-in-out;
+        color: var(--color-accent);
+        background-color: rgba(244, 63, 94, 0.08);
+        border: 1px solid rgba(244, 63, 94, 0.2);
       }
       
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
       
-      @keyframes drawLine {
-        from { stroke-dashoffset: 5000; }
-        to { stroke-dashoffset: 0; }
-      }
-      
-      #solution-path path {
-        stroke-dasharray: 5000;
-        animation: drawLine 2s ease-in-out forwards;
-      }
-      
-      #status-messages {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 40px;
-        gap: 10px;
-      }
-      
-      /* Dataset annotation specific styles */
       .dataset-controls {
         display: flex;
         flex-wrap: wrap;
-        gap: 15px;
+        gap: 1rem;
         width: 100%;
-        margin-bottom: 20px;
-        padding: 15px;
-        background-color: var(--light);
-        border-radius: var(--border-radius);
+        margin-bottom: 1.25rem;
+        padding: 1rem 1.25rem;
+        background-color: var(--color-bg);
+        border-radius: var(--radius);
         align-items: center;
         justify-content: space-between;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+      }
+      
+      .dataset-controls:hover {
+        box-shadow: var(--shadow);
       }
       
       .dataset-nav {
         display: flex;
-        gap: 10px;
+        gap: 0.75rem;
         align-items: center;
       }
       
@@ -342,28 +506,31 @@
       .dataset-progress {
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 0.75rem;
       }
       
       .progress-bar {
-        width: 200px;
-        height: 8px;
-        background-color: #ddd;
-        border-radius: 4px;
+        width: 150px;
+        height: 6px;
+        background-color: rgba(226, 232, 240, 0.5);
+        border-radius: var(--radius-full);
         overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
       }
       
       .progress-fill {
         height: 100%;
-        background-color: var(--primary);
+        background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
         width: 0%;
-        transition: width 0.3s ease;
+        transition: width 0.5s ease;
+        box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
       }
       
       .file-upload {
         position: relative;
         overflow: hidden;
         display: inline-block;
+        cursor: pointer;
       }
       
       .file-upload input[type=file] {
@@ -382,29 +549,33 @@
       }
       
       .dataset-info {
-        margin-top: 10px;
-        font-size: 14px;
-        color: var(--dark);
+        margin-top: 0.75rem;
+        font-size: 0.9rem;
+        color: var(--color-text);
         text-align: center;
       }
       
+      /* Make sure export button container is properly styled */
       .export-container {
-        margin-top: 20px;
+        margin-top: 1.5rem;
         width: 100%;
         text-align: center;
+        padding: 1rem 0 0.5rem;
+        border-top: 1px solid rgba(226, 232, 240, 0.6);
       }
       
       #export-button {
-        background-color: var(--secondary);
+        background: linear-gradient(to bottom, var(--color-accent), #e11d48);
+        box-shadow: 0 4px 10px rgba(244, 63, 94, 0.2);
       }
       
       #export-button:hover {
-        background-color: #722bd4;
+        box-shadow: 0 6px 15px rgba(244, 63, 94, 0.25);
       }
       
       @media (max-width: 768px) {
         .container {
-          padding: 20px;
+          padding: 1rem 0.75rem;
         }
         
         .info-compact {
@@ -431,7 +602,12 @@
         }
         
         .dataset-progress {
-          justify-content: center;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
+        
+        .progress-bar {
           width: 100%;
         }
       }
@@ -439,26 +615,507 @@
       .github-link {
         display: flex;
         justify-content: center;
-        margin-bottom: 20px;
+        margin-bottom: 1rem;
       }
       
       .github-button {
-        background-color: #333;
+        background-color: #24292e;
         color: white;
         border: none;
-        border-radius: var(--border-radius);
-        padding: 8px 16px;
-        font-weight: 600;
+        border-radius: var(--radius);
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        font-weight: 500;
         display: flex;
         align-items: center;
-        gap: 8px;
-        transition: all 0.2s ease;
+        gap: 0.5rem;
+        transition: var(--transition);
       }
       
       .github-button:hover {
-        background-color: #24292e;
+        background-color: #333;
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      /* Header with gradient background, similar to index.html */
+      .site-header {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        padding: 2.5rem 0 2rem;
+        background: linear-gradient(135deg, #6366f1 0%, #818cf8 40%, #a5b4fc 100%);
+        color: white;
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+      
+      .site-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2V6h4V4H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        z-index: 0;
+      }
+      
+      .header-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      
+      .header-title {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+        background: linear-gradient(to right, #ffffff, #e0e7ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0px 0px 30px rgba(255, 255, 255, 0.2);
+      }
+      
+      .tagline {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        font-weight: 300;
+        opacity: 0.95;
+        line-height: 1.4;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Particle animation */
+      .particle-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 0;
+        opacity: 0.7;
+      }
+      
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        pointer-events: none;
+      }
+      
+      .particle-1 {
+        width: 400px;
+        height: 400px;
+        top: -100px;
+        right: -100px;
+        animation: float 15s ease-in-out infinite, pulse 8s ease-in-out infinite;
+      }
+      
+      .particle-2 {
+        width: 300px;
+        height: 300px;
+        bottom: -80px;
+        left: -80px;
+        animation: float-reverse 18s ease-in-out infinite, pulse 10s ease-in-out infinite;
+      }
+      
+      .particle-3 {
+        width: 200px;
+        height: 200px;
+        top: 40%;
+        right: 25%;
+        animation: float 12s ease-in-out infinite, pulse 6s ease-in-out infinite;
+      }
+      
+      @keyframes float {
+        0% { transform: translateY(0px) translateX(0px); }
+        50% { transform: translateY(-20px) translateX(10px); }
+        100% { transform: translateY(0px) translateX(0px); }
+      }
+      
+      @keyframes float-reverse {
+        0% { transform: translateY(0px) translateX(0px); }
+        50% { transform: translateY(20px) translateX(-10px); }
+        100% { transform: translateY(0px) translateX(0px); }
+      }
+      
+      @keyframes pulse {
+        0% { opacity: 0.5; }
+        50% { opacity: 0.8; }
+        100% { opacity: 0.5; }
+      }
+      
+      input[type="text"] {
+        padding: 0.6rem 1rem;
+        border-radius: var(--radius-full);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        font-family: var(--font-base);
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-inner);
+      }
+      
+      input[type="text"]:hover {
+        border-color: #cbd5e1;
+      }
+      
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      }
+      
+      @keyframes drawLine {
+        from { stroke-dashoffset: 5000; }
+        to { stroke-dashoffset: 0; }
+      }
+      
+      #solution-path path {
+        stroke-dasharray: 5000;
+        animation: drawLine 2s ease-in-out forwards;
+      }
+      
+      #status-messages {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 30px;
+        gap: 10px;
+      }
+      
+      /* Make display more compact */
+      #puzzle-info-compact .info-item {
+        margin-right: 0.5rem;
+      }
+      
+      /* Compact file upload area */
+      #input-content > div {
+        padding: 10px !important;
+      }
+      
+      #input-content > div > div {
+        margin-bottom: 10px !important;
+      }
+      
+      /* Reduce SVG size for more compact view */
+      #puzzle {
+        max-height: 75vh;
+      }
+      
+      /* Adjust font sizes for better compactness */
+      #progress-text, #completion-text {
+        font-size: 0.95rem; /* Increased from 0.85rem */
+      }
+      
+      /* Add new navigation buttons styles */
+      .navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        width: 100%;
+      }
+      
+      .nav-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: var(--radius-full);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        gap: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      
+      .back-button {
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+      }
+      
+      .back-button:hover {
+        background-color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 0 0 2px rgba(99, 102, 241, 0.1);
+      }
+      
+      /* Update GitHub button styling to match other buttons */
+      .github-button {
+        background-color: #24292e;
+        color: white;
+      }
+      
+      .github-button:hover {
+        background-color: #333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      /* Adjust dataset controls for better button placement */
+      .dataset-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        width: 100%;
+        margin-bottom: 1.25rem;
+        padding: 1rem 1.25rem;
+        background-color: var(--color-bg);
+        border-radius: var(--radius);
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+      }
+      
+      /* Improve button spacing in solution controls */
+      .solution-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+      
+      /* Better align buttons in small space */
+      @media (max-width: 500px) {
+        .navigation-buttons {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        
+        .nav-button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+      
+      /* Improve solution controls on mobile */
+      @media (max-width: 768px) {
+        .solution-controls {
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+      }
+      
+      #url-input {
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+      }
+      
+      /* Make navigation buttons consistent and aligned */
+      .navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        width: 100%;
+      }
+      
+      /* Ensure solution controls have the right styles */
+      .solution-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.25rem;
+      }
+      
+      /* Fix skip button styling to match other buttons */
+      #skip-puzzle {
+        background: linear-gradient(to bottom, var(--color-muted), #7f8ea7);
+        box-shadow: 0 4px 10px rgba(148, 163, 184, 0.2);
+      }
+      
+      #skip-puzzle:hover {
+        box-shadow: 0 6px 15px rgba(148, 163, 184, 0.25);
+      }
+      
+      /* Ensure proper styling for clear dataset button */
+      #clear-dataset {
+        background: linear-gradient(to bottom, var(--color-muted), #7f8ea7);
+        box-shadow: 0 4px 10px rgba(148, 163, 184, 0.2);
+      }
+      
+      #clear-dataset:hover {
+        box-shadow: 0 6px 15px rgba(148, 163, 184, 0.25);
+      }
+      
+      /* Add subtle transitions to all interactive elements */
+      button, .nav-button, input, .info-item, .stat-item {
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      /* Increase size of all standard buttons */
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(to bottom, var(--color-primary), #5558e6);
+        color: white;
+        font-weight: 500;
+        padding: 0.85rem 1.75rem; /* Increased padding */
+        font-size: 1.125rem; /* Increased font size */
+        border-radius: var(--radius-full);
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        gap: 0.75rem; /* Increased gap */
+        letter-spacing: 0.01em;
+        box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+        min-height: 48px; /* Ensure minimum height */
+      }
+      
+      /* Increase nav buttons size */
+      .nav-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.85rem 1.75rem; /* Increased padding */
+        font-size: 1.125rem; /* Increased font size */
+        font-weight: 500;
+        border-radius: var(--radius-full);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        gap: 0.75rem; /* Increased gap */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        min-height: 48px; /* Ensure minimum height */
+      }
+      
+      /* Make icons in buttons larger */
+      button i, .nav-button i {
+        font-size: 1.25rem; /* Larger icons */
+      }
+      
+      /* Adjust button spacing in containers */
+      .buttons {
+        gap: 1rem; /* Increased gap between buttons */
+        padding: 1rem 1.5rem; /* Increased padding */
+      }
+      
+      .solution-controls {
+        gap: 1.5rem; /* Increased gap between solution buttons */
+        margin-top: 1.5rem; /* More space above */
+      }
+      
+      /* Make export button extra prominent */
+      #export-button {
+        padding: 1rem 2rem; /* Extra padding */
+        font-size: 1.2rem; /* Larger font */
+      }
+      
+      /* Make mobile buttons full-width for easy tapping */
+      @media (max-width: 768px) {
+        button, .nav-button {
+          padding: 0.85rem 1.5rem;
+          font-size: 1.125rem;
+        }
+        
+        .solution-controls button {
+          flex-grow: 1;
+          justify-content: center;
+        }
+      }
+      
+      /* More compact header - apply to existing styles */
+      :root {
+        --compact-spacing: 0.75rem;
+      }
+      
+      .site-header {
+        padding: 1.75rem 0 1.5rem !important; /* Reduced padding */
+        margin-bottom: 1.25rem !important; /* Reduced margin */
+      }
+      
+      /* More compact container */
+      .container {
+        padding: 1.25rem !important; /* Reduced padding */
+        margin-bottom: 1rem !important; /* Reduced margin */
+      }
+      
+      /* Tighter navigation buttons spacing */
+      .navigation-buttons {
+        margin-bottom: 1rem !important; /* Reduced margin */
+      }
+      
+      /* More compact sections */
+      .input-section {
+        margin-bottom: 1rem !important; /* Reduced margin */
+      }
+      
+      .input-header {
+        padding: 0.65rem 1rem !important; /* Reduced padding */
+      }
+      
+      /* Compact info sections */
+      .info-compact {
+        padding: 0.75rem 1rem !important; /* Reduced padding */
+        margin-bottom: 0.75rem !important; /* Reduced margin */
+      }
+      
+      .info-compact .info-item {
+        padding: 0.15rem 0.4rem !important; /* Reduced padding */
+      }
+      
+      /* More compact stats container */
+      .stats-container {
+        padding: 0.75rem 1rem !important; /* Reduced padding */
+        margin-bottom: 0.75rem !important; /* Reduced margin */
+      }
+      
+      .stat-item {
+        padding: 0.15rem 0.5rem !important; /* Reduced padding */
+      }
+      
+      /* More compact puzzle container */
+      #puzzle-container {
+        margin: 0.75rem 0 !important; /* Reduced margins */
+        padding: 1rem !important; /* Reduced padding */
+      }
+      
+      /* Compact dataset controls */
+      .dataset-controls {
+        padding: 0.75rem 1rem !important; /* Reduced padding */
+        margin-bottom: 0.75rem !important; /* Reduced margin */
+      }
+      
+      /* More compact messages */
+      .success-message, .error-message {
+        margin: 0.5rem 0 !important; /* Reduced margin */
+        padding: 0.5rem 1rem !important; /* Reduced padding */
+      }
+      
+      /* Tighter export container */
+      .export-container {
+        margin-top: 1rem !important; /* Reduced margin */
+        padding: 0.75rem 0 0.5rem !important; /* Reduced padding */
+      }
+      
+      /* More compact form elements */
+      .buttons {
+        padding: 0.75rem 1.25rem !important; /* Reduced padding */
+      }
+      
+      input[type="text"] {
+        padding: 0.5rem 0.75rem !important; /* Reduced padding */
+      }
+      
+      .dataset-progress {
+        gap: 0.5rem !important; /* Reduced gap */
       }
     </style>
     <script type="text/javascript" src="visualizer/engine/utilities.js"></script>
@@ -479,12 +1136,28 @@
   <body>
     <!-- Hidden elements required by the engine -->
     <input type="hidden" id="sens" value="1.0">
+    
+    <!-- Header section with particles -->
+    <div class="site-header">
+      <div class="particle-container">
+        <div class="particle particle-1"></div>
+        <div class="particle particle-2"></div>
+        <div class="particle particle-3"></div>
+      </div>
+      <div class="header-content">
+        <h1 class="header-title">SPaRC Puzzle Annotator</h1>
+        <p class="tagline">Annotate and explore SPaRC puzzle datasets with ease</p>
+      </div>
+    </div>
+    
     <div class="container">
-      <h1><i class="fas fa-puzzle-piece"></i> Witness Puzzle Annotator</h1>
-      
-      <div class="github-link">
-        <a href="https://github.com/lkaesberg/TheWitnessDatasetVisualizer" target="_blank" rel="noopener noreferrer">
-          <button class="github-button"><i class="fab fa-github"></i> View on GitHub</button>
+      <!-- Navigation buttons at the top for better accessibility -->
+      <div class="navigation-buttons">
+        <a href="index.html#tools" class="nav-button back-button">
+          <i class="fas fa-arrow-left"></i> Back to Main Page
+        </a>
+        <a href="https://github.com/lkaesberg/SPaRCWebsite" target="_blank" rel="noopener noreferrer" class="nav-button github-button">
+          <i class="fab fa-github"></i> View on GitHub
         </a>
       </div>
       
@@ -502,7 +1175,7 @@
               </div>
             </div>
             <div style="margin-bottom: 15px; display: flex; align-items: center; justify-content: center;">
-              <input type="text" id="url-input" placeholder="Enter URL to JSONL file" style="width: 300px; padding: 8px; border-radius: var(--border-radius); border: 1px solid #ccc; margin-right: 10px;">
+              <input type="text" id="url-input" placeholder="Enter URL to JSONL file" style="width: 300px; border-radius: var(--radius-sm); border: 1px solid rgba(226, 232, 240, 0.8); margin-right: 10px;">
               <button id="load-url-btn"><i class="fas fa-cloud-download-alt"></i> Load from URL</button>
             </div>
             <div class="dataset-info" id="dataset-info"></div>
@@ -650,7 +1323,7 @@
             urlInput.value = datasetUrl;
             
             // Check if we have existing data before loading
-            if (localStorage.getItem('witnessAnnotatorData')) {
+            if (localStorage.getItem('sparcAnnotatorData')) {
               if (confirm("You have existing saved progress. Do you want to overwrite it with the dataset from URL?")) {
                 loadDatasetFromUrl(datasetUrl);
               } else {
@@ -672,7 +1345,7 @@
           }
           
           // Check if we have existing data before loading
-          if (localStorage.getItem('witnessAnnotatorData')) {
+          if (localStorage.getItem('sparcAnnotatorData')) {
             if (confirm("You have existing saved progress. Do you want to overwrite it with the dataset from URL?")) {
               loadDatasetFromUrl(url);
             } else {
@@ -739,10 +1412,10 @@
             const jsonData = JSON.stringify(dataToSave);
             
             // Clear previous data
-            localStorage.removeItem('witnessAnnotatorData');
+            localStorage.removeItem('sparcAnnotatorData');
             
             // Store the data
-            localStorage.setItem('witnessAnnotatorData', jsonData);
+            localStorage.setItem('sparcAnnotatorData', jsonData);
             
             console.log('Saved annotation data to localStorage');
           } catch (error) {
@@ -756,7 +1429,7 @@
         
         function loadFromLocalStorage() {
           try {
-            const savedData = localStorage.getItem('witnessAnnotatorData');
+            const savedData = localStorage.getItem('sparcAnnotatorData');
             
             if (!savedData) {
               console.log('No saved data found in localStorage');
@@ -1297,7 +1970,7 @@
             
             // Create a more descriptive filename with date
             const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-            link.download = `witness_puzzles_annotated_${date}.jsonl`;
+            link.download = `sparc_puzzles_annotated_${date}.jsonl`;
             
             // Trigger download
             document.body.appendChild(link);
@@ -1353,7 +2026,7 @@
           window.TRACE_COMPLETION_FUNC = null;
           
           // Clear localStorage data
-          localStorage.removeItem('witnessAnnotatorData');
+          localStorage.removeItem('sparcAnnotatorData');
           
           showMessage('success', 'Dataset cleared!');
         });
