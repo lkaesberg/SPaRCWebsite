@@ -4,46 +4,36 @@
 
 # SPaRC Dataset Visualizer
 
-A web-based visualization and puzzle creation tool for SPaRC spatial reasoning puzzles. This project allows you to:
+**SPaRC: A Spatial Pathfinding and Reasoning Challenge**
 
-- Browse a collection of spatial reasoning puzzles
-- Create and edit your own puzzles
-- Practice challenge puzzles
-- Use automatic solvers for specific puzzle types
-- Visualize puzzle mechanics and solutions
+A web-based visualization and puzzle creation tool for SPaRC spatial reasoning puzzles.
+
+## Overview
+
+This repository hosts the code for the SPaRC dataset website. SPaRC contains 1,000 grid puzzles that challenge spatial reasoning abilities. For detailed information, visit [sparc.gipplab.org](https://sparc.gipplab.org).
 
 ## Features
 
-- Interactive puzzle editor with support for all SPaRC puzzle mechanics
-- Comprehensive validation system for puzzle solutions
-- Visual rendering of puzzles using SVG
+- Interactive puzzle editor
+- Puzzle visualization tools
 - Challenge practice mode
-- Automatic solvers for specific puzzle types
-- Support for various puzzle elements including:
-  - Polyominos
-  - Colored squares
-  - Stars
-  - Triangles
-  - Dots and gaps
-  - And more
-
-## Usage
-
-Visit the main site at [sparc.gipplab.org](https://sparc.gipplab.org) to access the following features:
-
-- Browse - List of all puzzles
-- Challenge - Challenge practice
-- Editor - Create a new puzzle
-- Visualization tools
 - Automatic solvers
+
+## Links
+
+- **Website**: [sparc.gipplab.org](https://sparc.gipplab.org)
+- **Dataset**: [HuggingFace/lkaesberg/SPaRC](https://huggingface.co/datasets/lkaesberg/SPaRC)
+- **Original Repo**: [jbzdarkid/jbzdarkid.github.io](https://github.com/jbzdarkid/jbzdarkid.github.io)
 
 ## Credits
 
-This project is a fork of the original repository by [jbzdarkid](https://github.com/jbzdarkid/jbzdarkid.github.io), which provided the initial implementation. The original repository can be found at:
-[https://github.com/jbzdarkid/jbzdarkid.github.io](https://github.com/jbzdarkid/jbzdarkid.github.io)
+This project is a fork of the original repository by jbzdarkid. All credit for the initial implementation goes to them.
 
-All credit for the original implementation goes to jbzdarkid.
+## Contact
+
+For questions: l.kaesberg@uni-goettingen.de
 
 ## License
 
-This code is licensed under BSD 3-Clause. You are free to fork this project and play with it, within the limits of the license. 
+- **Code**: BSD 3-Clause
+- **Dataset**: CC-BY-4.0 · © 2025 SPaRC Authors 
