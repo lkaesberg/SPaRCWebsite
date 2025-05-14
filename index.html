@@ -1509,27 +1509,6 @@
                 <div style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 280px; flex-grow: 1; max-height: 80vh; overflow: visible; position: relative;">
                   <div id="puzzle-container" style="width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; max-width: 450px; max-height: 450px;">
                     <svg id="puzzle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" style="width: 100%; height: 100%; filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));"></svg>
-                    
-                    <!-- Interactive hint animation -->
-                    <div id="puzzle-interaction-hint" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; opacity: 0.9; transition: opacity 0.5s ease; background-color: rgba(0,0,0,0.3);">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="width: 80px; height: 80px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-                        <!-- Pulsing circle -->
-                        <circle id="hint-pulse" cx="50" cy="50" r="35" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.3">
-                          <animate attributeName="r" from="35" to="45" dur="1.5s" begin="0s" repeatCount="indefinite" />
-                          <animate attributeName="opacity" from="0.6" to="0" dur="1.5s" begin="0s" repeatCount="indefinite" />
-                        </circle>
-                        <!-- Secondary pulsing circle -->
-                        <circle id="hint-pulse-inner" cx="50" cy="50" r="20" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.5">
-                          <animate attributeName="r" from="20" to="30" dur="1.5s" begin="0.5s" repeatCount="indefinite" />
-                          <animate attributeName="opacity" from="0.7" to="0.1" dur="1.5s" begin="0.5s" repeatCount="indefinite" />
-                        </circle>
-                      </svg>
-                      
-                      <!-- Hint text -->
-                      <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; color: white; font-size: 14px; text-shadow: 0 1px 3px rgba(0,0,0,0.7); font-weight: 500;">
-                        Click to interact with the puzzle
-                      </div>
-                    </div>
                   </div>
                 </div>
                 
@@ -2216,6 +2195,11 @@
             if (svg) {
               svg.setAttribute('viewBox', `0 0 ${viewBoxWidth} ${viewBoxHeight}`);
               
+              // Add simple touch scroll prevention directly to the SVG
+              svg.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+              }, { passive: false });
+              
               // Adjust container size ratio for extreme grid dimensions
               const puzzleContainer = document.getElementById('puzzle-container');
               if (puzzleContainer) {
@@ -2622,53 +2606,17 @@
         let puzzleContainer = document.getElementById('puzzle-container');
         let puzzle = document.getElementById('puzzle');
         
-        // Function to prevent default scroll behavior
-        function preventScroll(e) {
-          if (window.innerWidth <= 768) {
-            e.preventDefault();
-            document.body.style.overflow = 'hidden';
-          }
-        }
-        
-        // Function to re-enable scrolling
-        function enableScroll() {
-          document.body.style.overflow = '';
-        }
-        
-        // Function to setup touch handlers
-        function setupTouchHandlers() {
+        // Function to setup handlers
+        function setupHandlers() {
           // Get the latest references to elements (they might have been replaced)
           puzzleContainer = document.getElementById('puzzle-container');
           puzzle = document.getElementById('puzzle');
           
           if (!puzzleContainer || !puzzle) return;
-          
-          // Remove any previous event listeners if they exist
-          puzzleContainer.removeEventListener('touchstart', preventScroll);
-          puzzleContainer.removeEventListener('touchmove', preventScroll);
-          puzzleContainer.removeEventListener('touchend', enableScroll);
-          puzzleContainer.removeEventListener('mouseenter', enableScroll);
-          puzzleContainer.removeEventListener('mouseleave', enableScroll);
-          
-          // Add touch events for mobile devices
-          puzzleContainer.addEventListener('touchstart', preventScroll, { passive: false });
-          puzzleContainer.addEventListener('touchmove', preventScroll, { passive: false });
-          puzzleContainer.addEventListener('touchend', enableScroll);
-          
-          // Mouse events for desktop (just for consistency)
-          puzzleContainer.addEventListener('mouseenter', () => {
-            if (window.innerWidth <= 768) {
-              document.body.style.overflow = 'hidden';
-            }
-          });
-          
-          puzzleContainer.addEventListener('mouseleave', () => {
-            document.body.style.overflow = '';
-          });
         }
         
         // Set up the handlers initially
-        setupTouchHandlers();
+        setupHandlers();
         
         // Watch for puzzle changes and re-setup handlers
         const observer = new MutationObserver((mutations) => {
@@ -2676,7 +2624,7 @@
             if (mutation.type === 'childList' && (
                 mutation.target.id === 'puzzle-container' || 
                 mutation.target.id === 'puzzle')) {
-              setupTouchHandlers();
+              setupHandlers();
               break;
             }
           }
@@ -2693,83 +2641,7 @@
         if (randomizeBtn) {
           randomizeBtn.addEventListener('click', () => {
             // Wait for new puzzle to load
-            setTimeout(setupTouchHandlers, 500);
-          });
-        }
-        
-        // Track if hint has been dismissed
-        let hintDismissed = false;
-        
-        // Function to hide the interaction hint
-        function hideInteractionHint(event) {
-          // Stop event propagation to prevent puzzle handlers
-          event.stopPropagation();
-          event.preventDefault();
-          
-          const hint = document.getElementById('puzzle-interaction-hint');
-          if (hint) {
-            // Fade out animation
-            hint.style.opacity = '0';
-            
-            // Hide completely after animation completes
-            setTimeout(() => {
-              hint.style.display = 'none';
-            }, 500);
-            
-            // Mark hint as dismissed
-            hintDismissed = true;
-          }
-        }
-        
-        // Initialize interaction hint
-        function initInteractionHint() {
-          // Get latest element
-          const hint = document.getElementById('puzzle-interaction-hint');
-          
-          if (!hint) return;
-          
-          // If hint was previously dismissed, keep it hidden
-          if (hintDismissed) {
-            hint.style.display = 'none';
-            return;
-          }
-          
-          // Show hint for every new puzzle (if not dismissed)
-          hint.style.display = 'block';
-          hint.style.opacity = '0.9';
-          
-          // Clean up any existing listeners
-          hint.removeEventListener('mousedown', hideInteractionHint);
-          hint.removeEventListener('touchstart', hideInteractionHint);
-          
-          // Add listeners directly to the hint with capturing phase (true)
-          hint.addEventListener('mousedown', hideInteractionHint);
-          hint.addEventListener('touchstart', hideInteractionHint);
-        }
-        
-        // Initialize on page load
-        initInteractionHint();
-        
-        // Re-initialize when puzzle changes, but respect dismissed state
-        const puzzleObserver = new MutationObserver((mutations) => {
-          // Only process if hint hasn't been dismissed yet
-          if (!hintDismissed) {
-            for (const mutation of mutations) {
-              if (mutation.type === 'childList') {
-                // Wait for DOM to update fully
-                setTimeout(initInteractionHint, 100);
-                break;
-              }
-            }
-          }
-        });
-        
-        // Use a different variable name to avoid conflicts
-        const hintTargetElement = document.getElementById('example');
-        if (hintTargetElement) {
-          puzzleObserver.observe(hintTargetElement, {
-            childList: true,
-            subtree: true
+            setTimeout(setupHandlers, 500);
           });
         }
       });
@@ -2814,6 +2686,12 @@
           if (window.trace && window.trace.puzzle) {
             window.trace.cancel();
           }
+          
+          // Remove any global document touch/mouse handlers
+          document.onmousemove = null;
+          document.ontouchstart = null;
+          document.ontouchmove = null;
+          document.ontouchend = null;
           
           // Get the SVG element
           const svg = document.getElementById('puzzle');
@@ -3056,6 +2934,11 @@
             // Update SVG viewBox to accommodate the puzzle size
             if (svg) {
               svg.setAttribute('viewBox', `0 0 ${viewBoxWidth} ${viewBoxHeight}`);
+              
+              // Add simple touch scroll prevention directly to the SVG
+              svg.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+              }, { passive: false });
               
               // Adjust container size ratio for extreme grid dimensions
               const puzzleContainer = document.getElementById('puzzle-container');
