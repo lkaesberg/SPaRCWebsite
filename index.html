@@ -25,25 +25,37 @@
         --font-base: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
-
-      /* Reset & globals */
-      *, *::before, *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
       
+      /* Prevent horizontal scrolling while allowing sticky elements */
       html {
+        overflow-x: hidden;
+        width: 100%;
         scroll-behavior: smooth;
       }
       
       body {
+        width: 100%;
+        position: relative;
+        overflow-x: clip; /* Modern alternative to hidden that allows sticky */
         font-family: var(--font-base);
         background-color: var(--color-bg);
         color: var(--color-text);
         line-height: 1.7;
         font-weight: 400;
         font-size: 16px;
+        margin: 0;
+        padding: 0;
+      }
+      
+      /* Ensure all elements respect viewport width */
+      * {
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      
+      /* Reset & globals */
+      *, *::before, *::after {
+        box-sizing: border-box;
         margin: 0;
         padding: 0;
       }
@@ -99,6 +111,8 @@
         max-width: 1200px;
         margin: 0 auto;
         padding: 0 1.5rem;
+        box-sizing: border-box;
+        overflow-x: hidden;
       }
       
       .grid {
@@ -342,6 +356,9 @@
         display: flex;
         gap: 1rem;
         justify-content: center;
+        position: relative;
+        z-index: 5;
+        margin-bottom: 1rem;
       }
       
       .header-btn {
@@ -419,16 +436,25 @@
         .header-buttons {
           flex-direction: column;
           gap: 0.5rem;
+          margin-bottom: 2.5rem !important; /* Extra space on small mobile */
+          padding-bottom: 1rem;
+        }
+        
+        /* Adjust the spacing above the wave */
+        .site-header {
+          padding-bottom: 2rem;
         }
       }
       
       /* Navigation */
       .nav-container {
+        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000;
         background: white;
-        box-shadow: var(--shadow-sm);
-        position: sticky;
-        top: 0;
-        z-index: 100;
+        width: 100%;
+        will-change: transform;
       }
       
       .main-nav {
@@ -494,10 +520,14 @@
       
       /* Hero Grid */
       .hero-grid {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        gap: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
         margin-bottom: 3rem;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
       }
       
       .visual-card {
@@ -834,6 +864,148 @@
           grid-column: span 2;
         }
       }
+
+      /* Hide scrollbar but keep functionality */
+      .nav-list::-webkit-scrollbar {
+        display: none;
+      }
+      
+      /* Add fading edges to indicate scrollable content */
+      @media (max-width: 768px) {
+        .nav-container::before,
+        .nav-container::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 30px;
+          z-index: 2;
+          pointer-events: none;
+        }
+        
+        .nav-container::before {
+          left: 0;
+          background: linear-gradient(to right, white, rgba(255, 255, 255, 0));
+        }
+        
+        .nav-container::after {
+          right: 0;
+          background: linear-gradient(to left, white, rgba(255, 255, 255, 0));
+        }
+        
+        /* Larger touch targets for mobile */
+        .nav-link {
+          padding: 0.8rem 0.9rem !important; 
+          font-size: 0.9rem !important;
+        }
+        
+        /* More compact spacing for small screens */
+        .nav-list {
+          padding: 0.3rem 0 !important;
+          justify-content: flex-start !important;
+          padding-left: 0.5rem !important;
+          scroll-behavior: smooth; /* Add smooth scrolling */
+        }
+        
+        /* Add smooth transition for active state */
+        .nav-link.active {
+          transition: all 0.3s ease;
+        }
+      }
+      
+      /* Additional fixes for mobile layout */
+      @media (max-width: 768px) {
+        /* Fix potential overflow issues */
+        .container {
+          padding-left: 1rem;
+          padding-right: 1rem;
+          max-width: 100%;
+        }
+        
+        /* Ensure all grids are responsive */
+        [class*="grid"] {
+          width: 100%;
+          margin-left: 0;
+          margin-right: 0;
+        }
+        
+        /* Rules container fix */
+        .rules-container {
+          margin-left: -0.5rem;
+          margin-right: -0.5rem;
+          width: calc(100% + 1rem);
+          padding-left: 0.5rem;
+          padding-right: 0.5rem;
+        }
+      }
+      
+      /* Tablet layout (768px to 991px) */
+      @media (min-width: 768px) and (max-width: 991px) {
+        .hero-grid {
+          grid-template-columns: repeat(12, 1fr) !important;
+          gap: 1.5rem !important;
+        }
+        
+        .grid-item-format,
+        .grid-item-performance {
+          grid-column: span 6 !important; /* Equal width on tablets */
+        }
+        
+        .visual-card {
+          height: 300px !important; /* Slightly reduced height on tablets */
+        }
+      }
+      
+      /* Mobile-specific grid layout to stack items vertically */
+      @media (max-width: 767px) {
+        .hero-grid {
+          grid-template-columns: 1fr !important;
+          gap: 2rem !important;
+        }
+        
+        .grid-item-format,
+        .grid-item-performance {
+          grid-column: span 12 !important;
+        }
+        
+        .visual-card {
+          height: 250px !important; /* More compact on phones */
+        }
+      }
+
+      /* Tablet and Desktop layout adjustments */
+      @media (min-width: 768px) {
+        .hero-grid {
+          justify-content: center;
+          gap: 2rem;
+        }
+        
+        .grid-item-format,
+        .grid-item-performance {
+          flex: 1;
+          max-width: 500px; /* Constrain width on larger screens */
+        }
+      }
+      
+      /* Mobile-specific layout adjustments */
+      @media (max-width: 767px) {
+        .hero-grid {
+          flex-direction: column;
+          align-items: center;
+          gap: 2rem;
+        }
+        
+        .grid-item-format,
+        .grid-item-performance {
+          width: 100%;
+          max-width: 450px; /* Slightly narrower on mobile */
+          margin-bottom: 0;
+        }
+        
+        .visual-card {
+          height: 280px; /* Taller on phones for better visibility */
+        }
+      }
     </style>
   </head>
   <body>
@@ -846,31 +1018,30 @@
       </div>
       <div class="container">
         <div class="header-content">
-          <h1 class="header-title" style="font-size: 5.5rem; margin-bottom: 1rem; position: relative; display: inline-block; background: linear-gradient(90deg, #ffffff, #e0e7ff, #ffffff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 6s ease infinite; text-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);">
-            <span class="title-highlight" style="position: relative; z-index: 2;">SPaRC</span>
-            <div style="position: absolute; bottom: 15px; left: 0; width: 100%; height: 10px; background: rgba(255, 255, 255, 0.2); border-radius: 5px; z-index: 1;"></div>
+          <h1 class="header-title" style="font-size: 4.5rem; margin-bottom: 0.5rem; position: relative; display: inline-block; background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #ffffff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; letter-spacing: -0.02em;">
+            SPaRC
           </h1>
-          <p class="tagline" style="font-size: 1.3rem; max-width: 700px; margin: 0 auto 2rem; line-height: 1.6; color: rgba(255, 255, 255, 0.95); text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); font-weight: 400;">
+          <p class="tagline" style="font-size: 1.2rem; max-width: 700px; margin: 0 auto 1.5rem; line-height: 1.5; color: rgba(255, 255, 255, 0.95); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); font-weight: 400;">
             A Spatial Pathfinding and Reasoning Corpus for grounding language models in spatial cognition
           </p>
           
-          <div class="header-meta" style="display: flex; justify-content: center; align-items: center; gap: 2rem; margin-bottom: 2rem; padding: 1.5rem 2rem; background: rgba(255, 255, 255, 0.12); border-radius: var(--radius-lg); backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.1);">
-            <div class="header-stats" style="display: flex; gap: 2rem;">
+          <div class="header-meta" style="display: flex; justify-content: center; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; padding: 1.2rem 1.5rem; background: rgba(255, 255, 255, 0.12); border-radius: var(--radius); backdrop-filter: blur(10px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="header-stats" style="display: flex; gap: 1.5rem;">
               <div class="header-stat" style="text-align: center; position: relative;">
-                <div class="stat-number" style="font-size: 2.5rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">1,000</div>
+                <div class="stat-number" style="font-size: 2.2rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">1,000</div>
                 <div class="stat-label" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; opacity: 0.9;">Puzzles</div>
               </div>
               <div class="header-stat" style="text-align: center; position: relative;">
-                <div class="stat-number" style="font-size: 2.5rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">98%</div>
+                <div class="stat-number" style="font-size: 2.2rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">98%</div>
                 <div class="stat-label" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; opacity: 0.9;">Human Success</div>
               </div>
               <div class="header-stat" style="text-align: center; position: relative;">
-                <div class="stat-number" style="font-size: 2.5rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">15.8%</div>
+                <div class="stat-number" style="font-size: 2.2rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">15.8%</div>
                 <div class="stat-label" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; opacity: 0.9;">AI Success</div>
               </div>
             </div>
             
-            <div class="authors" style="text-align: left; padding-left: 2rem; border-left: 1px solid rgba(255, 255, 255, 0.2); line-height: 1.7; font-size: 0.95rem;">
+            <div class="authors" style="text-align: left; padding-left: 1.5rem; border-left: 1px solid rgba(255, 255, 255, 0.2); line-height: 1.6; font-size: 0.9rem;">
               <div style="font-weight: 500; margin-bottom: 0.2rem; color: rgba(255, 255, 255, 0.95);">
                 Lars&nbsp;Benedikt&nbsp;Kaesberg,
                 Jan&nbsp;Philip&nbsp;Wahle,
@@ -881,51 +1052,142 @@
             </div>
           </div>
           
-          <div class="header-buttons" style="display: flex; gap: 1.2rem; justify-content: center;">
-            <a href="#dataset" class="header-btn header-btn-primary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.9rem 2rem; font-weight: 600; font-size: 1rem; border-radius: 30px; transition: all 0.3s ease; background: #ffffff; color: var(--color-primary); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <div class="header-buttons" style="display: flex; gap: 1rem; justify-content: center; position: relative; z-index: 5; margin-bottom: 1rem;">
+            <a href="#dataset" class="header-btn header-btn-primary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.5rem; font-weight: 600; font-size: 0.95rem; border-radius: 30px; transition: all 0.3s ease; background: #ffffff; color: var(--color-primary); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
               Get the Dataset
             </a>
-            <a href="https://github.com/lkaesberg/SPaRC" class="header-btn header-btn-secondary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.9rem 2rem; font-weight: 600; font-size: 1rem; border-radius: 30px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.15); color: white; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.2);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+            <a href="https://github.com/lkaesberg/SPaRC" class="header-btn header-btn-secondary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.5rem; font-weight: 600; font-size: 0.95rem; border-radius: 30px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.15); color: white; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.2);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
               View on GitHub
+            </a>
+            <a href="#citation" class="header-btn header-btn-secondary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.5rem; font-weight: 600; font-size: 0.95rem; border-radius: 30px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.15); color: white; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.2);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
+              Cite SPaRC
             </a>
           </div>
         </div>
       </div>
       
-      <div style="position: absolute; bottom: -2px; left: 0; width: 100%; z-index: 1;">
+      <div style="position: absolute; bottom: -2px; left: 0; width: 100%; z-index: 1; pointer-events: none;">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" fill="#ffffff" preserveAspectRatio="none" style="display: block; width: 100%; height: 70px;">
           <path d="M0,32L80,42.7C160,53,320,75,480,75C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,100L1360,100C1280,100,1120,100,960,100C800,100,640,100,480,100C320,100,160,100,80,100L0,100Z"></path>
         </svg>
       </div>
+      
+      <style>
+        /* Adjust wave position on mobile */
+        @media (max-width: 480px) {
+          .site-header > div:last-child {
+            bottom: -1px;
+          }
+          .site-header > div:last-child svg {
+            height: 50px; /* Smaller wave on mobile */
+          }
+        }
+      </style>
     </header>
 
     <!-- Navigation -->
-    <div class="nav-container">
+    <div class="nav-container" style="border-bottom: 1px solid rgba(226, 232, 240, 0.8); position: sticky !important; top: 0 !important; z-index: 1000; background: white; width: 100%; will-change: transform;">
       <div class="container">
         <nav class="main-nav">
-          <ul class="nav-list">
-            <li class="nav-item"><a href="#overview" class="nav-link">Overview</a></li>
-            <li class="nav-item"><a href="#key-features" class="nav-link">Key Features</a></li>
-            <li class="nav-item"><a href="#example" class="nav-link">Example</a></li>
-            <li class="nav-item"><a href="#dataset" class="nav-link">Dataset</a></li>
-            <li class="nav-item"><a href="#leaderboard" class="nav-link">Leaderboard</a></li>
-            <li class="nav-item"><a href="#tools" class="nav-link">Tools</a></li>
-            <li class="nav-item"><a href="#citation" class="nav-link">Citation</a></li>
-            <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
+          <ul class="nav-list" style="display: flex; flex-wrap: nowrap; gap: 0.2rem; margin: 0; padding: 0.5rem 0; list-style: none; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch;">
+            <li class="nav-item"><a href="#overview" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Overview</a></li>
+            <li class="nav-item"><a href="#key-features" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Features</a></li>
+            <li class="nav-item"><a href="#puzzle-rules" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Rules</a></li>
+            <li class="nav-item"><a href="#example" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Example</a></li>
+            <li class="nav-item"><a href="#leaderboard" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Results</a></li>
+            <li class="nav-item"><a href="#tools" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Tools</a></li>
+            <li class="nav-item"><a href="#dataset" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Dataset</a></li>
+            <li class="nav-item"><a href="#citation" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Citation</a></li>
           </ul>
         </nav>
       </div>
-      </div>
+      <style>
+        /* Hide scrollbar but keep functionality */
+        .nav-list::-webkit-scrollbar {
+          display: none;
+        }
+        
+        /* Add fading edges to indicate scrollable content */
+        @media (max-width: 768px) {
+          .nav-container::before,
+          .nav-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 30px;
+            z-index: 2;
+            pointer-events: none;
+          }
+          
+          .nav-container::before {
+            left: 0;
+            background: linear-gradient(to right, white, rgba(255, 255, 255, 0));
+          }
+          
+          .nav-container::after {
+            right: 0;
+            background: linear-gradient(to left, white, rgba(255, 255, 255, 0));
+          }
+          
+          /* Larger touch targets for mobile */
+          .nav-link {
+            padding: 0.8rem 0.9rem !important; 
+            font-size: 0.9rem !important;
+          }
+          
+          /* More compact spacing for small screens */
+          .nav-list {
+            padding: 0.3rem 0 !important;
+            justify-content: flex-start !important;
+            padding-left: 0.5rem !important;
+            scroll-behavior: smooth; /* Add smooth scrolling */
+          }
+          
+          /* Add smooth transition for active state */
+          .nav-link.active {
+            transition: all 0.3s ease;
+          }
+        }
+        
+        /* Additional fixes for mobile layout */
+        @media (max-width: 768px) {
+          /* Fix potential overflow issues */
+          .container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            max-width: 100%;
+          }
+          
+          /* Ensure all grids are responsive */
+          [class*="grid"] {
+            width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+          }
+          
+          /* Rules container fix */
+          .rules-container {
+            margin-left: -0.5rem;
+            margin-right: -0.5rem;
+            width: calc(100% + 1rem);
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+          }
+        }
+      </style>
+    </div>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content" style="width: 100%; overflow-x: hidden; max-width: 100vw; position: relative; z-index: 1;">
       <div class="container">
         <!-- Hero Grid -->
-        <div class="hero-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
+        <div class="hero-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-bottom: 3rem; width: 100%; max-width: 100%; overflow: hidden;">
           <!-- Main visualization - keep this important image -->
-          <div style="grid-column: span 5; display: flex; flex-direction: column; box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden;">
+          <div class="grid-item-format" style="flex: 1; max-width: 500px; min-width: 300px; display: flex; flex-direction: column; box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden;">
             <div class="visual-card" style="height: 360px; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; position: relative;">
               <img src="graphics/images/teaser.png" alt="SPaRC Grid Visualization" style="width: 100%; height: 100%; object-fit: contain; background-color: #ffffff; padding: 1rem;" />
             </div>
@@ -935,7 +1197,7 @@
           </div>
           
           <!-- Performance chart - keep this key visualization -->
-          <div style="grid-column: span 7; display: flex; flex-direction: column; box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden;">
+          <div class="grid-item-performance" style="grid-column: span 7; display: flex; flex-direction: column; box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden;">
             <div class="visual-card" style="height: 360px; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; position: relative;">
               <img src="graphics/figure2_solve_rates.png" alt="Model Performance Comparison" style="width: 100%; height: 100%; object-fit: contain; background-color: #ffffff; padding: 0.5rem;" />
             </div>
@@ -943,32 +1205,27 @@
               Performance
             </div>
           </div>
-          
-          <!-- Remove the three smaller puzzle images from the second row, replace with text cards -->
-          <div class="feature-card" style="grid-column: span 4; background: #1e293b; color: white; border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid rgba(244, 63, 94, 0.85);">
-            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.75rem;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-              <h3 style="margin: 0;">Stars Puzzle</h3>
-            </div>
-            <p style="margin: 0;">Stars must be separated by different regions in valid solutions</p>
-          </div>
-          
-          <div class="feature-card" style="grid-column: span 4; background: #1e293b; color: white; border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid rgba(234, 179, 8, 0.85);">
-            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.75rem;"><path d="M3 20h18L12 3z"></path></svg>
-              <h3 style="margin: 0;">Triangles Puzzle</h3>
-            </div>
-            <p style="margin: 0;">Triangles indicate number of elements must match in their region</p>
-          </div>
-          
-          <div class="feature-card" style="grid-column: span 4; background: #1e293b; color: white; border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid rgba(79, 70, 229, 0.85);">
-            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.75rem;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
-              <h3 style="margin: 0;">Dots Puzzle</h3>
-            </div>
-            <p style="margin: 0;">Dots must be covered by a path exactly once to solve the puzzle</p>
-          </div>
         </div>
+        
+        <style>
+          /* Mobile-specific grid layout to stack items vertically */
+          @media (max-width: 767px) {
+            .hero-grid {
+              grid-template-columns: 1fr !important;
+              gap: 2rem !important;
+            }
+            
+            .grid-item-format,
+            .grid-item-performance {
+              grid-column: span 12 !important;
+              margin-bottom: 0 !important;
+            }
+            
+            .visual-card {
+              height: 280px !important; /* Taller on phones for better visibility */
+            }
+          }
+        </style>
 
         <!-- Key Stats -->
         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin: 1rem 0 4rem; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 2rem; border-radius: var(--radius-lg);">
@@ -1014,31 +1271,188 @@
           </div>
           <div class="features-grid">
             <div class="feature-card">
-              <h3>Grounded Spatial Reasoning</h3>
-              <p>Puzzles combine symbolic clues with geometric constraints for true spatial reasoning challenges.</p>
+              <h3>Multi‑Constraint Problem Solving</h3>
+              <p>Puzzles require simultaneously satisfying multiple spatial constraints, forcing models to integrate various rules (counting, segregation, shape logic) while planning a single path. Wrong steps can lead to irreversible errors, requiring careful hypothesis revision and deep abstract reasoning.</p>
             </div>
             <div class="feature-card">
-              <h3>Long‑Horizon Planning</h3>
-              <p>Typical solutions require 15 or more sequential steps, testing genuine planning capabilities.</p>
+              <h3>Joint Planning and Pathfinding</h3>
+              <p>Tasks demand step-by-step planning combined with pathfinding and logic skills. Solvers must understand rule interactions, perform long-term planning, and navigate through spatial constraints—a core human ability that modern AI systems struggle with.</p>
             </div>
             <div class="feature-card">
-              <h3>Rule Diversity</h3>
-              <p>Includes arithmetic, region membership, obstacle negotiation, parity rules and other constraints.</p>
-            </div>
-            <div class="feature-card">
-              <h3>Human‑Verifiable</h3>
-              <p>Each puzzle has a single gold solution grid and natural‑language rationale for verification.</p>
-            </div>
-            <div class="feature-card">
-              <h3>Open &amp; Extensible</h3>
-              <p>Released under CC‑BY‑4.0 with generation scripts to synthesize new puzzles for research.</p>
-            </div>
-            <div class="feature-card">
-              <h3>Reproducible Evaluation</h3>
-              <p>Standardized evaluation harness facilitates fair comparison between different approaches.</p>
+              <h3>Significant Human-AI Performance Gap</h3>
+              <p>Humans solve 98% of puzzles easily (including 94.5% of the hardest level 5 puzzles), while state-of-the-art reasoning models achieve only 15.8% accuracy overall and just 1.1% on difficult puzzles—revealing fundamental limitations in current AI spatial reasoning.</p>
             </div>
           </div>
       </section>
+
+        <!-- Puzzle Rules Section -->
+        <section id="puzzle-rules" class="section">
+          <div class="section-header">
+            <h2 class="section-title">Puzzle Rules</h2>
+          </div>
+          
+          <div class="rules-container" style="display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 1rem; padding-bottom: 1rem; -webkit-overflow-scrolling: touch; margin-bottom: 2rem; justify-content: flex-start; width: 100%; max-width: 100vw; margin-left: 0; margin-right: 0;">
+            <!-- Rule 1: Dots -->
+            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(0)">
+              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
+                <img src="graphics/images/rules/dot.png" alt="Dots Rule" style="width: 145%; height: 145%; object-fit: cover;">
+              </div>
+              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Dots</div>
+            </div>
+            
+            <!-- Rule 2: Gaps -->
+            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(1)">
+              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
+                <img src="graphics/images/rules/gap.png" alt="Gaps Rule" style="width: 145%; height: 145%; object-fit: cover;">
+              </div>
+              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Gaps</div>
+            </div>
+            
+            <!-- Rule 3: Stones -->
+            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(2)">
+              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
+                <img src="graphics/images/rules/stone.png" alt="Stones Rule" style="width: 145%; height: 145%; object-fit: cover;">
+              </div>
+              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Stones</div>
+            </div>
+            
+            <!-- Rule 4: Stars -->
+            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(3)">
+              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
+                <img src="graphics/images/rules/star.png" alt="Stars Rule" style="width: 145%; height: 145%; object-fit: cover;">
+              </div>
+              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Stars</div>
+            </div>
+            
+            <!-- Rule 5: Triangles -->
+            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(4)">
+              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
+                <img src="graphics/images/rules/triangle.png" alt="Triangles Rule" style="width: 145%; height: 145%; object-fit: cover;">
+              </div>
+              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Triangles</div>
+            </div>
+            
+            <!-- Rule 6: Polyominoes -->
+            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(5)">
+              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
+                <img src="graphics/images/rules/poly.png" alt="Polyominoes Rule" style="width: 145%; height: 145%; object-fit: cover;">
+              </div>
+              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Polyominoes</div>
+            </div>
+            
+            <!-- Rule 7: Ylop -->
+            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(6)">
+              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
+                <img src="graphics/images/rules/ylop.png" alt="Ylop Rule" style="width: 145%; height: 145%; object-fit: cover;">
+              </div>
+              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Ylop</div>
+            </div>
+          </div>
+          
+          <!-- Rule Details Container -->
+          <div id="ruleDetails" class="rule-details" style="background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 2rem; margin-bottom: 2rem; display: block;">
+            <div class="rule-header" style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+              <div id="detailIcon" class="detail-icon" style="background: rgba(99, 102, 241, 0.1); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; overflow: hidden;">
+                <img src="graphics/images/rules/dot.png" alt="Dots Rule" style="width: 145%; height: 145%; object-fit: cover;">
+              </div>
+              <div>
+                <h3 id="detailTitle" class="detail-title" style="margin: 0 0 0.25rem; font-size: 1.5rem; color: var(--color-primary);">
+                  Item Collection
+                </h3>
+                <div id="detailSubtitle" class="detail-subtitle" style="font-size: 1rem; color: var(--color-muted); font-weight: 400;">
+                  Dots
+                </div>
+              </div>
+            </div>
+            <p id="detailDescription" class="detail-description" style="font-size: 1.1rem; line-height: 1.6; margin: 0;">
+              The solution path needs to pass through every dot.
+            </p>
+          </div>
+          
+          <script>
+            // Rule definitions
+            const rules = [
+              {
+                title: 'Item Collection',
+                subtitle: 'Dots',
+                image: 'graphics/images/rules/dot.png',
+                description: 'The solution path needs to pass through every dot.'
+              },
+              {
+                title: 'Path Breaks',
+                subtitle: 'Gaps',
+                image: 'graphics/images/rules/gap.png',
+                description: 'The solution path cannot go through any edge segment containing a gap. Gaps act as local barriers.'
+              },
+              {
+                title: 'Color Separation',
+                subtitle: 'Stones',
+                image: 'graphics/images/rules/stone.png',
+                description: 'The solution path must be drawn to separate stones of different colors. All stones located within any single enclosed region must be of the same color.'
+              },
+              {
+                title: 'Pairing',
+                subtitle: 'Stars',
+                image: 'graphics/images/rules/star.png',
+                description: 'Each star must share its region with exactly one other symbol of the same color. No unpaired or triplet stars are allowed in a region.'
+              },
+              {
+                title: 'Edge Count',
+                subtitle: 'Triangles',
+                image: 'graphics/images/rules/triangle.png',
+                description: 'The solution path must touch the number of edges shown by the triangles in the cell, e.g., two triangles mean the path must touch exactly two edges of that cell.'
+              },
+              {
+                title: 'Shape Fitting',
+                subtitle: 'Polyominoes',
+                image: 'graphics/images/rules/poly.png',
+                description: 'If a cell contains a polyomino (poly), the solution path must enclose a region that matches its exact shape and area. The region must not rotate or mirror the poly. Multiple polys can share a region if their shapes fit without overlapping.'
+              },
+              {
+                title: 'Shape Subtraction',
+                subtitle: 'Ylop',
+                image: 'graphics/images/rules/ylop.png',
+                description: 'A ylop must be enclosed in the same region as one or more polys. Its shape and area subtract from the total required by the polys. If a ylop cancels out a poly exactly, that pair imposes no constraint.'
+              }
+            ];
+            
+            // Function to show rule details
+            function showRule(index) {
+              // Get the rule details
+              const rule = rules[index];
+              
+              // Update the details
+              document.getElementById('detailIcon').innerHTML = `<img src="${rule.image}" alt="${rule.subtitle} Rule" style="width: 145%; height: 145%; object-fit: cover;">`;
+              document.getElementById('detailTitle').textContent = rule.title;
+              document.getElementById('detailSubtitle').textContent = rule.subtitle;
+              document.getElementById('detailDescription').textContent = rule.description;
+              
+              // Update highlighted item state
+              const items = document.querySelectorAll('.rule-item');
+              items.forEach((item, i) => {
+                if (i === index) {
+                  item.style.transform = 'translateY(-5px)';
+                  item.style.boxShadow = 'var(--shadow)';
+                  item.style.background = 'rgba(99, 102, 241, 0.05)';
+                } else {
+                  item.style.transform = '';
+                  item.style.boxShadow = 'var(--shadow-sm)';
+                  item.style.background = 'white';
+                }
+              });
+            }
+            
+            // Initialize with first rule
+            document.addEventListener('DOMContentLoaded', function() {
+              const firstItem = document.querySelector('.rule-item');
+              if (firstItem) {
+                firstItem.style.transform = 'translateY(-5px)';
+                firstItem.style.boxShadow = 'var(--shadow)';
+                firstItem.style.background = 'rgba(99, 102, 241, 0.05)';
+              }
+            });
+          </script>
+        </section>
 
         <!-- Example Section -->
         <section id="example" class="section">
@@ -1091,9 +1505,9 @@
                 <div style="position: absolute; width: 300px; height: 300px; background: rgba(16, 185, 129, 0.05); border-radius: 50%; filter: blur(40px);"></div>
                 <div style="position: absolute; width: 250px; height: 250px; background: rgba(99, 102, 241, 0.05); border-radius: 50%; filter: blur(40px);"></div>
                 
-                <!-- Puzzle container with fixed dimensions -->
-                <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 350px;">
-                  <div id="puzzle-container" style="width: 350px; height: 350px; position: relative; display: flex; align-items: center; justify-content: center;">
+                <!-- Puzzle container with adaptive dimensions -->
+                <div style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 280px; flex-grow: 1; max-height: 80vh; overflow: visible;">
+                  <div id="puzzle-container" style="width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; max-width: 450px; max-height: 450px;">
                     <svg id="puzzle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" style="width: 100%; height: 100%; filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));"></svg>
                   </div>
                 </div>
@@ -1108,52 +1522,49 @@
               </div>
             </div>
           </div>
+          <style>
+            /* Responsive layout for the example section */
+            @media (max-width: 768px) {
+              .example-content {
+                grid-template-columns: 1fr !important;
+              }
+              
+              .puzzle-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+              }
+              
+              .puzzle-controls button {
+                width: 100%;
+              }
+              
+              #puzzle-container {
+                min-height: 280px;
+                max-height: 400px;
+                margin: 1rem auto;
+              }
+            }
+            
+            /* Finer adjustments for smaller screens */
+            @media (max-width: 480px) {
+              .puzzle-stats {
+                grid-template-columns: 1fr !important;
+                padding: 1rem !important;
+              }
+              
+              #puzzle-container {
+                min-height: 250px;
+                max-height: 350px;
+              }
+              
+              .card {
+                padding: 1rem !important;
+              }
+            }
+          </style>
       </section>
 
-        <!-- Dataset Section -->
-        <section id="dataset" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Dataset</h2>
-          </div>
-          <div style="display: flex; align-items: center; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.03) 100%); padding: 1.5rem; border-radius: var(--radius);">
-            <div style="flex: 1;">
-              <p style="font-size: 1.1rem; line-height: 1.5; margin: 0;">
-                The SPaRC dataset contains 1,000 spatial reasoning puzzles with the complete "all" set 
-                available on <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" style="font-weight: 500; text-decoration: underline;" target="_blank">HuggingFace</a>.
-              </p>
-            </div>
-            <div style="margin-left: 2rem;">
-              <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" target="_blank" style="display: inline-flex; align-items: center; text-decoration: none; color: var(--color-primary); font-weight: 500;">
-                <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg" alt="HuggingFace" style="height: 32px; margin-right: 0.75rem;">
-                <span>Browse on HuggingFace</span>
-              </a>
-            </div>
-          </div>
-          
-          <div class="card" style="background: #1e293b; color: #e2e8f0; box-shadow: var(--shadow); overflow: hidden; padding: 0;">
-            <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
-              <div style="display: flex; align-items: center;">
-                <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg" alt="HuggingFace" style="height: 24px; margin-right: 0.75rem;">
-                <h4 style="margin: 0; color: white; font-size: 1.1rem;">HuggingFace Usage</h4>
-              </div>
-              <div>
-                <span style="font-size: 0.8rem; opacity: 0.7;">Python</span>
-              </div>
-            </div>
-            <div class="code-block" style="margin: 0; border-radius: 0; padding: 1.5rem; background: transparent;"># Install and import
-pip install datasets
-from datasets import load_dataset
-
-# Login using e.g. `huggingface-cli login` to access this dataset
-ds = load_dataset("lkaesberg/SPaRC", "all", split="test")
-
-# Access puzzle data
-puzzle = ds[0]
-print(puzzle["id"])                # Puzzle identifier
-print(puzzle["difficulty_level"])  # Difficulty (1-5)
-print(puzzle["grid_size"])         # Grid dimensions</div>
-          </div>
-      </section>
+ 
 
         <!-- Leaderboard Section -->
         <section id="leaderboard" class="section">
@@ -1179,12 +1590,12 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
               <tbody>
                 <tr class="human-row" style="background-color: rgba(16, 185, 129, 0.1);">
                   <td><strong>Human</strong></td>
-                  <td><strong>97.9%</strong></td>
-                  <td>99.8%</td>
-                  <td>99.2%</td>
-                  <td>98.4%</td>
-                  <td>96.4%</td>
-                  <td>95.7%</td>
+                  <td>98.0%</td>
+                  <td>100.0%</td>
+                  <td>100.0%</td>
+                  <td>100.0%</td>
+                  <td>94.4%</td>
+                  <td>94.5%</td>
                 </tr>
                 <tr style="background-color: #f8fafc;">
                   <td colspan="7"><strong>Reasoning Models</strong></td>
@@ -1204,7 +1615,7 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
                   <td>29.1%</td>
                   <td>10.2%</td>
                   <td>2.5%</td>
-                  <td>1.2%</td>
+                  <td><strong>1.2%</strong></td>
                   <td>0.0%</td>
                 </tr>
                 <tr>
@@ -1213,7 +1624,7 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
                   <td>20.9%</td>
                   <td>5.9%</td>
                   <td>2.5%</td>
-                  <td>1.2%</td>
+                  <td><strong>1.2%</strong></td>
                   <td>0.0%</td>
                 </tr>
                 <tr>
@@ -1244,7 +1655,7 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
                   <td>0.8%</td>
                   <td>0.8%</td>
                   <td>0.0%</td>
-                  <td>1.1%</td>
+                  <td><strong>1.1%</strong></td>
                 </tr>
                 <tr>
                   <td><img src="graphics/images/logos/qwen.png" alt="Qwen" width="16px" style="vertical-align: middle; margin-right: 6px;"> Qwen 2.5 72B</td>
@@ -1268,20 +1679,65 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
           </div>
 
           <!-- Error Analysis Figure - Dedicated section with improved styling -->
-          <div style="margin: 3rem 0; background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;">
-            <div style="background: linear-gradient(to right, rgba(99, 102, 241, 0.08), rgba(16, 185, 129, 0.08)); padding: 1.5rem; border-bottom: 1px solid #f1f5f9;">
-              <h3 style="margin: 0; color: var(--color-text); font-size: 1.4rem;">Model Error Analysis</h3>
-              <p style="margin: 0.5rem 0 0; color: var(--color-muted); font-size: 1rem;">Breakdown of error types across different model families</p>
+          <div style="margin: 3rem 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; width: 100%; max-width: 100%; overflow-x: hidden;">
+            <!-- Radar Plot Container -->
+            <div style="background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; height: 100%; max-width: 100%;">
+              <div style="background: linear-gradient(to right, rgba(99, 102, 241, 0.08), rgba(16, 185, 129, 0.08)); padding: 1.5rem; border-bottom: 1px solid #f1f5f9;">
+                <h3 style="margin: 0; color: var(--color-text); font-size: 1.4rem;">Error Patterns by Model Type</h3>
+                <p style="margin: 0.5rem 0 0; color: var(--color-muted); font-size: 1rem;">Radar chart showing different failure modes</p>
+              </div>
+              
+              <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 100%;">
+                <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 100%;">
+                  <img src="graphics/figure_radar_error_types_seaborn.png" alt="Error Analysis by Model Type" style="max-width: 100%; height: auto; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);" />
+                </div>
+                <p style="margin-top: 1.5rem; color: var(--color-muted); font-size: 0.9rem; text-align: center;">
+                  Error patterns differ across model types, with reasoning models showing better performance on baseline spatial tasks but struggling with complex rule interactions.
+                </p>
+              </div>
             </div>
             
-            <div style="padding: 2rem; text-align: center;">
-              <img src="graphics/figure_radar_error_types_seaborn.png" alt="Error Analysis by Model Type" style="max-width: 800px; width: 100%; height: auto; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);" />
-            </div>
-            
-            <div style="padding: 0 2rem 2rem; text-align: center; color: var(--color-muted); font-size: 0.95rem; max-width: 800px; margin: 0 auto;">
-              <p>The radar chart shows different failure modes across model types. Reasoning models show better performance on baseline spatial tasks but struggle with complex rule interactions, while instruction-tuned models have more balanced but weaker performance overall.</p>
+            <!-- Reasoning Example Container -->
+            <div style="background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; height: 100%; max-width: 100%;">
+              <div style="background: linear-gradient(to right, rgba(244, 63, 94, 0.08), rgba(99, 102, 241, 0.08)); padding: 1.5rem; border-bottom: 1px solid #f1f5f9;">
+                <h3 style="margin: 0; color: var(--color-text); font-size: 1.4rem;">Reasoning Analysis Example</h3>
+                <p style="margin: 0.5rem 0 0; color: var(--color-muted); font-size: 1rem;">Case study of model reasoning failure</p>
+              </div>
+              
+              <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 100%;">
+                <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 100%;">
+                  <img src="graphics/reasoning.png" alt="Reasoning Analysis Example" style="max-width: 100%; height: auto; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);" />
+                </div>
+                <p style="margin-top: 1.5rem; color: var(--color-muted); font-size: 0.9rem; text-align: center;">
+                  Analysis of puzzle 80a59619e323acba with an incorrect solution attempt by DeepSeek R1 Llama 70B. The model tends to commit to a sequence of reasoning steps without thoroughly validating each one, leading to careless mistakes.
+                </p>
+              </div>
             </div>
           </div>
+
+          <style>
+            @media (max-width: 850px) {
+              [style*="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr))"] {
+                grid-template-columns: 1fr !important;
+              }
+            }
+            
+            @media (max-width: 600px) {
+              [style*="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr))"] {
+                grid-template-columns: 1fr !important;
+              }
+              
+              [style*="minmax(400px, 1fr)"] > div {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 1rem !important;
+              }
+              
+              [style*="minmax(400px, 1fr)"] h3 {
+                font-size: 1.2rem !important;
+              }
+            }
+          </style>
       </section>
 
         <!-- Tools Section -->
@@ -1303,7 +1759,7 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
               </div>
               
               <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid var(--color-primary); font-size: 0.9rem; color: var(--color-text); opacity: 0.9; flex-grow: 1;">
-                <p>Step through any puzzle frame-by-frame with our interactive visualization tool. Allows examining solutions, rules, and constraints.</p>
+                <p>Solve any puzzle with our interactive visualization tool. Allows examining solutions, rules, and constraints.</p>
               </div>
               
               <a href="/visualizer.html" class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto;">
@@ -1325,7 +1781,7 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
               </div>
               
               <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid var(--color-accent); font-size: 0.9rem; color: var(--color-text); opacity: 0.9; flex-grow: 1;">
-                <p>Contribute to the project by labeling crowdsourced puzzle rationales and helping improve the benchmark dataset.</p>
+                <p>Use our annotation interface to label puzzle samples and analyze human capabilities compared to AI models.</p>
               </div>
               
               <a href="/annotate.html" class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto;">
@@ -1334,29 +1790,74 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
               </a>
             </div>
             
-            <!-- Live Playground -->
+            <!-- Result Analyser (Coming Soon) -->
             <div class="feature-card" style="background: white; border-radius: var(--radius); padding: 1.5rem; overflow: hidden; box-shadow: var(--shadow); border: none; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column;">
               <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
                 <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M9 17h6"></path><path d="M10 20H3a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2h7M14 20h7a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-7"></path><path d="M21 14H3"></path><path d="M21 6H3"></path></svg>
                 </div>
                 <div>
-                  <h3 style="margin: 0; font-size: 1.25rem; color: var(--color-text);">Live Playground</h3>
-                  <div style="font-size: 0.85rem; color: #10b981; font-weight: 500;">Interactive</div>
+                  <h3 style="margin: 0; font-size: 1.25rem; color: var(--color-text);">Result Analyser</h3>
+                  <div style="font-size: 0.85rem; color: #10b981; font-weight: 500;">Coming Soon</div>
                 </div>
               </div>
               
               <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #10b981; font-size: 0.9rem; color: var(--color-text); opacity: 0.9; flex-grow: 1;">
-                <p>Solve puzzles directly in your browser and compare your solutions with those generated by various AI models.</p>
+                <p>Analyze model performance patterns and compare reasoning strategies across different AI systems to identify key areas for improvement.</p>
               </div>
               
-              <a href="/playground.html" class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                Try Puzzles
-              </a>
+              <button disabled class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto; opacity: 0.7; cursor: not-allowed;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 6v6l4 2"></path></svg>
+                Coming Soon
+              </button>
             </div>
           </div>
       </section>
+
+             <!-- Dataset Section -->
+             <section id="dataset" class="section">
+              <div class="section-header">
+                <h2 class="section-title">Dataset</h2>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.03) 100%); padding: 1.5rem; border-radius: var(--radius);">
+                <div style="flex: 1;">
+                  <p style="font-size: 1.1rem; line-height: 1.5; margin: 0;">
+                    The SPaRC dataset contains 1,000 spatial reasoning puzzles with the complete "all" set 
+                    available on <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" style="font-weight: 500; text-decoration: underline;" target="_blank">HuggingFace</a>.
+                  </p>
+                </div>
+                <div style="margin-left: 2rem;">
+                  <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" target="_blank" style="display: inline-flex; align-items: center; text-decoration: none; color: var(--color-primary); font-weight: 500;">
+                    <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg" alt="HuggingFace" style="height: 32px; margin-right: 0.75rem;">
+                    <span>Browse on HuggingFace</span>
+                  </a>
+                </div>
+              </div>
+              
+              <div class="card" style="background: #1e293b; color: #e2e8f0; box-shadow: var(--shadow); overflow: hidden; padding: 0;">
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+                  <div style="display: flex; align-items: center;">
+                    <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg" alt="HuggingFace" style="height: 24px; margin-right: 0.75rem;">
+                    <h4 style="margin: 0; color: white; font-size: 1.1rem;">HuggingFace Usage</h4>
+                  </div>
+                  <div>
+                    <span style="font-size: 0.8rem; opacity: 0.7;">Python</span>
+                  </div>
+                </div>
+                <div class="code-block" style="margin: 0; border-radius: 0; padding: 1.5rem; background: transparent;"># Install and import
+    pip install datasets
+    from datasets import load_dataset
+    
+    # Login using e.g. `huggingface-cli login` to access this dataset
+    ds = load_dataset("lkaesberg/SPaRC", "all", split="test")
+    
+    # Access puzzle data
+    puzzle = ds[0]
+    print(puzzle["id"])                # Puzzle identifier
+    print(puzzle["difficulty_level"])  # Difficulty (1-5)
+    print(puzzle["grid_size"])         # Grid dimensions</div>
+              </div>
+          </section>
 
         <!-- Citation Section -->
         <section id="citation" class="section">
@@ -1378,10 +1879,7 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
           </div>
           <div class="card" style="text-align: center;">
             <p>For questions, feedback, or collaboration opportunities:</p>
-            <p><a href="mailto:sparc@cs.uni-goettingen.de">sparc@cs.uni-goettingen.de</a></p>
-            <div style="margin-top: 2rem;">
-              <a href="https://github.com/lkaesberg/SPaRC" class="btn">GitHub Repository</a>
-            </div>
+            <p><a href="mailto:l.kaesberg@uni-goettingen.de">l.kaesberg@uni-goettingen.de</a></p>
           </div>
       </section>
       </div>
@@ -1391,11 +1889,10 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
     <footer class="site-footer">
       <div class="container">
         <div class="footer-content">
-          <p>Released under <a href="https://creativecommons.org/licenses/by/4.0/">CC‑BY‑4.0</a> · © 2025 SPaRC Authors</p>
+          <p>Dataset Released under <a href="https://creativecommons.org/licenses/by/4.0/">CC‑BY‑4.0</a> · © 2025 SPaRC Authors</p>
           <div class="footer-links">
             <a href="https://github.com/lkaesberg/SPaRC">GitHub</a>
             <a href="https://huggingface.co/datasets/lkaesberg/SPaRC">HuggingFace</a>
-            <a href="https://paperswithcode.com/sota/spatial-reasoning-on-sparc">Papers With Code</a>
           </div>
         </div>
       </div>
@@ -1630,6 +2127,37 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
             const height = puzzleData.grid_size.height;
             const puzzle = new Puzzle(width, height);
             
+            // Adjust SVG viewBox based on grid size
+            const cellSize = 41; // Standard cell size used in the visualization
+            const padding = 50; // Padding around the grid
+            const viewBoxWidth = width * 2 * cellSize + padding * 2;
+            const viewBoxHeight = height * 2 * cellSize + padding * 2;
+            
+            // Update SVG viewBox to accommodate the puzzle size
+            if (svg) {
+              svg.setAttribute('viewBox', `0 0 ${viewBoxWidth} ${viewBoxHeight}`);
+              
+              // Adjust container size ratio for extreme grid dimensions
+              const puzzleContainer = document.getElementById('puzzle-container');
+              if (puzzleContainer) {
+                // Calculate aspect ratio and apply it to the container
+                const aspectRatio = viewBoxWidth / viewBoxHeight;
+                if (aspectRatio > 1.5) {
+                  // Wide puzzle
+                  puzzleContainer.style.width = '100%';
+                  puzzleContainer.style.height = `${100 / aspectRatio}%`;
+                } else if (aspectRatio < 0.7) {
+                  // Tall puzzle
+                  puzzleContainer.style.height = '100%';
+                  puzzleContainer.style.width = `${100 * aspectRatio}%`;
+                } else {
+                  // Relatively square puzzle
+                  puzzleContainer.style.width = '100%';
+                  puzzleContainer.style.height = '100%';
+                }
+              }
+            }
+            
             // Parse YAML from text_visualization using js-yaml
             const yamlData = jsyaml.load(puzzleData.text_visualization);
             
@@ -1786,11 +2314,22 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
           // Create a path element for the solution
           const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
           
-          // Build path data
+          // Get the current viewBox dimensions from the SVG
+          const viewBox = svg.getAttribute('viewBox')?.split(' ') || ['0', '0', '500', '500'];
+          const viewBoxWidth = parseFloat(viewBox[2]);
+          const viewBoxHeight = parseFloat(viewBox[3]);
+          
+          // Calculate scale and offset based on grid size
+          const width = puzzleData.grid_size.width;
+          const height = puzzleData.grid_size.height;
+          const cellSize = 41; // Standard cell size
+          const padding = 50; // Standard padding
+          
+          // Build path data with proper scaling
           let pathData = "";
           path.forEach((point, index) => {
-            const x = point.x * 41 + 52;
-            const y = point.y * 41 + 52;
+            const x = point.x * cellSize + padding;
+            const y = point.y * cellSize + padding;
             
             if (index === 0) {
               pathData += `M ${x} ${y} `;
@@ -1852,6 +2391,141 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
             console.error('Error initializing puzzle:', e);
           }
         }, 500);
+      });
+    </script>
+
+    <script>
+      // Add active state to navigation links based on scroll position
+      document.addEventListener('DOMContentLoaded', function() {
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section[id]');
+        
+        function setActiveLink() {
+          let scrollPos = window.scrollY + 100;
+          
+          // Find the current section
+          sections.forEach((section, i) => {
+            if (section.offsetTop <= scrollPos && 
+                (section.offsetTop + section.offsetHeight > scrollPos || i === sections.length - 1)) {
+              
+              // Remove active class from all links
+              navLinks.forEach(link => {
+                link.classList.remove('active');
+                link.style.backgroundColor = '';
+                link.style.color = '';
+              });
+              
+              // Add active class to current link
+              const currentLink = document.querySelector(`.nav-link[href="#${section.id}"]`);
+              if (currentLink) {
+                currentLink.classList.add('active');
+                currentLink.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+                currentLink.style.color = 'var(--color-primary)';
+              }
+            }
+          });
+        }
+        
+        window.addEventListener('scroll', setActiveLink);
+        setActiveLink();
+      });
+    </script>
+
+    <script>
+      // Center active items in the navigation bar on mobile
+      document.addEventListener('DOMContentLoaded', function() {
+        const navList = document.querySelector('.nav-list');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section[id]');
+        const isMobile = window.innerWidth <= 768;
+        
+        // Function to center an item in the navigation
+        function centerItemInNav(item) {
+          if (!item || !isMobile) return;
+          
+          const navListWidth = navList.offsetWidth;
+          const itemWidth = item.offsetWidth;
+          const itemLeft = item.offsetLeft;
+          const itemCenter = itemLeft + itemWidth / 2;
+          const navListCenter = navListWidth / 2;
+          const scrollLeft = itemCenter - navListCenter;
+          
+          navList.scrollTo({
+            left: scrollLeft,
+            behavior: 'smooth'
+          });
+        }
+        
+        // Center the item when clicking on a nav link
+        navLinks.forEach(link => {
+          link.addEventListener('click', function(e) {
+            // Allow a moment for the active class to be added
+            setTimeout(() => centerItemInNav(this), 100);
+          });
+        });
+        
+        // Function to update active state based on scroll position
+        function setActiveLink() {
+          let scrollPos = window.scrollY + 100;
+          let activeLink = null;
+          
+          // Find the current section
+          sections.forEach((section, i) => {
+            if (section.offsetTop <= scrollPos && 
+                (section.offsetTop + section.offsetHeight > scrollPos || i === sections.length - 1)) {
+              
+              // Remove active class from all links
+              navLinks.forEach(link => {
+                link.classList.remove('active');
+                link.style.backgroundColor = '';
+                link.style.color = '';
+              });
+              
+              // Add active class to current link
+              activeLink = document.querySelector(`.nav-link[href="#${section.id}"]`);
+              if (activeLink) {
+                activeLink.classList.add('active');
+                activeLink.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+                activeLink.style.color = 'var(--color-primary)';
+                
+                // Center the active link
+                centerItemInNav(activeLink);
+              }
+            }
+          });
+        }
+        
+        // Initial centering of active item
+        window.addEventListener('load', function() {
+          // Find the initial active link
+          const initialActive = document.querySelector('.nav-link.active') || navLinks[0];
+          if (initialActive) {
+            initialActive.classList.add('active');
+            initialActive.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+            initialActive.style.color = 'var(--color-primary)';
+            
+            // Give the browser a moment to calculate positions
+            setTimeout(() => centerItemInNav(initialActive), 300);
+          }
+        });
+        
+        // Update on scroll
+        window.addEventListener('scroll', setActiveLink);
+        
+        // Update on resize
+        window.addEventListener('resize', function() {
+          // Update mobile status
+          isMobile = window.innerWidth <= 768;
+          
+          // Find the current active link and center it
+          const currentActive = document.querySelector('.nav-link.active');
+          if (currentActive) {
+            centerItemInNav(currentActive);
+          }
+        });
+        
+        // Run initially
+        setActiveLink();
       });
     </script>
   </body>
