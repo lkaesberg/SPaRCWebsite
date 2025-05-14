@@ -1877,7 +1877,7 @@
     print(puzzle["id"])                # Puzzle identifier
     print(puzzle["difficulty_level"])  # Difficulty (1-5)
     print(puzzle["grid_size"])         # Grid dimensions</div>
-              </div>
+          </div>
       </section>
 
         <!-- Citation Section -->
@@ -2202,6 +2202,9 @@
             const width = puzzleData.grid_size.width;
             const height = puzzleData.grid_size.height;
             const puzzle = new Puzzle(width, height);
+            
+            // Make sure the puzzle object is stored in the global space for reference
+            window.puzzleBoard = puzzle;
             
             // Adjust SVG viewBox based on grid size
             const cellSize = 41; // Standard cell size used in the visualization
@@ -3040,6 +3043,9 @@
             const width = puzzleData.grid_size.width;
             const height = puzzleData.grid_size.height;
             const puzzle = new Puzzle(width, height);
+            
+            // Make sure the puzzle object is stored in the global space for reference
+            window.puzzleBoard = puzzle;
             
             // Adjust SVG viewBox based on grid size
             const cellSize = 41; // Standard cell size used in the visualization
