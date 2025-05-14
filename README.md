@@ -1,8 +1,12 @@
-# The Witness Dataset Visualizer
+<p align="center">
+  <img src="favicon/web-app-manifest-512x512.png" alt="SPaRC Logo" width="128"/>
+</p>
 
-A web-based visualization and puzzle creation tool for The Witness puzzle mechanics. This project allows you to:
+# SPaRC Dataset Visualizer
 
-- Browse a collection of puzzles from The Witness
+A web-based visualization and puzzle creation tool for SPaRC spatial reasoning puzzles. This project allows you to:
+
+- Browse a collection of spatial reasoning puzzles
 - Create and edit your own puzzles
 - Practice challenge puzzles
 - Use automatic solvers for specific puzzle types
@@ -10,7 +14,7 @@ A web-based visualization and puzzle creation tool for The Witness puzzle mechan
 
 ## Features
 
-- Interactive puzzle editor with support for all puzzle mechanics from The Witness
+- Interactive puzzle editor with support for all SPaRC puzzle mechanics
 - Comprehensive validation system for puzzle solutions
 - Visual rendering of puzzles using SVG
 - Challenge practice mode
@@ -20,24 +24,22 @@ A web-based visualization and puzzle creation tool for The Witness puzzle mechan
   - Colored squares
   - Stars
   - Triangles
-  - Symmetry
-  - Negation
-  - Pillars
-  - Gaps and dots
+  - Dots and gaps
+  - And more
 
 ## Usage
 
-Visit the main site at [witnesspuzzles.com](https://witnesspuzzles.com) to access the following pages:
+Visit the main site at [sparc.gipplab.org](https://sparc.gipplab.org) to access the following features:
 
-- [Browse](https://witnesspuzzles.com/browse.html) - List of all puzzles
-- [Challenge](https://witnesspuzzles.com/challenge.html) - Challenge practice
-- [Editor](https://witnesspuzzles.com/editor.html) - Create a new puzzle
-- [Metapuzzle](https://witnesspuzzles.com/metapuzzle.html) - Automatic solver for the Mountain metapuzzle
-- [WebCrow](https://witnesspuzzles.com/webcrow.html) - Automatic solver for the challenge triangle puzzles
+- Browse - List of all puzzles
+- Challenge - Challenge practice
+- Editor - Create a new puzzle
+- Visualization tools
+- Automatic solvers
 
 ## Credits
 
-This project is a fork of the original repository by [jbzdarkid](https://github.com/jbzdarkid/jbzdarkid.github.io), which provides a JavaScript implementation of the puzzles in The Witness. The original repository can be found at:
+This project is a fork of the original repository by [jbzdarkid](https://github.com/jbzdarkid/jbzdarkid.github.io), which provided the initial implementation. The original repository can be found at:
 [https://github.com/jbzdarkid/jbzdarkid.github.io](https://github.com/jbzdarkid/jbzdarkid.github.io)
 
 All credit for the original implementation goes to jbzdarkid.
