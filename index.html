@@ -1537,6 +1537,18 @@
                 <div style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 280px; flex-grow: 1; max-height: 80vh; overflow: visible; position: relative;">
                   <div id="puzzle-container" style="width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; max-width: 450px; max-height: 450px;">
                     <svg id="puzzle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" style="width: 100%; height: 100%; filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));"></svg>
+                    
+                    <!-- Interactive overlay indicator -->
+                    <div id="puzzle-interaction-hint" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.5); border-radius: var(--radius); backdrop-filter: blur(2px); cursor: pointer; z-index: 10; transition: opacity 0.3s ease-in-out;">
+                      <div class="pulse-circle" style="position: relative; width: 80px; height: 80px; margin-bottom: 20px;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.2); animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;"></div>
+                        <div style="position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; animation: pulse-dot 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;">
+                        </div>
+                      </div>
+                      <p style="color: white; font-weight: 500; text-align: center; margin: 0; padding: 0 20px; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                        Click to interact
+                      </p>
+                    </div>
                   </div>
                 </div>
                 
@@ -1587,6 +1599,34 @@
               
               .card {
                 padding: 1rem !important;
+              }
+            }
+            
+            /* Animation for the interaction hint */
+            @keyframes pulse-ring {
+              0% {
+                transform: scale(0.8);
+                opacity: 0.8;
+              }
+              50% {
+                transform: scale(1.2);
+                opacity: 0.3;
+              }
+              100% {
+                transform: scale(0.8);
+                opacity: 0.8;
+              }
+            }
+            
+            @keyframes pulse-dot {
+              0% {
+                transform: scale(0.9);
+              }
+              50% {
+                transform: scale(1);
+              }
+              100% {
+                transform: scale(0.9);
               }
             }
           </style>
@@ -2726,6 +2766,22 @@
             console.error('Error initializing puzzle:', e);
           }
         }, 500);
+      });
+    </script>
+
+    <!-- Add script to handle the interaction hint -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const interactionHint = document.getElementById('puzzle-interaction-hint');
+        if (interactionHint) {
+          // Hide the hint when clicked
+          interactionHint.addEventListener('click', function() {
+            interactionHint.style.opacity = '0';
+            setTimeout(() => {
+              interactionHint.style.display = 'none';
+            }, 300);
+          });
+        }
       });
     </script>
   </body>
