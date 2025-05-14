@@ -25,7 +25,7 @@
         --font-base: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
-      
+
       /* Prevent horizontal scrolling while allowing sticky elements */
       html {
         overflow-x: hidden;
@@ -1179,7 +1179,7 @@
           }
         }
       </style>
-    </div>
+      </div>
 
     <!-- Main Content -->
     <main class="main-content" style="width: 100%; overflow-x: hidden; max-width: 100vw; position: relative; z-index: 1;">
@@ -1205,8 +1205,8 @@
               Performance
             </div>
           </div>
-        </div>
-        
+          </div>
+          
         <style>
           /* Mobile-specific grid layout to stack items vertically */
           @media (max-width: 767px) {
@@ -1282,23 +1282,23 @@
               <h3>Significant Human-AI Performance Gap</h3>
               <p>Humans solve 98% of puzzles easily (including 94.5% of the hardest level 5 puzzles), while state-of-the-art reasoning models achieve only 15.8% accuracy overall and just 1.1% on difficult puzzles—revealing fundamental limitations in current AI spatial reasoning.</p>
             </div>
-          </div>
+            </div>
       </section>
 
         <!-- Puzzle Rules Section -->
         <section id="puzzle-rules" class="section">
           <div class="section-header">
             <h2 class="section-title">Puzzle Rules</h2>
-          </div>
+            </div>
           
           <div class="rules-container" style="display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 1rem; padding-bottom: 1rem; -webkit-overflow-scrolling: touch; margin-bottom: 2rem; justify-content: flex-start; width: 100%; max-width: 100vw; margin-left: 0; margin-right: 0;">
             <!-- Rule 1: Dots -->
             <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(0)">
               <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
                 <img src="graphics/images/rules/dot.png" alt="Dots Rule" style="width: 145%; height: 145%; object-fit: cover;">
-              </div>
-              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Dots</div>
             </div>
+              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Dots</div>
+          </div>
             
             <!-- Rule 2: Gaps -->
             <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(1)">
@@ -1452,7 +1452,7 @@
               }
             });
           </script>
-        </section>
+      </section>
 
         <!-- Example Section -->
         <section id="example" class="section">
@@ -1506,9 +1506,30 @@
                 <div style="position: absolute; width: 250px; height: 250px; background: rgba(99, 102, 241, 0.05); border-radius: 50%; filter: blur(40px);"></div>
                 
                 <!-- Puzzle container with adaptive dimensions -->
-                <div style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 280px; flex-grow: 1; max-height: 80vh; overflow: visible;">
+                <div style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 280px; flex-grow: 1; max-height: 80vh; overflow: visible; position: relative;">
                   <div id="puzzle-container" style="width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; max-width: 450px; max-height: 450px;">
                     <svg id="puzzle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" style="width: 100%; height: 100%; filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));"></svg>
+                    
+                    <!-- Interactive hint animation -->
+                    <div id="puzzle-interaction-hint" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; opacity: 0.9; transition: opacity 0.5s ease; background-color: rgba(0,0,0,0.3);">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="width: 80px; height: 80px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                        <!-- Pulsing circle -->
+                        <circle id="hint-pulse" cx="50" cy="50" r="35" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.3">
+                          <animate attributeName="r" from="35" to="45" dur="1.5s" begin="0s" repeatCount="indefinite" />
+                          <animate attributeName="opacity" from="0.6" to="0" dur="1.5s" begin="0s" repeatCount="indefinite" />
+                        </circle>
+                        <!-- Secondary pulsing circle -->
+                        <circle id="hint-pulse-inner" cx="50" cy="50" r="20" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.5">
+                          <animate attributeName="r" from="20" to="30" dur="1.5s" begin="0.5s" repeatCount="indefinite" />
+                          <animate attributeName="opacity" from="0.7" to="0.1" dur="1.5s" begin="0.5s" repeatCount="indefinite" />
+                        </circle>
+                      </svg>
+                      
+                      <!-- Hint text -->
+                      <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; color: white; font-size: 14px; text-shadow: 0 1px 3px rgba(0,0,0,0.7); font-weight: 500;">
+                        Click to interact with the puzzle
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
@@ -1682,11 +1703,11 @@
           <div style="margin: 3rem 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; width: 100%; max-width: 100%; overflow-x: hidden;">
             <!-- Radar Plot Container -->
             <div style="background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; height: 100%; max-width: 100%;">
-              <div style="background: linear-gradient(to right, rgba(99, 102, 241, 0.08), rgba(16, 185, 129, 0.08)); padding: 1.5rem; border-bottom: 1px solid #f1f5f9;">
+            <div style="background: linear-gradient(to right, rgba(99, 102, 241, 0.08), rgba(16, 185, 129, 0.08)); padding: 1.5rem; border-bottom: 1px solid #f1f5f9;">
                 <h3 style="margin: 0; color: var(--color-text); font-size: 1.4rem;">Error Patterns by Model Type</h3>
                 <p style="margin: 0.5rem 0 0; color: var(--color-muted); font-size: 1rem;">Radar chart showing different failure modes</p>
-              </div>
-              
+            </div>
+            
               <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 100%;">
                 <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 100%;">
                   <img src="graphics/figure_radar_error_types_seaborn.png" alt="Error Analysis by Model Type" style="max-width: 100%; height: auto; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);" />
@@ -1702,12 +1723,12 @@
               <div style="background: linear-gradient(to right, rgba(244, 63, 94, 0.08), rgba(99, 102, 241, 0.08)); padding: 1.5rem; border-bottom: 1px solid #f1f5f9;">
                 <h3 style="margin: 0; color: var(--color-text); font-size: 1.4rem;">Reasoning Analysis Example</h3>
                 <p style="margin: 0.5rem 0 0; color: var(--color-muted); font-size: 1rem;">Case study of model reasoning failure</p>
-              </div>
+            </div>
               
               <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 100%;">
                 <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 100%;">
                   <img src="graphics/reasoning.png" alt="Reasoning Analysis Example" style="max-width: 100%; height: auto; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);" />
-                </div>
+          </div>
                 <p style="margin-top: 1.5rem; color: var(--color-muted); font-size: 0.9rem; text-align: center;">
                   Analysis of puzzle 80a59619e323acba with an incorrect solution attempt by DeepSeek R1 Llama 70B. The model tends to commit to a sequence of reasoning steps without thoroughly validating each one, leading to careless mistakes.
                 </p>
@@ -1830,9 +1851,9 @@
                   <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" target="_blank" style="display: inline-flex; align-items: center; text-decoration: none; color: var(--color-primary); font-weight: 500;">
                     <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg" alt="HuggingFace" style="height: 32px; margin-right: 0.75rem;">
                     <span>Browse on HuggingFace</span>
-                  </a>
-                </div>
-              </div>
+              </a>
+            </div>
+          </div>
               
               <div class="card" style="background: #1e293b; color: #e2e8f0; box-shadow: var(--shadow); overflow: hidden; padding: 0;">
                 <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
@@ -1857,7 +1878,7 @@
     print(puzzle["difficulty_level"])  # Difficulty (1-5)
     print(puzzle["grid_size"])         # Grid dimensions</div>
               </div>
-          </section>
+      </section>
 
         <!-- Citation Section -->
         <section id="citation" class="section">
@@ -2672,6 +2693,626 @@
             setTimeout(setupTouchHandlers, 500);
           });
         }
+        
+        // Track if hint has been dismissed
+        let hintDismissed = false;
+        
+        // Function to hide the interaction hint
+        function hideInteractionHint(event) {
+          // Stop event propagation to prevent puzzle handlers
+          event.stopPropagation();
+          event.preventDefault();
+          
+          const hint = document.getElementById('puzzle-interaction-hint');
+          if (hint) {
+            // Fade out animation
+            hint.style.opacity = '0';
+            
+            // Hide completely after animation completes
+            setTimeout(() => {
+              hint.style.display = 'none';
+            }, 500);
+            
+            // Mark hint as dismissed
+            hintDismissed = true;
+          }
+        }
+        
+        // Initialize interaction hint
+        function initInteractionHint() {
+          // Get latest element
+          const hint = document.getElementById('puzzle-interaction-hint');
+          
+          if (!hint) return;
+          
+          // If hint was previously dismissed, keep it hidden
+          if (hintDismissed) {
+            hint.style.display = 'none';
+            return;
+          }
+          
+          // Show hint for every new puzzle (if not dismissed)
+          hint.style.display = 'block';
+          hint.style.opacity = '0.9';
+          
+          // Clean up any existing listeners
+          hint.removeEventListener('mousedown', hideInteractionHint);
+          hint.removeEventListener('touchstart', hideInteractionHint);
+          
+          // Add listeners directly to the hint with capturing phase (true)
+          hint.addEventListener('mousedown', hideInteractionHint);
+          hint.addEventListener('touchstart', hideInteractionHint);
+        }
+        
+        // Initialize on page load
+        initInteractionHint();
+        
+        // Re-initialize when puzzle changes, but respect dismissed state
+        const puzzleObserver = new MutationObserver((mutations) => {
+          // Only process if hint hasn't been dismissed yet
+          if (!hintDismissed) {
+            for (const mutation of mutations) {
+              if (mutation.type === 'childList') {
+                // Wait for DOM to update fully
+                setTimeout(initInteractionHint, 100);
+                break;
+              }
+            }
+          }
+        });
+        
+        // Use a different variable name to avoid conflicts
+        const hintTargetElement = document.getElementById('example');
+        if (hintTargetElement) {
+          puzzleObserver.observe(hintTargetElement, {
+            childList: true,
+            subtree: true
+          });
+        }
+      });
+    </script>
+
+    <!-- Puzzle Script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Keep one sample puzzle as a fallback
+        const fallbackPuzzle = {"difficulty_level":5,"difficulty_score":5.8,"grid_size":{"height":2,"width":3},"id":"176d1e37ebbacac0","polyshapes":{"16":"·█··\n····\n····\n····"},"puzzle_array":[["+","+","+","+","+",".","+"],["S","N","+","P-R-16","+","o-B","+"],["+","+","+","+","+","+","+"],["+","N","+","N","+","o-B","+"],["+","+","E","+","+","+","+"]],"solution_count":1,"solutions":[{"index":0,"path":[{"x":0,"y":1},{"x":0,"y":0},{"x":1,"y":0},{"x":2,"y":0},{"x":2,"y":1},{"x":2,"y":2},{"x":3,"y":2},{"x":4,"y":2},{"x":4,"y":1},{"x":4,"y":0},{"x":5,"y":0},{"x":6,"y":0},{"x":6,"y":1},{"x":6,"y":2},{"x":6,"y":3},{"x":6,"y":4},{"x":5,"y":4},{"x":4,"y":4},{"x":3,"y":4},{"x":2,"y":4}],"pathLength":20}],"text_visualization":"puzzle:\n  dimensions:\n    width: 3\n    height: 2\n  start:\n    x: 0\n    y: 1\n  end:\n    x: 2\n    y: 4\n  cells:\n    - position:\n        x: 3\n        y: 1\n      properties:\n        type: \"poly\"\n        polyshape: 16\n        color: \"red\"\n    - position:\n        x: 5\n        y: 0\n      properties:\n        dot: 1\n        color: \"black\"\n    - position:\n        x: 5\n        y: 1\n      properties:\n        type: \"square\"\n        color: \"blue\"\n    - position:\n        x: 5\n        y: 3\n      properties:\n        type: \"square\"\n        color: \"blue\"\n"};
+        
+        let currentPuzzle = fallbackPuzzle;
+        let solutionVisible = false;
+        let puzzlesCache = [];
+        let isLoadingPuzzle = false;
+        
+        // Get DOM elements
+        const showSolutionBtn = document.getElementById('show-solution-btn');
+        const randomizePuzzleBtn = document.getElementById('randomize-puzzle-btn');
+        
+        // Add event listeners to buttons
+        if (showSolutionBtn) {
+          showSolutionBtn.addEventListener('click', toggleSolution);
+        }
+        
+        if (randomizePuzzleBtn) {
+          randomizePuzzleBtn.addEventListener('click', loadRandomPuzzle);
+        }
+        
+        // Function to clean up previous puzzle state and event handlers
+        function cleanupPreviousPuzzle() {
+          // Remove any solution
+          const existingSolution = document.getElementById('solution-path');
+          if (existingSolution) {
+            existingSolution.remove();
+          }
+          
+          // Reset interaction state
+          solutionVisible = false;
+          
+          // Clean up any global state set by the witness engine
+          if (window.trace && window.trace.puzzle) {
+            window.trace.cancel();
+          }
+          
+          // Get the SVG element
+          const svg = document.getElementById('puzzle');
+          if (svg) {
+            // Remove any event listeners attached to the SVG
+            const newSvg = svg.cloneNode(false);
+            if (svg.parentNode) {
+              svg.parentNode.replaceChild(newSvg, svg);
+            }
+          }
+          
+          // Force garbage collection hints for old puzzle objects
+          if (window.puzzleBoard) {
+            window.puzzleBoard = null;
+          }
+          
+          // Clean up any CSS animations
+          const style = document.createElement('style');
+          style.textContent = '.line-active, .line-success, .line-fail { animation: none !important; }';
+          document.head.appendChild(style);
+          setTimeout(() => {
+            if (style.parentNode) style.parentNode.removeChild(style);
+          }, 100);
+        }
+        
+        // Toggle solution visibility
+        function toggleSolution() {
+          if (solutionVisible) {
+            // Remove solution
+            const existingSolution = document.getElementById('solution-path');
+            if (existingSolution) {
+              existingSolution.remove();
+            }
+            solutionVisible = false;
+            showSolutionBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg> Show Solution';
+          } else {
+            // Show solution
+            displaySolution(currentPuzzle, 0);
+            solutionVisible = true;
+            showSolutionBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg> Hide Solution';
+          }
+        }
+        
+        // Load a random puzzle from the dataset
+        function loadRandomPuzzle() {
+          // Don't load a new puzzle if we're still loading one
+          if (isLoadingPuzzle) return;
+          
+          isLoadingPuzzle = true;
+          
+          // Reset solution visibility state
+          solutionVisible = false;
+          if (showSolutionBtn) {
+            showSolutionBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg> Show Solution';
+          }
+          
+          // Remove any displayed solution
+          const existingSolution = document.getElementById('solution-path');
+          if (existingSolution) {
+            existingSolution.remove();
+          }
+          
+          // Disable the button and show loading indicator
+          if (randomizePuzzleBtn) {
+            randomizePuzzleBtn.disabled = true;
+            randomizePuzzleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> Loading...';
+          }
+          
+          // If we have cached puzzles, use one of them
+          if (puzzlesCache.length > 0) {
+            // Get a random puzzle from the cache
+            const randomIndex = Math.floor(Math.random() * puzzlesCache.length);
+            const puzzleData = puzzlesCache[randomIndex];
+            
+            // Remove the used puzzle from cache
+            puzzlesCache.splice(randomIndex, 1);
+            
+            // Update current puzzle
+            currentPuzzle = puzzleData;
+            
+            // Reset solution visibility
+            solutionVisible = false;
+            if (showSolutionBtn) {
+              showSolutionBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg> Show Solution';
+            }
+            
+            // Load the puzzle
+            createPuzzleFromData(puzzleData);
+            
+            // Enable the button
+            if (randomizePuzzleBtn) {
+              randomizePuzzleBtn.disabled = false;
+              randomizePuzzleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"></path></svg> Random Dataset Puzzle';
+            }
+            
+            isLoadingPuzzle = false;
+          } else {
+            // Load the dataset file
+            fetch('puzzle_all_test.jsonl')
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`Network response was not ok: ${response.status}`);
+                }
+                return response.text();
+              })
+              .then(data => {
+                // Split the file into lines
+                const lines = data.split('\n').filter(line => line.trim().length > 0);
+                
+                // Cache some random puzzles for future use (up to 10)
+                puzzlesCache = [];
+                const maxCache = Math.min(10, lines.length);
+                
+                for (let i = 0; i < maxCache; i++) {
+                  const randomLineIndex = Math.floor(Math.random() * lines.length);
+                  try {
+                    const puzzleJson = lines[randomLineIndex];
+                    const puzzleData = JSON.parse(puzzleJson);
+                    
+                    // Only use the first as the current puzzle
+                    if (i === 0) {
+                      // Update current puzzle
+                      currentPuzzle = puzzleData;
+                      
+                      // Reset solution visibility
+                      solutionVisible = false;
+                      if (showSolutionBtn) {
+                        showSolutionBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg> Show Solution';
+                      }
+                      
+                      // Load the puzzle
+                      createPuzzleFromData(puzzleData);
+                    } else {
+                      // Cache the rest
+                      puzzlesCache.push(puzzleData);
+                    }
+                  } catch (err) {
+                    console.error('Error parsing puzzle JSON:', err);
+                  }
+                }
+                
+                // Enable the button
+                if (randomizePuzzleBtn) {
+                  randomizePuzzleBtn.disabled = false;
+                  randomizePuzzleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"></path></svg> Random Dataset Puzzle';
+                }
+                
+                isLoadingPuzzle = false;
+              })
+              .catch(error => {
+                console.error('Error loading dataset:', error);
+                
+                // Fallback to the default puzzle
+                currentPuzzle = fallbackPuzzle;
+                createPuzzleFromData(fallbackPuzzle);
+                
+                // Enable the button
+                if (randomizePuzzleBtn) {
+                  randomizePuzzleBtn.disabled = false;
+                  randomizePuzzleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> Loading...';
+                }
+                
+                isLoadingPuzzle = false;
+              });
+          }
+        }
+        
+        // Format polyshapes data properly
+        function parsePolyshapes(polyshapesData) {
+          // If it's already an object, return it
+          if (typeof polyshapesData === 'object' && !Array.isArray(polyshapesData) && polyshapesData !== null) {
+            return polyshapesData;
+          }
+          
+          // If it's a string, try to parse it as JSON
+          if (typeof polyshapesData === 'string') {
+            try {
+              return JSON.parse(polyshapesData);
+            } catch (e) {
+              // If it can't be parsed, return null
+              return null;
+            }
+          }
+          
+          // Default return
+          return null;
+        }
+        
+        // Update puzzle stats
+        function updatePuzzleStats(puzzleData) {
+          // Update puzzle ID
+          const puzzleIdElement = document.getElementById('puzzle-id');
+          if (puzzleIdElement) {
+            puzzleIdElement.textContent = puzzleData.id;
+          }
+          
+          // Update difficulty
+          const puzzleDifficultyElement = document.getElementById('puzzle-difficulty');
+          if (puzzleDifficultyElement) {
+            puzzleDifficultyElement.textContent = `Level ${puzzleData.difficulty_level} (${puzzleData.difficulty_score.toFixed(1)})`;
+          }
+          
+          // Update grid size
+          const puzzleGridSizeElement = document.getElementById('puzzle-grid-size');
+          if (puzzleGridSizeElement) {
+            puzzleGridSizeElement.textContent = `${puzzleData.grid_size.width}×${puzzleData.grid_size.height}`;
+          }
+          
+          // Update path length
+          const puzzlePathLengthElement = document.getElementById('puzzle-path-length');
+          if (puzzlePathLengthElement && puzzleData.solutions && puzzleData.solutions.length > 0) {
+            puzzlePathLengthElement.textContent = `${puzzleData.solutions[0].pathLength} steps`;
+          }
+        }
+        
+        // Create puzzle from the input data
+        function createPuzzleFromData(puzzleData) {
+          try {
+            // First, remove any previous interaction state and event listeners
+            cleanupPreviousPuzzle();
+            
+            // Clear previous puzzle if there was one
+            const svg = document.getElementById('puzzle');
+            while (svg && svg.firstChild) svg.removeChild(svg.firstChild);
+            
+            // Extract dimensions and create puzzle
+            const width = puzzleData.grid_size.width;
+            const height = puzzleData.grid_size.height;
+            const puzzle = new Puzzle(width, height);
+            
+            // Adjust SVG viewBox based on grid size
+            const cellSize = 41; // Standard cell size used in the visualization
+            const padding = 50; // Padding around the grid
+            const viewBoxWidth = width * 2 * cellSize + padding * 2;
+            const viewBoxHeight = height * 2 * cellSize + padding * 2;
+            
+            // Update SVG viewBox to accommodate the puzzle size
+            if (svg) {
+              svg.setAttribute('viewBox', `0 0 ${viewBoxWidth} ${viewBoxHeight}`);
+              
+              // Adjust container size ratio for extreme grid dimensions
+              const puzzleContainer = document.getElementById('puzzle-container');
+              if (puzzleContainer) {
+                // Calculate aspect ratio and apply it to the container
+                const aspectRatio = viewBoxWidth / viewBoxHeight;
+                if (aspectRatio > 1.5) {
+                  // Wide puzzle
+                  puzzleContainer.style.width = '100%';
+                  puzzleContainer.style.height = `${100 / aspectRatio}%`;
+                } else if (aspectRatio < 0.7) {
+                  // Tall puzzle
+                  puzzleContainer.style.height = '100%';
+                  puzzleContainer.style.width = `${100 * aspectRatio}%`;
+                } else {
+                  // Relatively square puzzle
+                  puzzleContainer.style.width = '100%';
+                  puzzleContainer.style.height = '100%';
+                }
+              }
+            }
+            
+            // Parse YAML from text_visualization using js-yaml
+            const yamlData = jsyaml.load(puzzleData.text_visualization);
+            
+            // Set start point
+            const startX = yamlData.puzzle.start.x;
+            const startY = yamlData.puzzle.start.y;
+            puzzle.grid[startX][startY].start = true;
+            
+            // Set end point
+            const endX = yamlData.puzzle.end.x;
+            const endY = yamlData.puzzle.end.y;
+            
+            // Determine end direction based on position
+            let endDirection;
+            if (endX === 0) {
+              endDirection = "left";
+            } else if (endX === width * 2) {
+              endDirection = "right";
+            } else if (endY === 0) {
+              endDirection = "top";
+            } else if (endY === height * 2) {
+              endDirection = "bottom";
+            } else {
+              // Default fallback if not on an edge
+              endDirection = "left";
+            }
+            
+            puzzle.grid[endX][endY].end = endDirection;
+            
+            // Parse polyshapes if in JSON string format
+            const polyshapes = typeof puzzleData.polyshapes === 'string' ? 
+                               parsePolyshapes(puzzleData.polyshapes) : 
+                               puzzleData.polyshapes;
+            
+            // Add puzzle elements
+            if (yamlData.puzzle.cells) {
+              yamlData.puzzle.cells.forEach(cell => {
+                const x = cell.position.x;
+                const y = cell.position.y;
+                
+                if (x >= 0 && y >= 0 && x < puzzle.width && y < puzzle.height) {
+                  if (cell.properties.type === 'poly' || cell.properties.type === 'ylop') {
+                    const polyId = cell.properties.polyshape;
+                    const polyshape = polyshapes && polyshapes[polyId];
+                    
+                    // Parse the ASCII polyshape into a numeric value
+                    let polyValue = 0;
+                    if (polyshape && typeof polyshape === 'string') {
+                      const rows = polyshape.split('\n');
+                      for (let y = 0; y < rows.length; y++) {
+                        for (let x = 0; x < rows[y].length; x++) {
+                          if (rows[x][y] === '█') {
+                            // Set the bit for this position in the polyomino
+                            polyValue |= (1 << (y * 4 + x));
+                          }
+                        }
+                      }
+                    }
+                    
+                    puzzle.grid[x][y] = {
+                      type: cell.properties.type,
+                      polyshape: polyValue || polyId, // Use parsed value or fall back to ID
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.type === 'square') {
+                    puzzle.grid[x][y] = {
+                      type: 'square',
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.type === 'star') {
+                    puzzle.grid[x][y] = {
+                      type: 'star',
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.type === 'triangle') {
+                    puzzle.grid[x][y] = {
+                      type: 'triangle',
+                      color: cell.properties.color,
+                      count: cell.properties.count
+                    };
+                  } else if (cell.properties.type === 'nega') {
+                    puzzle.grid[x][y] = {
+                      type: 'nega',
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.dot) {
+                    puzzle.grid[x][y] = {
+                      dot: window.DOT_BLACK,
+                      type: 'line',
+                      line: 0
+                    };
+                  } else if (cell.properties.gap) {
+                    puzzle.grid[x][y] = {
+                      gap: 1,
+                      type: 'line',
+                      line: 0
+                    };
+                  }
+                }
+              });
+            }
+            
+            // Make sure the puzzle container is visible
+            const puzzleContainer = document.getElementById('puzzle-container');
+            if (puzzleContainer) {
+              puzzleContainer.style.display = 'flex';
+            }
+            
+            // Update the puzzle stats
+            updatePuzzleStats(puzzleData);
+            
+            // Safety checks before using potentially dangerous functions
+            if (typeof window.draw === 'function') {
+              // Draw the puzzle
+              window.draw(puzzle);
+              
+              // Make sure cursorPos element exists
+              if (svg) {
+                let cursorPosElement = document.getElementById('cursorPos');
+                if (!cursorPosElement) {
+                  cursorPosElement = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+                  cursorPosElement.id = "cursorPos";
+                  svg.appendChild(cursorPosElement);
+                }
+                
+                // Ensure trace handlers are initialized correctly
+                if (typeof window.initTrace === 'function') {
+                  // Delay trace initialization to ensure all elements are properly created
+                  setTimeout(() => {
+                    window.initTrace(svg.id, 1);
+                  }, 100);
+                }
+              }
+            } else {
+              console.error('window.draw function not found. Puzzle scripts may not be loaded correctly.');
+            }
+          } catch (error) {
+            console.error('Error creating puzzle:', error);
+          }
+        }
+        
+        // Display a solution on the puzzle
+        function displaySolution(puzzleData, solutionIndex) {
+          if (!puzzleData.solutions || puzzleData.solutions.length === 0) return;
+          
+          // Remove previous solution if it exists
+          const existingSolution = document.getElementById('solution-path');
+          if (existingSolution) {
+            existingSolution.remove();
+          }
+          
+          const solution = puzzleData.solutions[solutionIndex];
+          const path = solution.path;
+          
+          // Draw the solution path on the puzzle
+          const svg = document.getElementById('puzzle');
+          if (!svg) return;
+          
+          const solutionGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          solutionGroup.setAttribute("id", "solution-path");
+          
+          // Create a path element for the solution
+          const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          
+          // Get the current viewBox dimensions from the SVG
+          const viewBox = svg.getAttribute('viewBox')?.split(' ') || ['0', '0', '500', '500'];
+          const viewBoxWidth = parseFloat(viewBox[2]);
+          const viewBoxHeight = parseFloat(viewBox[3]);
+          
+          // Calculate scale and offset based on grid size
+          const width = puzzleData.grid_size.width;
+          const height = puzzleData.grid_size.height;
+          const cellSize = 41; // Standard cell size
+          const padding = 50; // Standard padding
+          
+          // Build path data with proper scaling
+          let pathData = "";
+          path.forEach((point, index) => {
+            const x = point.x * cellSize + padding;
+            const y = point.y * cellSize + padding;
+            
+            if (index === 0) {
+              pathData += `M ${x} ${y} `;
+            } else {
+              pathData += `L ${x} ${y} `;
+            }
+          });
+          
+          pathElement.setAttribute("d", pathData);
+          pathElement.setAttribute("stroke", "#38b000");
+          pathElement.setAttribute("stroke-width", "8");
+          pathElement.setAttribute("stroke-linecap", "round");
+          pathElement.setAttribute("stroke-linejoin", "round");
+          pathElement.setAttribute("fill", "none");
+          pathElement.setAttribute("stroke-dasharray", "5000");
+          pathElement.setAttribute("stroke-dashoffset", "5000");
+          pathElement.style.animation = "drawLine 3s ease-in-out forwards";
+          
+          solutionGroup.appendChild(pathElement);
+          svg.appendChild(solutionGroup);
+          
+          // Add animation
+          if (!document.getElementById('drawLineAnimation')) {
+            const style = document.createElement('style');
+            style.id = 'drawLineAnimation';
+            style.textContent = `
+              @keyframes drawLine {
+                to {
+                  stroke-dashoffset: 0;
+                }
+              }
+            `;
+            document.head.appendChild(style);
+          }
+        }
+        
+        // Override potentially problematic functions with safer versions for this page
+        window.PLAY_SOUND = function(soundType) {
+          // No-op function for sounds
+          console.log('Sound would play:', soundType);
+        };
+        
+        window.TRACE_COMPLETION_FUNC = function(puzzle, path) {
+          // No-op function for trace completion
+          console.log('Puzzle solved!');
+        };
+        
+        // Initialize when DOM is loaded
+        setTimeout(() => {
+          try {
+            // Initialize with the initial puzzle
+            createPuzzleFromData(currentPuzzle);
+            
+            // Preload some puzzles for faster randomization
+            setTimeout(() => {
+              loadRandomPuzzle();
+            }, 1000);
+          } catch (e) {
+            console.error('Error initializing puzzle:', e);
+          }
+        }, 500);
       });
     </script>
   </body>
