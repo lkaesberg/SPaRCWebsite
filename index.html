@@ -1987,49 +1987,6 @@
       // Define fallbackPuzzle globally to avoid duplication
       const fallbackPuzzle = {"difficulty_level":5,"difficulty_score":5.8,"grid_size":{"height":2,"width":3},"id":"176d1e37ebbacac0","polyshapes":{"16":"·█··\n····\n····\n····"},"puzzle_array":[["+","+","+","+","+",".","+"],["S","N","+","P-R-16","+","o-B","+"],["+","+","+","+","+","+","+"],["+","N","+","N","+","o-B","+"],["+","+","E","+","+","+","+"]],"solution_count":1,"solutions":[{"index":0,"path":[{"x":0,"y":1},{"x":0,"y":0},{"x":1,"y":0},{"x":2,"y":0},{"x":2,"y":1},{"x":2,"y":2},{"x":3,"y":2},{"x":4,"y":2},{"x":4,"y":1},{"x":4,"y":0},{"x":5,"y":0},{"x":6,"y":0},{"x":6,"y":1},{"x":6,"y":2},{"x":6,"y":3},{"x":6,"y":4},{"x":5,"y":4},{"x":4,"y":4},{"x":3,"y":4},{"x":2,"y":4}],"pathLength":20}],"text_visualization":"puzzle:\n  dimensions:\n    width: 3\n    height: 2\n  start:\n    x: 0\n    y: 1\n  end:\n    x: 2\n    y: 4\n  cells:\n    - position:\n        x: 3\n        y: 1\n      properties:\n        type: \"poly\"\n        polyshape: 16\n        color: \"red\"\n    - position:\n        x: 5\n        y: 0\n      properties:\n        dot: 1\n        color: \"black\"\n    - position:\n        x: 5\n        y: 1\n      properties:\n        type: \"square\"\n        color: \"blue\"\n    - position:\n        x: 5\n        y: 3\n      properties:\n        type: \"square\"\n        color: \"blue\"\n"};
     </script>
-    
-    <!-- Add animation -->
-          if (!document.getElementById('drawLineAnimation')) {
-            const style = document.createElement('style');
-            style.id = 'drawLineAnimation';
-            style.textContent = `
-              @keyframes drawLine {
-                to {
-                  stroke-dashoffset: 0;
-                }
-              }
-            `;
-            document.head.appendChild(style);
-          }
-        }
-        
-        // Override potentially problematic functions with safer versions for this page
-        window.PLAY_SOUND = function(soundType) {
-          // No-op function for sounds
-          console.log('Sound would play:', soundType);
-        };
-        
-        window.TRACE_COMPLETION_FUNC = function(puzzle, path) {
-          // No-op function for trace completion
-          console.log('Puzzle solved!');
-        };
-        
-        // Initialize when DOM is loaded
-        setTimeout(() => {
-          try {
-            // Initialize with the initial puzzle
-            createPuzzleFromData(currentPuzzle);
-            
-            // Preload some puzzles for faster randomization
-            setTimeout(() => {
-              loadRandomPuzzle();
-            }, 1000);
-          } catch (e) {
-            console.error('Error initializing puzzle:', e);
-          }
-        }, 500);
-      });
-    </script>
 
     <script>
       // Add active state to navigation links based on scroll position
@@ -2074,7 +2031,7 @@
         const navList = document.querySelector('.nav-list');
         const navLinks = document.querySelectorAll('.nav-link');
         const sections = document.querySelectorAll('section[id]');
-        const isMobile = window.innerWidth <= 768;
+        let isMobile = window.innerWidth <= 768;
         
         // Function to center an item in the navigation
         function centerItemInNav(item) {
