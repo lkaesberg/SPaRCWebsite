@@ -2528,5 +2528,44 @@
         setActiveLink();
       });
     </script>
+
+    <script>
+      // Prevent scrolling when interacting with puzzle on mobile
+      document.addEventListener('DOMContentLoaded', function() {
+        const puzzleContainer = document.getElementById('puzzle-container');
+        const puzzle = document.getElementById('puzzle');
+        
+        if (!puzzleContainer || !puzzle) return;
+        
+        // Touch events for mobile devices
+        puzzleContainer.addEventListener('touchstart', preventScroll, { passive: false });
+        puzzleContainer.addEventListener('touchmove', preventScroll, { passive: false });
+        puzzleContainer.addEventListener('touchend', enableScroll);
+        
+        // Mouse events for desktop (just for consistency)
+        puzzleContainer.addEventListener('mouseenter', () => {
+          if (window.innerWidth <= 768) {
+            document.body.style.overflow = 'hidden';
+          }
+        });
+        
+        puzzleContainer.addEventListener('mouseleave', () => {
+          document.body.style.overflow = '';
+        });
+        
+        // Function to prevent default scroll behavior
+        function preventScroll(e) {
+          if (window.innerWidth <= 768) {
+            e.preventDefault();
+            document.body.style.overflow = 'hidden';
+          }
+        }
+        
+        // Function to re-enable scrolling
+        function enableScroll() {
+          document.body.style.overflow = '';
+        }
+      });
+    </script>
   </body>
 </html>
