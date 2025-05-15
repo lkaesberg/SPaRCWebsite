@@ -2,11 +2,11 @@
   <img src="favicon/web-app-manifest-512x512.png" alt="SPaRC Logo" width="128"/>
 </p>
 
-# SPaRC Dataset Visualizer
+# SPaRC Website
 
 **SPaRC: A Spatial Pathfinding and Reasoning Challenge**
 
-A web-based visualization and puzzle creation tool for SPaRC spatial reasoning puzzles.
+A web-based visualization and puzzle annotation tool for SPaRC spatial reasoning puzzles.
 
 ## Overview
 
@@ -14,9 +14,8 @@ This repository hosts the code for the SPaRC dataset website. SPaRC contains 1,0
 
 ## Features
 
-- Interactive puzzle editor
+- Interactive puzzle annotator
 - Puzzle visualization tools
-- Challenge practice mode
 - Automatic solvers
 
 ## Links
@@ -27,7 +26,7 @@ This repository hosts the code for the SPaRC dataset website. SPaRC contains 1,0
 
 ## Credits
 
-This project is a fork of the original repository by jbzdarkid. All credit for the initial implementation goes to them.
+- The SPaRC website is a fork of [jbzdarkid's repository](https://github.com/jbzdarkid/jbzdarkid.github.io) 
 
 ## Contact
 
