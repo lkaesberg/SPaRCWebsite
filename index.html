@@ -460,7 +460,7 @@
         }
       }
       
-      @media (max-width: 480px) {
+      @media (max-width: 680px) {
         .header-buttons {
           flex-direction: column;
           gap: 0.5rem;
@@ -885,7 +885,7 @@
         }
       }
       
-      @media (max-width: 480px) {
+      @media (max-width: 680px) {
         .hero-grid .visual-card:nth-child(3),
         .hero-grid .visual-card:nth-child(4),
         .hero-grid .visual-card:nth-child(5) {
@@ -1097,6 +1097,10 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
               Cite SPaRC
             </a>
+            <a href="https://arxiv.org/abs/2505.16686" target="_blank" class="header-btn header-btn-secondary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.5rem; font-weight: 600; font-size: 0.95rem; border-radius: 30px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.15); color: white; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.2);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              Read Paper
+            </a>
           </div>
         </div>
       </div>
@@ -1109,7 +1113,7 @@
       
       <style>
         /* Adjust wave position on mobile */
-        @media (max-width: 480px) {
+        @media (max-width: 680px) {
           .site-header > div:last-child {
             bottom: -1px;
           }
@@ -1485,155 +1489,6 @@
             });
           </script>
       </section>
-
-        <!-- Example Section -->
-        <section id="example" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Example Puzzle</h2>
-          </div>
-          <div class="card" style="background: linear-gradient(to bottom, #ffffff, #f8fafc); overflow: hidden; border: none; box-shadow: var(--shadow);">
-            <div class="example-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-              <div>
-                <h3 style="margin-top: 0; color: var(--color-primary);">Puzzle Description</h3>
-                <p style="font-style: italic; color: var(--color-text); margin-bottom: 2rem;">
-                  "Start at the marked position. Navigate through the grid while adhering to the rules defined by the colored elements. Find a valid path to the exit point while satisfying all constraints."
-                </p>
-                
-                <div style="margin-bottom: 2rem;">
-                  <div class="puzzle-controls" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                    <button id="show-solution-btn" class="btn btn-accent" style="display: flex; align-items: center; gap: 0.5rem;">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
-                      Show Solution
-                    </button>
-                    <button id="randomize-puzzle-btn" class="btn" style="display: flex; align-items: center; gap: 0.5rem;">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"></path></svg>
-                      Random Puzzle
-                    </button>
-                  </div>
-                </div>
-                
-                <div class="puzzle-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; background: #f1f5f9; padding: 1.5rem; border-radius: var(--radius-sm);">
-                  <div class="stat-item">
-                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); margin-bottom: 0.25rem;">Puzzle ID</div>
-                    <div id="puzzle-id" style="font-size: 1rem; font-weight: 600; font-family: 'SF Mono', monospace;"></div>
-                  </div>
-                  <div class="stat-item">
-                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); margin-bottom: 0.25rem;">Difficulty</div>
-                    <div id="puzzle-difficulty" style="font-size: 1rem; font-weight: 600;"></div>
-                  </div>
-                  <div class="stat-item">
-                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); margin-bottom: 0.25rem;">Grid Size</div>
-                    <div id="puzzle-grid-size" style="font-size: 1rem; font-weight: 600;"></div>
-                  </div>
-                  <div class="stat-item">
-                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); margin-bottom: 0.25rem;">Solution Length</div>
-                    <div id="puzzle-path-length" style="font-size: 1rem; font-weight: 600;"></div>
-                  </div>
-                </div>
-              </div>
-              
-              <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 10px 25px -5px rgba(17, 24, 39, 0.5); height: 100%;">
-                <!-- Glow effects -->
-                <div style="position: absolute; width: 300px; height: 300px; background: rgba(16, 185, 129, 0.05); border-radius: 50%; filter: blur(40px);"></div>
-                <div style="position: absolute; width: 250px; height: 250px; background: rgba(99, 102, 241, 0.05); border-radius: 50%; filter: blur(40px);"></div>
-                
-                <!-- Puzzle container with adaptive dimensions -->
-                <div style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 280px; flex-grow: 1; max-height: 80vh; overflow: visible; position: relative;">
-                  <div id="puzzle-container" style="width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; max-width: 450px; max-height: 450px;">
-                    <svg id="puzzle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" style="width: 100%; height: 100%; filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));"></svg>
-                    
-                    <!-- Interactive overlay indicator -->
-                    <div id="puzzle-interaction-hint" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.5); border-radius: var(--radius); backdrop-filter: blur(2px); cursor: pointer; z-index: 10; transition: opacity 0.3s ease-in-out;">
-                      <div class="pulse-circle" style="position: relative; width: 80px; height: 80px; margin-bottom: 20px;">
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.2); animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;"></div>
-                        <div style="position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; animation: pulse-dot 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;">
-                        </div>
-                      </div>
-                      <p style="color: white; font-weight: 500; text-align: center; margin: 0; padding: 0 20px; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-                        Click to interact
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Information text -->
-                <div style="margin-top: 1.5rem; text-align: center; color: white; font-size: 0.9rem; width: 100%;">
-                  <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.1); padding: 0.5rem 1rem; border-radius: 20px; backdrop-filter: blur(5px);">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
-                    <span>Click "Show Solution" to visualize the optimal path</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <style>
-            /* Responsive layout for the example section */
-            @media (max-width: 768px) {
-              .example-content {
-                grid-template-columns: 1fr !important;
-              }
-              
-              .puzzle-controls {
-                flex-wrap: wrap;
-                justify-content: center;
-              }
-              
-              .puzzle-controls button {
-                width: 100%;
-              }
-              
-              #puzzle-container {
-                min-height: 280px;
-                max-height: 400px;
-                margin: 1rem auto;
-              }
-            }
-            
-            /* Finer adjustments for smaller screens */
-            @media (max-width: 480px) {
-              .puzzle-stats {
-                grid-template-columns: 1fr !important;
-                padding: 1rem !important;
-              }
-              
-              #puzzle-container {
-                min-height: 250px;
-                max-height: 350px;
-              }
-              
-              .card {
-                padding: 1rem !important;
-              }
-            }
-            
-            /* Animation for the interaction hint */
-            @keyframes pulse-ring {
-              0% {
-                transform: scale(0.8);
-                opacity: 0.8;
-              }
-              50% {
-                transform: scale(1.2);
-                opacity: 0.3;
-              }
-              100% {
-                transform: scale(0.8);
-                opacity: 0.8;
-              }
-            }
-            
-            @keyframes pulse-dot {
-              0% {
-                transform: scale(0.9);
-              }
-              50% {
-                transform: scale(1);
-              }
-              100% {
-                transform: scale(0.9);
-              }
-            }
-          </style>
       </section>
 
  
@@ -1810,138 +1665,6 @@
               }
             }
           </style>
-      </section>
-
-        <!-- Tools Section -->
-        <section id="tools" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Tools &amp; Resources</h2>
-          </div>
-          <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
-            <!-- Puzzle Visualizer -->
-            <div class="feature-card" style="background: white; border-radius: var(--radius); padding: 1.5rem; overflow: hidden; box-shadow: var(--shadow); border: none; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column;">
-              <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(99, 102, 241, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                </div>
-                <div>
-                  <h3 style="margin: 0; font-size: 1.25rem; color: var(--color-text);">Puzzle Visualizer</h3>
-                  <div style="font-size: 0.85rem; color: var(--color-primary); font-weight: 500;">Interactive Tool</div>
-                </div>
-              </div>
-              
-              <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid var(--color-primary); font-size: 0.9rem; color: var(--color-text); opacity: 0.9; flex-grow: 1;">
-                <p>Solve any puzzle with our interactive visualization tool. Allows examining solutions, rules, and constraints.</p>
-              </div>
-              
-              <a href="/visualizer.html" class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
-                Open Visualizer
-              </a>
-            </div>
-            
-            <!-- Annotation Interface -->
-            <div class="feature-card" style="background: white; border-radius: var(--radius); padding: 1.5rem; overflow: hidden; box-shadow: var(--shadow); border: none; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column;">
-              <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(244, 63, 94, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                </div>
-                <div>
-                  <h3 style="margin: 0; font-size: 1.25rem; color: var(--color-text);">Annotation Interface</h3>
-                  <div style="font-size: 0.85rem; color: var(--color-accent); font-weight: 500;">Research Tool</div>
-                </div>
-              </div>
-              
-              <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid var(--color-accent); font-size: 0.9rem; color: var(--color-text); opacity: 0.9; flex-grow: 1;">
-                <p>Use our annotation interface to label puzzle samples and analyze human capabilities compared to AI models.</p>
-              </div>
-              
-              <a href="/annotate.html" class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                Start Annotating
-              </a>
-            </div>
-            
-            <!-- Result Analyser (Coming Soon) -->
-            <div class="feature-card" style="background: white; border-radius: var(--radius); padding: 1.5rem; overflow: hidden; box-shadow: var(--shadow); border: none; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column;">
-              <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M9 17h6"></path><path d="M10 20H3a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2h7M14 20h7a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-7"></path><path d="M21 14H3"></path><path d="M21 6H3"></path></svg>
-                </div>
-                <div>
-                  <h3 style="margin: 0; font-size: 1.25rem; color: var(--color-text);">Result Analyser</h3>
-                  <div style="font-size: 0.85rem; color: #10b981; font-weight: 500;">Coming Soon</div>
-                </div>
-              </div>
-              
-              <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #10b981; font-size: 0.9rem; color: var(--color-text); opacity: 0.9; flex-grow: 1;">
-                <p>Analyze model performance patterns and compare reasoning strategies across different AI systems to identify key areas for improvement.</p>
-              </div>
-              
-              <button disabled class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto; opacity: 0.7; cursor: not-allowed;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 6v6l4 2"></path></svg>
-                Coming Soon
-              </button>
-            </div>
-          </div>
-      </section>
-
-             <!-- Dataset Section -->
-             <section id="dataset" class="section">
-              <div class="section-header">
-                <h2 class="section-title">Dataset</h2>
-              </div>
-              <div style="display: flex; align-items: center; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.03) 100%); padding: 1.5rem; border-radius: var(--radius);">
-                <div style="flex: 1;">
-                  <p style="font-size: 1.1rem; line-height: 1.5; margin: 0;">
-                    The SPaRC dataset contains 1,000 spatial reasoning puzzles with the complete "all" set 
-                    available on <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" style="font-weight: 500; text-decoration: underline;" target="_blank">HuggingFace</a>.
-                  </p>
-                </div>
-                <div style="margin-left: 2rem;">
-                  <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" target="_blank" style="display: inline-flex; align-items: center; text-decoration: none; color: var(--color-primary); font-weight: 500;">
-                    <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg" alt="HuggingFace" style="height: 32px; margin-right: 0.75rem;">
-                    <span>Browse on HuggingFace</span>
-              </a>
-            </div>
-          </div>
-              
-              <div class="card" style="background: #1e293b; color: #e2e8f0; box-shadow: var(--shadow); overflow: hidden; padding: 0;">
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
-                  <div style="display: flex; align-items: center;">
-                    <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg" alt="HuggingFace" style="height: 24px; margin-right: 0.75rem;">
-                    <h4 style="margin: 0; color: white; font-size: 1.1rem;">HuggingFace Usage</h4>
-                  </div>
-                  <div>
-                    <span style="font-size: 0.8rem; opacity: 0.7;">Python</span>
-                  </div>
-                </div>
-                <div class="code-block" style="margin: 0; border-radius: 0; padding: 1.5rem; background: transparent;"># Install and import
-    pip install datasets
-    from datasets import load_dataset
-    
-    # Login using e.g. `huggingface-cli login` to access this dataset
-    ds = load_dataset("lkaesberg/SPaRC", "all", split="test")
-    
-    # Access puzzle data
-    puzzle = ds[0]
-    print(puzzle["id"])                # Puzzle identifier
-    print(puzzle["difficulty_level"])  # Difficulty (1-5)
-    print(puzzle["grid_size"])         # Grid dimensions</div>
-          </div>
-      </section>
-
-        <!-- Citation Section -->
-        <section id="citation" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Citation</h2>
-          </div>
-          <div class="citation-block">@article{kaesberg2025sparc,
-  title     = {SPaRC: A Spatial Pathfinding Reasoning Challenge},
-  author    = {Kaesberg, Lars Benedikt and Wahle, Jan Philip and Ruas, Terry and Gipp, Bela},
-  year      = {2025},
-  url       = {https://huggingface.co/datasets/lkaesberg/SPaRC}
-}</div>
       </section>
 
         <!-- Contact Section -->
