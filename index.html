@@ -1921,17 +1921,17 @@
                   </div>
                 </div>
                 <div class="code-block" style="margin: 0; border-radius: 0; padding: 1.5rem; background: transparent;"># Install and import
-    pip install datasets
-    from datasets import load_dataset
-    
-    # Login using e.g. `huggingface-cli login` to access this dataset
-    ds = load_dataset("lkaesberg/SPaRC", "all", split="test")
-    
-    # Access puzzle data
-    puzzle = ds[0]
-    print(puzzle["id"])                # Puzzle identifier
-    print(puzzle["difficulty_level"])  # Difficulty (1-5)
-    print(puzzle["grid_size"])         # Grid dimensions</div>
+pip install datasets
+from datasets import load_dataset
+
+# Login using e.g. `huggingface-cli login` to access this dataset
+ds = load_dataset("lkaesberg/SPaRC", "all", split="test")
+
+# Access puzzle data
+puzzle = ds[0]
+print(puzzle["id"])                # Puzzle identifier
+print(puzzle["difficulty_level"])  # Difficulty (1-5)
+print(puzzle["grid_size"])         # Grid dimensions</div>
           </div>
       </section>
 
