@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/xhtml">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Witness Puzzle Image Generator</title>
+    <link rel="stylesheet" type="text/css" href="data/style.css" id="stylesheet">
+    <link rel="icon" type="image/png" href="data/favicon.png">
+    <style>
+      :root {
+        --primary: #3a86ff;
+        --secondary: #8338ec;
+        --success: #38b000;
+        --dark: #333;
+        --light: #f8f9fa;
+        --border-radius: 8px;
+      }
+      
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f0f2f5;
+        color: var(--dark);
+        line-height: 1.6;
+      }
+      
+      h1 {
+        margin-bottom: 20px;
+        color: var(--primary);
+        font-weight: 600;
+        text-align: center;
+      }
+      
+      .container {
+        width: 100%;
+        max-width: 1000px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+      }
+      
+      .input-section {
+        width: 100%;
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+      }
+      
+      .input-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background-color: var(--light);
+        cursor: pointer;
+      }
+      
+      .input-header h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      
+      button {
+        padding: 8px 16px;
+        cursor: pointer;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+      
+      button:hover {
+        background-color: #2a76ef;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+      
+      button:active {
+        transform: translateY(0);
+      }
+      
+      button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .file-upload {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+      }
+      
+      .file-upload input[type=file] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        min-width: 100%;
+        min-height: 100%;
+        font-size: 100px;
+        text-align: right;
+        filter: alpha(opacity=0);
+        opacity: 0;
+        outline: none;
+        cursor: pointer;
+        display: block;
+      }
+      
+      .loader {
+        display: none;
+        width: 24px;
+        height: 24px;
+        border: 3px solid var(--light);
+        border-bottom-color: var(--primary);
+        border-radius: 50%;
+        margin: 0 auto;
+        animation: rotation 1s linear infinite;
+      }
+      
+      @keyframes rotation {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .success-message {
+        color: var(--success);
+        text-align: center;
+        font-weight: 600;
+        margin: 10px 0;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      
+      .error-message {
+        color: #e63946;
+        text-align: center;
+        font-weight: 600;
+        margin: 10px 0;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      .url-input {
+        width: 100%;
+        max-width: 400px;
+        padding: 8px;
+        border-radius: var(--border-radius);
+        border: 1px solid #ccc;
+        margin-right: 10px;
+      }
+      
+      .progress-container {
+        width: 100%;
+        max-width: 400px;
+        margin: 20px 0;
+        display: none;
+      }
+      
+      .progress-bar {
+        width: 100%;
+        height: 20px;
+        background-color: #f0f0f0;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      
+      .progress-fill {
+        height: 100%;
+        background-color: var(--primary);
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+      
+      .progress-text {
+        text-align: center;
+        margin-top: 5px;
+        font-size: 14px;
+      }
+      
+      .info-section {
+        margin: 20px 0;
+        padding: 15px;
+        background-color: var(--light);
+        border-radius: var(--border-radius);
+        width: 100%;
+      }
+      
+      .hidden-container {
+        position: absolute;
+        left: -9999px;
+        top: -9999px;
+      }
+      
+      #puzzle-preview {
+        margin: 15px 0;
+        border: 1px solid #eee;
+        border-radius: var(--border-radius);
+        max-width: 100%;
+        display: none;
+      }
+      
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+      
+      .download-btn {
+        background-color: var(--success);
+      }
+      
+      .download-btn:hover {
+        background-color: #2b9348;
+      }
+      
+      .github-link {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      
+      .github-button {
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 8px 16px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+      }
+      
+      .github-button:hover {
+        background-color: #24292e;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+    </style>
+    <!-- Load required JavaScript libraries -->
+    <script type="text/javascript" src="engine/utilities.js"></script>
+    <script type="text/javascript" src="engine/svg.js"></script>
+    <script type="text/javascript" src="engine/polyominos.js"></script>
+    <script type="text/javascript" src="engine/puzzle.js"></script>
+    <script type="text/javascript" src="engine/display2.js"></script>
+    <script type="text/javascript" src="engine/serializer.js"></script>
+    <script type="text/javascript" src="engine/custom_mechanics.js"></script>
+    
+    <!-- Add js-yaml library for parsing puzzle data -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    
+    <!-- Add JSZip for creating zip files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <!-- Add FileSaver.js for saving files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <!-- Add font awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <!-- Hidden elements required by the engine -->
+    <input type="hidden" id="sens" value="1.0">
+    
+    <div class="container">
+      <h1><i class="fas fa-puzzle-piece"></i> Witness Puzzle Image Generator</h1>
+      
+      <div class="github-link">
+        <a href="https://github.com/lkaesberg/TheWitnessDatasetVisualizer" target="_blank" rel="noopener noreferrer">
+          <button class="github-button"><i class="fab fa-github"></i> View on GitHub</button>
+        </a>
+      </div>
+      
+      <div class="input-section">
+        <div class="input-header">
+          <h3><i class="fas fa-database"></i> Dataset Input</h3>
+        </div>
+        <div id="input-content">
+          <div style="padding: 15px;">
+            <div style="margin-bottom: 15px; text-align: center;">
+              <div class="file-upload">
+                <button id="upload-file-btn"><i class="fas fa-file-upload"></i> Load Dataset</button>
+                <input type="file" id="upload-dataset" accept=".jsonl,.json" />
+              </div>
+            </div>
+            <div style="margin-bottom: 15px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
+              <input type="text" id="url-input" placeholder="Enter URL to JSONL file" class="url-input">
+              <button id="load-url-btn"><i class="fas fa-cloud-download-alt"></i> Load from URL</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="dataset-info" class="info-section" style="display: none;">
+        <div id="dataset-stats"></div>
+        <div class="button-group">
+          <button id="generate-images-btn" disabled><i class="fas fa-images"></i> Generate Images & Zip</button>
+          <button id="download-zip-btn" class="download-btn" style="display: none;"><i class="fas fa-download"></i> Download Zip</button>
+        </div>
+      </div>
+      
+      <div id="progress-container" class="progress-container">
+        <div class="progress-bar">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <div id="progress-text" class="progress-text">Processing puzzles: 0 of 0</div>
+      </div>
+      
+      <div id="status-messages">
+        <div class="loader" id="loading-indicator"></div>
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
+      </div>
+      
+      <div id="puzzle-container" style="display: none;">
+        <svg id="puzzle" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      
+      <div id="puzzle-preview-container" style="display: none;">
+        <h3>Preview of first puzzle:</h3>
+      </div>
+      
+      <!-- Hidden container for rendering puzzles -->
+      <div class="hidden-container">
+        <svg id="render-canvas" xmlns="http://www.w3.org/2000/svg" width="800" height="800"></svg>
+      </div>
+    </div>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // UI element references
+        const uploadDataset = document.getElementById('upload-dataset');
+        const urlInput = document.getElementById('url-input');
+        const loadUrlBtn = document.getElementById('load-url-btn');
+        const generateImagesBtn = document.getElementById('generate-images-btn');
+        const downloadZipBtn = document.getElementById('download-zip-btn');
+        const progressContainer = document.getElementById('progress-container');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        const datasetInfo = document.getElementById('dataset-info');
+        const datasetStats = document.getElementById('dataset-stats');
+        const puzzlePreviewContainer = document.getElementById('puzzle-preview-container');
+        
+        // State variables
+        let dataset = [];
+        let generatedZip = null;
+        
+        // Check for URL parameter 'url' on page load
+        checkUrlParameter();
+        
+        // Event listeners for file inputs
+        uploadDataset.addEventListener('change', handleDatasetUpload);
+        loadUrlBtn.addEventListener('click', handleUrlLoad);
+        generateImagesBtn.addEventListener('click', generateImagesAndZip);
+        downloadZipBtn.addEventListener('click', downloadZip);
+        
+        // Check if the URL contains a 'url' parameter
+        function checkUrlParameter() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const datasetUrl = urlParams.get('url');
+          
+          if (datasetUrl) {
+            urlInput.value = datasetUrl;
+            loadDatasetFromUrl(datasetUrl);
+          }
+        }
+        
+        // Handle loading dataset from URL input field
+        function handleUrlLoad() {
+          const url = urlInput.value.trim();
+          if (!url) {
+            showMessage('error', 'Please enter a URL to a JSONL file');
+            return;
+          }
+          
+          loadDatasetFromUrl(url);
+        }
+        
+        // Load dataset from a URL
+        async function loadDatasetFromUrl(url) {
+          setLoading(true);
+          try {
+            showMessage('success', 'Fetching dataset from URL...');
+            
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            const content = await response.text();
+            parseDataset(content);
+            
+            setLoading(false);
+          } catch (error) {
+            console.error('Error loading dataset from URL:', error);
+            showMessage('error', 'Error loading dataset from URL: ' + error.message);
+            setLoading(false);
+          }
+        }
+        
+        // Process dataset upload
+        async function handleDatasetUpload(event) {
+          setLoading(true);
+          try {
+            const file = event.target.files[0];
+            if (!file) {
+              setLoading(false);
+              return;
+            }
+            
+            const content = await file.text();
+            
+            // Process content as dataset
+            parseDataset(content);
+            
+            // Reset file input so the same file can be loaded again if needed
+            event.target.value = '';
+            setLoading(false);
+          } catch (error) {
+            console.error('Error loading dataset:', error);
+            showMessage('error', 'Error loading dataset: ' + error.message);
+            setLoading(false);
+          }
+        }
+        
+        // Parse dataset content
+        function parseDataset(content) {
+          try {
+            let parsedData;
+            
+            // Check if content is a JSONL file (multiple JSON objects, one per line)
+            if (content.trim().includes('\n')) {
+              // Split by newlines and parse each line as a separate JSON object
+              parsedData = content.split('\n')
+                .filter(line => line.trim())
+                .map(line => JSON.parse(line));
+            } else {
+              try {
+                // Try to parse as a JSON object (could be a single puzzle or exported data)
+                const jsonObject = JSON.parse(content);
+                
+                // Check if it's an exported dataset with annotations
+                if (jsonObject.dataset) {
+                  // It's an exported dataset with annotations, use it directly
+                  parsedData = jsonObject.dataset;
+                  showMessage('success', 'Annotated dataset loaded with ' + parsedData.length + ' puzzles');
+                } else {
+                  // It's a single puzzle
+                  parsedData = [jsonObject];
+                }
+              } catch (e) {
+                throw new Error('Invalid JSON format');
+              }
+            }
+            
+            if (parsedData.length === 0) {
+              throw new Error('No valid puzzles found in the dataset');
+            }
+            
+            // Store the dataset
+            dataset = parsedData;
+            
+            // Update UI
+            updateDatasetInfo();
+            
+            console.log("Dataset loaded. First puzzle:", dataset[0]);
+            
+            // Render preview of the first puzzle
+            if (dataset.length > 0) {
+              // Show the puzzle container first
+              document.getElementById('puzzle-container').style.display = 'flex';
+              // Then render the preview
+              renderPreviewPuzzle(dataset[0]);
+            }
+            
+            showMessage('success', `Dataset loaded with ${dataset.length} puzzles. Ready to generate images.`);
+          } catch (error) {
+            console.error('Error parsing dataset:', error);
+            showMessage('error', 'Error parsing dataset: ' + error.message);
+          }
+        }
+        
+        // Update dataset info in the UI
+        function updateDatasetInfo() {
+          datasetInfo.style.display = 'block';
+          datasetStats.textContent = `Dataset loaded with ${dataset.length} puzzles.`;
+          generateImagesBtn.disabled = false;
+        }
+        
+        // Render a preview of the first puzzle
+        function renderPreviewPuzzle(puzzleData) {
+          try {
+            console.log("Starting to render preview puzzle");
+            
+            // Get the puzzle container
+            const puzzleContainer = document.getElementById('puzzle-container');
+            puzzleContainer.style.display = 'flex';
+            
+            // Show preview container
+            puzzlePreviewContainer.style.display = 'block';
+            
+            // Create the puzzle object
+            const puzzle = createPuzzleFromData(puzzleData);
+            console.log("Puzzle object created successfully:", puzzle);
+            
+            // Get the SVG element
+            const svg = document.getElementById('puzzle');
+            console.log("SVG element:", svg);
+            
+            if (!svg) {
+              console.error("SVG element not found!");
+              showMessage('error', 'SVG element not found');
+              return;
+            }
+            
+            // Clear any previous content
+            while (svg.firstChild) svg.removeChild(svg.firstChild);
+            
+            console.log("Calling window.draw with puzzle:", puzzle);
+            // Draw the puzzle using exactly the same approach as in annotate.html
+            window.draw(puzzle);
+            console.log("Puzzle drawn successfully");
+            
+          } catch (error) {
+            console.error('Error rendering preview puzzle:', error);
+            showMessage('error', 'Error rendering preview puzzle: ' + error.message);
+          }
+        }
+        
+        // Create puzzle object from data
+        function createPuzzleFromData(puzzleData) {
+          // Extract dimensions and create puzzle
+          const width = puzzleData.grid_size.width;
+          const height = puzzleData.grid_size.height;
+          const puzzle = new Puzzle(width, height);
+          
+          // Parse YAML from text_visualization using js-yaml
+          const yamlData = jsyaml.load(puzzleData.text_visualization);
+          
+          // Set start point
+          const startX = yamlData.puzzle.start.x;
+          const startY = yamlData.puzzle.start.y;
+          puzzle.grid[startX][startY].start = true;
+          
+          // Set end point
+          const endX = yamlData.puzzle.end.x;
+          const endY = yamlData.puzzle.end.y;
+          
+          // Determine end direction based on position
+          let endDirection;
+          if (endX === 0) {
+            endDirection = "left";
+          } else if (endX === width * 2) {
+            endDirection = "right";
+          } else if (endY === 0) {
+            endDirection = "top";
+          } else if (endY === height * 2) {
+            endDirection = "bottom";
+          } else {
+            // Default fallback if not on an edge
+            endDirection = "left";
+          }
+          
+          puzzle.grid[endX][endY].end = endDirection;
+          
+          // Add puzzle elements
+          if (yamlData.puzzle.cells) {
+            yamlData.puzzle.cells.forEach(cell => {
+              const x = cell.position.x;
+              const y = cell.position.y;
+              
+              if (x >= 0 && y >= 0 && x < puzzle.width && y < puzzle.height) {
+                if (cell.properties.type === 'poly' || cell.properties.type === 'ylop') {
+                  const polyId = cell.properties.polyshape;
+                  const polyshape = puzzleData.polyshapes[polyId];
+                  
+                  // Parse the ASCII polyshape into a numeric value
+                  let polyValue = 0;
+                  if (polyshape && typeof polyshape === 'string') {
+                    const rows = polyshape.split('\n');
+                    for (let y = 0; y < rows.length; y++) {
+                      for (let x = 0; x < rows[y].length; x++) {
+                        if (rows[x][y] === '█') {
+                          // Set the bit for this position in the polyomino
+                          polyValue |= (1 << (y * 4 + x));
+                        }
+                      }
+                    }
+                  }
+                  
+                  puzzle.grid[x][y] = {
+                    type: cell.properties.type,
+                    polyshape: polyValue || polyId, // Use parsed value or fall back to ID
+                    color: cell.properties.color
+                  };
+                } else if (cell.properties.type === 'square') {
+                  puzzle.grid[x][y] = {
+                    type: 'square',
+                    color: cell.properties.color
+                  };
+                } else if (cell.properties.type === 'star') {
+                  puzzle.grid[x][y] = {
+                    type: 'star',
+                    color: cell.properties.color
+                  };
+                } else if (cell.properties.type === 'triangle') {
+                  puzzle.grid[x][y] = {
+                    type: 'triangle',
+                    color: cell.properties.color,
+                    count: cell.properties.count
+                  };
+                } else if (cell.properties.type === 'nega') {
+                  puzzle.grid[x][y] = {
+                    type: 'nega',
+                    color: cell.properties.color
+                  };
+                } else if (cell.properties.dot) {
+                  puzzle.grid[x][y] = {
+                    dot: window.DOT_BLACK,
+                    type: 'line',
+                    line: 0
+                  };
+                } else if (cell.properties.gap) {
+                  puzzle.grid[x][y] = {
+                    gap: 1,
+                    type: 'line',
+                    line: 0
+                  };
+                }
+              }
+            });
+          }
+          
+          return puzzle;
+        }
+        
+        // Generate images for all puzzles and create a zip file
+        async function generateImagesAndZip() {
+          if (dataset.length === 0) {
+            showMessage('error', 'No dataset loaded');
+            return;
+          }
+          
+          setLoading(true);
+          generateImagesBtn.disabled = true;
+          downloadZipBtn.style.display = 'none';
+          progressContainer.style.display = 'block';
+          
+          try {
+            showMessage('success', 'Starting image generation...');
+            console.log('Starting image generation process...');
+            
+            // Create a new JSZip instance
+            const zip = new JSZip();
+            
+            // Use the existing puzzle container for rendering
+            const puzzleContainer = document.getElementById('puzzle-container');
+            puzzleContainer.style.display = 'flex';
+            
+            // Make sure the SVG is clean and visible
+            const svg = document.getElementById('puzzle');
+            
+            // Create a canvas element and append it to the document
+            let canvas = document.createElement('canvas');
+            canvas.style.display = 'none';
+            document.body.appendChild(canvas);
+            
+            console.log("Canvas created:", canvas);
+            
+            // Process each puzzle
+            for (let i = 0; i < dataset.length; i++) {
+              // Update progress
+              updateProgress(i, dataset.length);
+              
+              // Get the current puzzle
+              const puzzleData = dataset[i];
+              
+              // Get puzzle ID for filename (fallback to index if no ID)
+              const puzzleId = puzzleData.id || `puzzle_${i + 1}`;
+              console.log(`Processing puzzle ${puzzleId} (${i+1}/${dataset.length})`);
+              
+              try {
+                // Create a temporary puzzle object
+                const puzzle = createPuzzleFromData(puzzleData);
+                
+                // Clear the SVG
+                while (svg.firstChild) svg.removeChild(svg.firstChild);
+                
+                // Reset SVG attributes to allow natural sizing
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.removeAttribute('viewBox');
+                
+                // Draw the puzzle - this will set the correct dimensions based on the puzzle
+                window.draw(puzzle);
+                
+                // Wait to ensure rendering is complete
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Get the actual dimensions from the rendered SVG
+                const svgRect = svg.getBoundingClientRect();
+                const svgWidth = svg.getAttribute('width') || svgRect.width;
+                const svgHeight = svg.getAttribute('height') || svgRect.height;
+                
+                console.log(`Puzzle ${puzzleId} dimensions: ${svgWidth}x${svgHeight}`);
+                
+                // Convert SVG to PNG
+                try {
+                  // Set canvas size to match SVG
+                  canvas.width = Number(svgWidth);
+                  canvas.height = Number(svgHeight);
+                  
+                  // Get the 2D context from the canvas
+                  const ctx = canvas.getContext('2d');
+                  if (!ctx) {
+                    throw new Error('Could not get canvas context');
+                  }
+                  
+                  // Clear canvas with white background
+                  ctx.fillStyle = '#FFFFFF';
+                  ctx.fillRect(0, 0, canvas.width, canvas.height);
+                  
+                  // Create a data URL from the SVG
+                  const svgData = new XMLSerializer().serializeToString(svg);
+                  const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+                  const url = URL.createObjectURL(svgBlob);
+                  
+                  // Create an image element
+                  const img = new Image();
+                  
+                  // Wait for the image to load
+                  await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = (err) => {
+                      console.error('Image load error:', err);
+                      reject(new Error('Failed to load SVG as image'));
+                    };
+                    img.src = url;
+                  });
+                  
+                  // Draw the image to the canvas - ensure proper scaling
+                  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                  
+                  // Revoke the object URL to free memory
+                  URL.revokeObjectURL(url);
+                  
+                  // Convert canvas to PNG blob
+                  const pngBlob = await new Promise((resolve, reject) => {
+                    try {
+                      canvas.toBlob((blob) => {
+                        if (blob) {
+                          resolve(blob);
+                        } else {
+                          reject(new Error('Canvas toBlob returned null'));
+                        }
+                      }, 'image/png');
+                    } catch (err) {
+                      reject(err);
+                    }
+                  });
+                  
+                  // Add PNG to zip
+                  zip.file(`${puzzleId}.png`, pngBlob);
+                  console.log(`Added PNG for puzzle ${puzzleId} (${canvas.width}x${canvas.height})`);
+                  
+                } catch (conversionErr) {
+                  console.error(`Error converting SVG to PNG for puzzle ${puzzleId}:`, conversionErr);
+                  throw new Error(`PNG conversion error: ${conversionErr.message}`);
+                }
+                
+              } catch (err) {
+                console.error(`Error processing puzzle ${puzzleId}:`, err);
+                
+                // Create a simple text file as a placeholder for the failed puzzle
+                zip.file(`${puzzleId}_error.txt`, `Failed to process puzzle: ${err.message}`);
+              }
+            }
+            
+            // Clean up by removing the canvas
+            document.body.removeChild(canvas);
+            
+            // Complete the progress
+            updateProgress(dataset.length, dataset.length);
+            
+            // Generate the zip file
+            console.log('Generating final ZIP file...');
+            showMessage('success', 'Generating zip file...');
+            generatedZip = await zip.generateAsync({ type: 'blob' });
+            console.log('ZIP generation complete!');
+            
+            // Show download button
+            downloadZipBtn.style.display = 'inline-block';
+            
+            showMessage('success', 'All images generated and zip file created successfully!');
+          } catch (error) {
+            console.error('Error generating images:', error);
+            showMessage('error', 'Error generating images: ' + error.message);
+            
+            // Try to clean up canvas if it exists
+            const canvasElements = document.getElementsByTagName('canvas');
+            for (let i = 0; i < canvasElements.length; i++) {
+              if (canvasElements[i].parentNode) {
+                canvasElements[i].parentNode.removeChild(canvasElements[i]);
+              }
+            }
+          } finally {
+            setLoading(false);
+            generateImagesBtn.disabled = false;
+          }
+        }
+        
+        // Download the generated zip file
+        function downloadZip() {
+          if (!generatedZip) {
+            showMessage('error', 'No zip file has been generated yet');
+            return;
+          }
+          
+          try {
+            // Generate a timestamp for the filename
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+            
+            // Save the zip file
+            saveAs(generatedZip, `witness_puzzles_${timestamp}.zip`);
+            
+            showMessage('success', 'Zip file downloaded successfully!');
+          } catch (error) {
+            console.error('Error downloading zip:', error);
+            showMessage('error', 'Error downloading zip: ' + error.message);
+          }
+        }
+        
+        // Update progress bar and text
+        function updateProgress(current, total) {
+          const percentage = Math.round((current / total) * 100);
+          progressFill.style.width = `${percentage}%`;
+          progressText.textContent = `Processing puzzles: ${current} of ${total} (${percentage}%)`;
+        }
+        
+        // Helper function to show/hide loading
+        function setLoading(isLoading) {
+          loadingIndicator.style.display = isLoading ? 'block' : 'none';
+        }
+        
+        // Helper function to show messages
+        function showMessage(type, message) {
+          if (type === 'error') {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+            setTimeout(() => {
+              errorMessage.style.display = 'none';
+            }, 5000);
+          } else {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            setTimeout(() => {
+              successMessage.style.display = 'none';
+            }, 5000);
+          }
+        }
+      });
+    </script>
+  </body>
+</html> 
