@@ -1324,25 +1324,41 @@
                 if (x >= 0 && y >= 0 && x < puzzle.width && y < puzzle.height) {
                   if (cell.properties.type === 'poly' || cell.properties.type === 'ylop') {
                     const polyId = cell.properties.polyshape;
-                    const polyshape = puzzleData.polyshapes[polyId];
+                    // Support new format where polyshapes can be a JSON string containing 4x4 arrays
+                    const rawPolyshapes = puzzleData.polyshapes;
+                    let polyshapesMap = rawPolyshapes;
+                    if (typeof rawPolyshapes === 'string') {
+                      try {
+                        polyshapesMap = JSON.parse(rawPolyshapes);
+                      } catch (e) {
+                        polyshapesMap = {};
+                      }
+                    }
+                    const shape = polyshapesMap ? (polyshapesMap[polyId] ?? polyshapesMap[String(polyId)]) : undefined;
                     
-                    // Parse the ASCII polyshape into a numeric value
+                    // Compute 16-bit poly value
                     let polyValue = 0;
-                    if (polyshape && typeof polyshape === 'string') {
-                      const rows = polyshape.split('\n');
-                      for (let y = 0; y < rows.length; y++) {
-                        for (let x = 0; x < rows[y].length; x++) {
-                          if (rows[x][y] === '█') {
-                            // Set the bit for this position in the polyomino
-                            polyValue |= (1 << (y * 4 + x));
-                          }
+                    if (Array.isArray(shape)) {
+                      // New numeric 4x4 array format
+                      for (let ry = 0; ry < shape.length; ry++) {
+                        const row = shape[ry] || [];
+                        for (let rx = 0; rx < row.length; rx++) {
+                          if (row[rx]) polyValue |= (1 << (ry * 4 + rx));
+                        }
+                      }
+                    } else if (shape && typeof shape === 'string') {
+                      // Legacy ASCII format
+                      const rows = shape.split('\n');
+                      for (let ry = 0; ry < rows.length; ry++) {
+                        for (let rx = 0; rx < rows[ry].length; rx++) {
+                          if (rows[ry][rx] === '█') polyValue |= (1 << (ry * 4 + rx));
                         }
                       }
                     }
                     
                     puzzle.grid[x][y] = {
                       type: cell.properties.type,
-                      polyshape: polyValue || polyId, // Use parsed value or fall back to ID
+                      polyshape: polyValue || polyId,
                       color: cell.properties.color
                     };
                   } else if (cell.properties.type === 'square') {
