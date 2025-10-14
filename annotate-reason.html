@@ -1140,6 +1140,28 @@
         border-color: var(--color-primary);
         box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
       }
+
+      /* Unsaved changes banner */
+      .unsaved-banner {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: none;
+        gap: 0.75rem;
+        align-items: center;
+        justify-content: space-between;
+        background: #fff7ed; /* amber-50 */
+        border: 1px solid #fed7aa; /* amber-200 */
+        color: #7c2d12; /* amber-900 */
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 0.75rem;
+      }
+      .unsaved-banner .actions {
+        display: flex;
+        gap: 0.5rem;
+      }
       
       /* Main content layout - two columns */
       .main-content {
@@ -1553,6 +1575,15 @@
         </a>
       </div>
       
+      <!-- Unsaved changes banner -->
+      <div class="unsaved-banner" id="unsaved-banner">
+        <div><i class="fas fa-exclamation-triangle"></i> You have unsaved changes. Please export before leaving.</div>
+        <div class="actions">
+          <button id="download-now" title="Download annotated dataset"><i class="fas fa-download"></i> Download now</button>
+          <button id="dismiss-banner" title="Dismiss this warning"><i class="fas fa-times"></i></button>
+        </div>
+      </div>
+      
       <div class="input-section">
         <div class="input-header">
           <h3><i class="fas fa-database"></i> Dataset Input</h3>
@@ -1631,10 +1662,10 @@
             <div class="analysis-grid"></div>
           </div>
           <div id="puzzle-container">
-            <svg id="puzzle" xmlns="http://www.w3.org/2000/svg"></svg>
+        <svg id="puzzle" xmlns="http://www.w3.org/2000/svg"></svg>
           </div>
-        </div>
-        
+      </div>
+      
         <div class="controls-column">
           <div class="solution-display" id="solution-display">
             <div class="solution-toggle model-solution" id="model-solution-toggle" title="Show/Hide model path">
@@ -1807,6 +1838,9 @@
         const completionText = document.getElementById('completion-text');
         const exportButton = document.getElementById('export-button');
         const exportContainer = document.getElementById('export-container');
+        const unsavedBanner = document.getElementById('unsaved-banner');
+        const downloadNowBtn = document.getElementById('download-now');
+        const dismissBannerBtn = document.getElementById('dismiss-banner');
         const analysisSections = document.querySelectorAll('.analysis-section');
         const urlInput = document.getElementById('url-input');
         const loadUrlBtn = document.getElementById('load-url-btn');
@@ -1872,11 +1906,11 @@
         
         // Annotation checkboxes - save on change
         document.querySelectorAll('.failure-reason input[type="checkbox"]').forEach(checkbox => {
-          checkbox.addEventListener('change', saveAnnotation);
+          checkbox.addEventListener('change', function() { saveAnnotation(); markDirty(); });
         });
         
         // Other reason textarea - save on blur
-        otherReasonInput.addEventListener('blur', saveAnnotation);
+        otherReasonInput.addEventListener('blur', function() { saveAnnotation(); markDirty(); });
 
         // Auto-save on tab hide/close and warn before unloading
         document.addEventListener('visibilitychange', function() {
@@ -1886,11 +1920,44 @@
         });
         window.addEventListener('beforeunload', function(e) {
           try { saveAnnotation(); } catch (err) { /* no-op */ }
-          if (dataset && dataset.length > 0) {
+          if (dataset && dataset.length > 0 && hasUnexportedChanges()) {
+            // Always show banner while unsaved
+            showUnsavedBanner();
             e.preventDefault();
             e.returnValue = '';
           }
         });
+
+        // Banner actions
+        if (downloadNowBtn) downloadNowBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          exportAnnotatedData();
+          hideUnsavedBanner();
+        });
+        if (dismissBannerBtn) dismissBannerBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          hideUnsavedBanner();
+        });
+
+        function showUnsavedBanner() {
+          if (!unsavedBanner) return;
+          unsavedBanner.style.display = 'flex';
+        }
+        function hideUnsavedBanner() {
+          if (!unsavedBanner) return;
+          unsavedBanner.style.display = 'none';
+        }
+        // Track whether the user has exported since last change
+        let isDirty = false;
+        function markDirty() { isDirty = true; }
+        function markClean() { isDirty = false; }
+        function hasUnexportedChanges() { return isDirty; }
+
+        // Show banner whenever dataset becomes available
+        // Show/hide banner based on dirty flag
+        setInterval(function() {
+          if (hasUnexportedChanges()) showUnsavedBanner(); else hideUnsavedBanner();
+        }, 1000);
         
         // Check if the URL contains a 'url' parameter
         function hasUrlParameter(param) {
@@ -1907,7 +1974,7 @@
             urlInput.value = datasetUrl;
             
             // Check if we have existing data before loading
-          loadDatasetFromUrl(datasetUrl);
+                loadDatasetFromUrl(datasetUrl);
           }
         }
         
@@ -1920,7 +1987,7 @@
           }
           
           // Check if we have existing data before loading
-          loadDatasetFromUrl(url);
+              loadDatasetFromUrl(url);
         }
         
         // Load dataset from a URL
@@ -1941,6 +2008,7 @@
             currentPuzzleIndex = findNextUnlabeledPuzzleIndex(-1);
             updateDatasetInfo();
             loadCurrentPuzzle();
+            markDirty();
             
             // Show dataset controls
             datasetControls.style.display = 'flex';
@@ -1952,7 +2020,7 @@
             modelNameElement.textContent = currentModelName;
             // Set dataset base name for export (strip _annotated)
             currentDatasetBaseName = extractBaseNameForExport(url) || 'dataset';
-
+            
             // Hide the initial input area after loading
             inputContent.classList.add('collapsed');
             const icon = toggleInputBtn.querySelector('i');
@@ -2130,9 +2198,9 @@
             if (!analysis) {
               grid.innerHTML = '<div class="analysis-item"><i class="fas fa-info-circle"></i><span>No analysis available</span></div>';
               section.style.display = 'block';
-              return;
-            }
-
+            return;
+          }
+          
             // Main validation result - fully_valid_path
             if ('fully_valid_path' in analysis) {
               const mainDiv = document.createElement('div');
@@ -2292,6 +2360,7 @@
             currentPuzzleIndex = findNextUnlabeledPuzzleIndex(-1);
             updateDatasetInfo();
             loadCurrentPuzzle();
+            markDirty();
             
             // Show dataset controls
             datasetControls.style.display = 'flex';
@@ -2303,7 +2372,7 @@
             modelNameElement.textContent = currentModelName;
             // Set dataset base name for export (strip _annotated)
             currentDatasetBaseName = extractBaseNameForExport(file.name) || 'dataset';
-
+            
             // Hide the initial input area after loading
             inputContent.classList.add('collapsed');
             const icon = toggleInputBtn.querySelector('i');
@@ -2453,7 +2522,7 @@
           if (currentPuzzleIndex > 0) {
             currentPuzzleIndex--;
             loadCurrentPuzzle();
-          } else {
+            } else {
             showMessage('error', 'Already at first puzzle');
           }
         }
@@ -2526,7 +2595,7 @@
             // Load reasoning trace (always show, expanded by default)
             if (currentReasoningTrace) {
               reasoningContent.textContent = currentReasoningTrace;
-            } else {
+              } else {
               reasoningContent.textContent = 'No reasoning trace available';
             }
             reasoningContent.classList.remove('collapsed');
@@ -2623,6 +2692,9 @@
             document.body.removeChild(link);
             
             showMessage('success', 'Puzzles exported as JSONL successfully!');
+            // Hide the banner after successful export
+            hideUnsavedBanner();
+            markClean();
           } catch (error) {
             console.error('Error exporting annotations:', error);
             showMessage('error', 'Error saving annotations: ' + error.message);
@@ -2867,7 +2939,7 @@
             // Add delay to create sequential appearance effect
             line.style.animation = `fadeIn 0.05s ${i * 0.03}s both`;
             line.style.opacity = "0";
-
+            
             baseGroup.appendChild(base);
             overlayGroup.appendChild(line);
           }
