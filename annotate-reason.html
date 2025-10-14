@@ -1,0 +1,3025 @@
+<html xmlns="http://www.w3.org/2000/xhtml">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPaRC Model Failure Annotator</title>
+    <link rel="stylesheet" type="text/css" href="visualizer/data/style.css" id="stylesheet">
+    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="/favicon/site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      /* Updated color scheme to match index.html more closely */
+      :root {
+        --color-bg: #fafafa;
+        --color-text: #333;
+        --color-primary: #6366f1; /* Indigo */
+        --color-secondary: #818cf8; /* Lighter indigo */
+        --color-accent: #f43f5e; /* Rose */
+        --color-muted: #94a3b8; /* Slate */
+        --color-success: #10b981; /* Emerald */
+        --color-card: #ffffff;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 10px 15px rgba(0, 0, 0, 0.04);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.05), 0 20px 48px rgba(0, 0, 0, 0.06);
+        --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+        --radius-sm: 8px;
+        --radius: 12px;
+        --radius-lg: 16px;
+        --radius-full: 9999px;
+        --font-base: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --compact-spacing: 0.75rem;
+      }
+      
+      html {
+        overflow-x: hidden;
+        width: 100%;
+        scroll-behavior: smooth;
+      }
+      
+      body {
+        width: 100%;
+        position: relative;
+        overflow-x: clip;
+        font-family: var(--font-base);
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        line-height: 1.7;
+        font-weight: 400;
+        font-size: 18px;
+        margin: 0;
+        padding: 0;
+        background-image: radial-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+        background-size: 25px 25px;
+      }
+      
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      
+      a {
+        color: var(--color-primary);
+        text-decoration: none;
+        transition: var(--transition);
+      }
+      
+      a:hover {
+        color: var(--color-accent);
+      }
+      
+      /* Typography */
+      h1, h2, h3, h4, h5 {
+        font-weight: 600;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+      }
+      
+      h1 {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        letter-spacing: -0.03em;
+      }
+      
+      h2 {
+        font-size: clamp(1.8rem, 3vw, 2.2rem);
+        letter-spacing: -0.02em;
+      }
+      
+      h3 {
+        font-size: 1.5rem;
+        letter-spacing: -0.015em;
+      }
+      
+      /* Layout */
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto 2rem;
+        padding: 1.5rem 1.5rem;
+        background-color: var(--color-card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg), 
+                    0 1px 2px rgba(99, 102, 241, 0.1), 
+                    0 0 0 1px rgba(226, 232, 240, 0.8);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .input-section {
+        width: 100%;
+        margin-bottom: 1.25rem;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: var(--radius);
+        overflow: hidden;
+        transition: box-shadow 0.3s ease;
+        box-shadow: var(--shadow-sm);
+        background-color: var(--color-card);
+      }
+      
+      .input-section:hover {
+        box-shadow: var(--shadow), 0 0 0 1px rgba(99, 102, 241, 0.2);
+      }
+      
+      .input-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.85rem 1.25rem;
+        background-color: var(--color-bg);
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+      }
+      
+      .input-header:hover {
+        background-color: rgba(99, 102, 241, 0.04);
+      }
+      
+      .input-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .input-header h3 i {
+        color: var(--color-primary);
+      }
+      
+      .toggle-btn {
+        background: none;
+        border: none;
+        color: var(--color-text);
+        cursor: pointer;
+        padding: 5px;
+      }
+      
+      #input-content {
+        transition: max-height 0.3s ease;
+        max-height: 300px;
+        overflow: hidden;
+      }
+      
+      #input-content.collapsed {
+        max-height: 0;
+      }
+      
+      textarea {
+        width: 100%;
+        height: 120px;
+        font-family: 'Consolas', monospace;
+        padding: 15px;
+        box-sizing: border-box;
+        border: none;
+        border-top: 1px solid rgba(226, 232, 240, 0.8);
+        resize: none;
+        transition: border 0.3s ease;
+        font-size: 14px;
+      }
+      
+      textarea:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+      }
+      
+      /* Style for all button containers to ensure consistency */
+      .button-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin: 0.75rem 0;
+      }
+      
+      /* Better styling for input buttons */
+      .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        padding: 0.75rem 1.25rem;
+        background-color: var(--color-bg);
+        justify-content: flex-end;
+        align-items: center;
+      }
+      
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(to bottom, var(--color-primary), #5558e6);
+        color: white;
+        font-weight: 500;
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+        border-radius: var(--radius-full);
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        gap: 0.5rem;
+        letter-spacing: 0.01em;
+        box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+      }
+      
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(99, 102, 241, 0.25);
+      }
+      
+      button:active {
+        transform: translateY(-1px);
+      }
+      
+      button::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: scale(0);
+        opacity: 0;
+        border-radius: var(--radius);
+        transition: all 0.4s ease;
+      }
+      
+      button:hover::after {
+        transform: scale(1);
+        opacity: 1;
+      }
+      
+      #clear-puzzle {
+        background: linear-gradient(to bottom, var(--color-muted), #7f8ea7);
+        box-shadow: 0 4px 10px rgba(148, 163, 184, 0.2);
+      }
+      
+      #clear-puzzle:hover {
+        box-shadow: 0 6px 15px rgba(148, 163, 184, 0.25);
+      }
+      
+      #show-solution, #next-solution {
+        background: linear-gradient(to bottom, var(--color-success), #0ca678);
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+      }
+      
+      #show-solution:hover, #next-solution:hover {
+        box-shadow: 0 6px 15px rgba(16, 185, 129, 0.25);
+      }
+      
+      #puzzle-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: 1.25rem 0;
+        padding: 1.5rem;
+        background-color: white;
+        border-radius: var(--radius-lg);
+        overflow: auto;
+        box-shadow: var(--shadow-inner);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+      }
+      
+      #puzzle-container:hover {
+        box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.06);
+      }
+      
+      #puzzle {
+        max-height: 75vh;
+      }
+      
+      .info-compact {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        width: 100%;
+        margin-bottom: 1.25rem;
+        padding: 1rem 1.25rem;
+        background-color: var(--color-bg);
+        border-radius: var(--radius);
+        font-size: 0.95rem;
+        align-items: center;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(226, 232, 240, 0.6);
+      }
+      
+      .info-compact:hover {
+        box-shadow: var(--shadow);
+      }
+      
+      .info-compact .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--radius-sm);
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+      
+      .info-compact .info-item:hover {
+        transform: translateY(-2px);
+        background-color: white;
+        box-shadow: var(--shadow-sm);
+      }
+      
+      .info-compact .info-label {
+        font-weight: 600;
+        color: var(--color-primary);
+      }
+      
+      .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-bottom: 1.25rem;
+        padding: 1rem 1.25rem;
+        background-color: var(--color-bg);
+        border-radius: var(--radius);
+        width: 100%;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+      }
+      
+      .stats-container:hover {
+        box-shadow: var(--shadow);
+      }
+      
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: transform 0.3s ease;
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--radius-full);
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+      
+      .stat-item:hover {
+        transform: translateY(-2px);
+        background-color: white;
+        box-shadow: var(--shadow-sm);
+      }
+      
+      .stat-item i {
+        color: var(--color-primary);
+        font-size: 1.125rem;
+      }
+      
+      .solved-indicator {
+        color: var(--color-success);
+        font-weight: 600;
+        background-color: rgba(16, 185, 129, 0.1);
+      }
+      
+      .solved-indicator i {
+        color: var(--color-success);
+      }
+      
+      .failed-indicator {
+        color: var(--color-accent);
+        font-weight: 600;
+        background-color: rgba(244, 63, 94, 0.1);
+      }
+      
+      .failed-indicator i {
+        color: var(--color-accent);
+      }
+      
+      #timer {
+        font-family: 'Consolas', monospace;
+        letter-spacing: 1px;
+      }
+      
+      .solution-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+      
+      .solution-counter {
+        font-size: 1rem; /* Increased */
+        font-weight: 500;
+        color: var(--color-text);
+      }
+      
+      .loader {
+        display: none;
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(226, 232, 240, 0.8);
+        border-radius: 50%;
+        border-top-color: var(--color-primary);
+        animation: spin 1s ease-in-out infinite;
+      }
+      
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
+      .success-message, .error-message {
+        font-weight: 500;
+        text-align: center;
+        margin: 0.75rem 0;
+        padding: 0.75rem 1.25rem;
+        border-radius: var(--radius-full);
+        transform: translateY(0);
+        animation: slideIn 0.4s ease-out;
+        box-shadow: var(--shadow-sm);
+        font-size: 1rem;
+      }
+      
+      .success-message {
+        color: var(--color-success);
+        background-color: rgba(16, 185, 129, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+      }
+      
+      .error-message {
+        color: var(--color-accent);
+        background-color: rgba(244, 63, 94, 0.08);
+        border: 1px solid rgba(244, 63, 94, 0.2);
+      }
+      
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .dataset-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        width: 100%;
+        margin-bottom: 1.25rem;
+        padding: 1rem 1.25rem;
+        background-color: var(--color-bg);
+        border-radius: var(--radius);
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+      }
+      
+      .dataset-controls:hover {
+        box-shadow: var(--shadow);
+      }
+      
+      .dataset-nav {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+      }
+      
+      .dataset-nav button {
+        min-width: 40px;
+      }
+      
+      .dataset-progress {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      
+      .progress-bar {
+        width: 150px;
+        height: 6px;
+        background-color: rgba(226, 232, 240, 0.5);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+        width: 0%;
+        transition: width 0.5s ease;
+        box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+      }
+      
+      .file-upload {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        cursor: pointer;
+      }
+      
+      .file-upload input[type=file] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        min-width: 100%;
+        min-height: 100%;
+        font-size: 100px;
+        text-align: right;
+        filter: alpha(opacity=0);
+        opacity: 0;
+        outline: none;
+        cursor: pointer;
+        display: block;
+      }
+      
+      .dataset-info {
+        margin-top: 0.75rem;
+        font-size: 0.9rem;
+        color: var(--color-text);
+        text-align: center;
+      }
+      
+      /* Make sure export button container is properly styled */
+      .export-container {
+        margin-top: 1.5rem;
+        width: 100%;
+        text-align: center;
+        padding: 1rem 0 0.5rem;
+        border-top: 1px solid rgba(226, 232, 240, 0.6);
+      }
+      
+      #export-button {
+        background: linear-gradient(to bottom, var(--color-accent), #e11d48);
+        box-shadow: 0 4px 10px rgba(244, 63, 94, 0.2);
+      }
+      
+      #export-button:hover {
+        box-shadow: 0 6px 15px rgba(244, 63, 94, 0.25);
+      }
+      
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem 0.75rem;
+        }
+        
+        .info-compact {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        
+        .buttons {
+          flex-direction: column;
+        }
+        
+        .solution-controls {
+          flex-direction: column;
+          width: 100%;
+        }
+        
+        .dataset-controls {
+          flex-direction: column;
+        }
+        
+        .dataset-nav {
+          justify-content: center;
+          width: 100%;
+        }
+        
+        .dataset-progress {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
+        
+        .progress-bar {
+          width: 100%;
+        }
+      }
+      
+      .github-link {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1rem;
+      }
+      
+      .github-button {
+        background-color: #24292e;
+        color: white;
+        border: none;
+        border-radius: var(--radius);
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: var(--transition);
+      }
+      
+      .github-button:hover {
+        background-color: #333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      /* Header with gradient background, similar to index.html */
+      .site-header {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        padding: 2.5rem 0 2rem;
+        background: linear-gradient(135deg, #6366f1 0%, #818cf8 40%, #a5b4fc 100%);
+        color: white;
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+      
+      .site-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2V6h4V4H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        z-index: 0;
+      }
+      
+      .header-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      
+      .header-title {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+        background: linear-gradient(to right, #ffffff, #e0e7ff);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0px 0px 30px rgba(255, 255, 255, 0.2);
+      }
+      
+      .tagline {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        font-weight: 300;
+        opacity: 0.95;
+        line-height: 1.4;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Particle animation */
+      .particle-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 0;
+        opacity: 0.7;
+      }
+      
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        pointer-events: none;
+      }
+      
+      .particle-1 {
+        width: 400px;
+        height: 400px;
+        top: -100px;
+        right: -100px;
+        animation: float 15s ease-in-out infinite, pulse 8s ease-in-out infinite;
+      }
+      
+      .particle-2 {
+        width: 300px;
+        height: 300px;
+        bottom: -80px;
+        left: -80px;
+        animation: float-reverse 18s ease-in-out infinite, pulse 10s ease-in-out infinite;
+      }
+      
+      .particle-3 {
+        width: 200px;
+        height: 200px;
+        top: 40%;
+        right: 25%;
+        animation: float 12s ease-in-out infinite, pulse 6s ease-in-out infinite;
+      }
+      
+      @keyframes float {
+        0% { transform: translateY(0px) translateX(0px); }
+        50% { transform: translateY(-20px) translateX(10px); }
+        100% { transform: translateY(0px) translateX(0px); }
+      }
+      
+      @keyframes float-reverse {
+        0% { transform: translateY(0px) translateX(0px); }
+        50% { transform: translateY(20px) translateX(-10px); }
+        100% { transform: translateY(0px) translateX(0px); }
+      }
+      
+      @keyframes pulse {
+        0% { opacity: 0.5; }
+        50% { opacity: 0.8; }
+        100% { opacity: 0.5; }
+      }
+      
+      input[type="text"] {
+        padding: 0.6rem 1rem;
+        border-radius: var(--radius-full);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        font-family: var(--font-base);
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-inner);
+      }
+      
+      input[type="text"]:hover {
+        border-color: #cbd5e1;
+      }
+      
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      }
+      
+      @keyframes drawLine {
+        from { stroke-dashoffset: 5000; }
+        to { stroke-dashoffset: 0; }
+      }
+      
+      /* Fade-in animation used for segmented solution rendering */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      #solution-path path {
+        stroke-dasharray: 5000;
+        animation: drawLine 2s ease-in-out forwards;
+      }
+      
+      #status-messages {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 30px;
+        gap: 10px;
+      }
+      
+      /* Make display more compact */
+      #puzzle-info-compact .info-item {
+        margin-right: 0.5rem;
+      }
+      
+      /* Compact file upload area */
+      #input-content > div {
+        padding: 10px !important;
+      }
+      
+      #input-content > div > div {
+        margin-bottom: 10px !important;
+      }
+      
+      /* Reduce SVG size for more compact view */
+      #puzzle {
+        max-height: 75vh;
+      }
+      
+      /* Adjust font sizes for better compactness */
+      #progress-text, #completion-text {
+        font-size: 0.95rem; /* Increased from 0.85rem */
+      }
+      
+      /* Add new navigation buttons styles */
+      .navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        width: 100%;
+      }
+      
+      .nav-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: var(--radius-full);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        gap: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      
+      .back-button {
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+      }
+      
+      .back-button:hover {
+        background-color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 0 0 2px rgba(99, 102, 241, 0.1);
+      }
+      
+      /* Update GitHub button styling to match other buttons */
+      .github-button {
+        background-color: #24292e;
+        color: white;
+      }
+      
+      .github-button:hover {
+        background-color: #333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      /* Adjust dataset controls for better button placement */
+      .dataset-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        width: 100%;
+        margin-bottom: 1.25rem;
+        padding: 1rem 1.25rem;
+        background-color: var(--color-bg);
+        border-radius: var(--radius);
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+      }
+      
+      /* Improve button spacing in solution controls */
+      .solution-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+      
+      /* Better align buttons in small space */
+      @media (max-width: 500px) {
+        .navigation-buttons {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        
+        .nav-button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+      
+      /* Improve solution controls on mobile */
+      @media (max-width: 768px) {
+        .solution-controls {
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+      }
+      
+      #url-input {
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+      }
+      
+      /* Make navigation buttons consistent and aligned */
+      .navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        width: 100%;
+      }
+      
+      /* Ensure solution controls have the right styles */
+      .solution-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.25rem;
+      }
+      
+      /* Fix skip button styling to match other buttons */
+      #skip-puzzle {
+        background: linear-gradient(to bottom, var(--color-muted), #7f8ea7);
+        box-shadow: 0 4px 10px rgba(148, 163, 184, 0.2);
+      }
+      
+      #skip-puzzle:hover {
+        box-shadow: 0 6px 15px rgba(148, 163, 184, 0.25);
+      }
+      
+      /* Ensure proper styling for clear dataset button */
+      #clear-dataset {
+        background: linear-gradient(to bottom, var(--color-muted), #7f8ea7);
+        box-shadow: 0 4px 10px rgba(148, 163, 184, 0.2);
+      }
+      
+      #clear-dataset:hover {
+        box-shadow: 0 6px 15px rgba(148, 163, 184, 0.25);
+      }
+      
+      /* Add subtle transitions to all interactive elements */
+      button, .nav-button, input, .info-item, .stat-item {
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      /* Increase size of all standard buttons */
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(to bottom, var(--color-primary), #5558e6);
+        color: white;
+        font-weight: 500;
+        padding: 0.85rem 1.75rem; /* Increased padding */
+        font-size: 1.125rem; /* Increased font size */
+        border-radius: var(--radius-full);
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        gap: 0.75rem; /* Increased gap */
+        letter-spacing: 0.01em;
+        box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+        min-height: 48px; /* Ensure minimum height */
+      }
+      
+      /* Increase nav buttons size */
+      .nav-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.85rem 1.75rem; /* Increased padding */
+        font-size: 1.125rem; /* Increased font size */
+        font-weight: 500;
+        border-radius: var(--radius-full);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        gap: 0.75rem; /* Increased gap */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        min-height: 48px; /* Ensure minimum height */
+      }
+      
+      /* Make icons in buttons larger */
+      button i, .nav-button i {
+        font-size: 1.25rem; /* Larger icons */
+      }
+      
+      /* Adjust button spacing in containers */
+      .buttons {
+        gap: 1rem; /* Increased gap between buttons */
+        padding: 1rem 1.5rem; /* Increased padding */
+      }
+      
+      .solution-controls {
+        gap: 1.5rem; /* Increased gap between solution buttons */
+        margin-top: 1.5rem; /* More space above */
+      }
+      
+      /* Reasoning trace display */
+      .reasoning-section {
+        background-color: var(--color-card);
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: var(--shadow-sm);
+      }
+      
+      .reasoning-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.6rem 0.75rem;
+        background-color: var(--color-bg);
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+      }
+      
+      .reasoning-header:hover {
+        background-color: rgba(99, 102, 241, 0.04);
+      }
+      
+      .reasoning-header h3 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .reasoning-content {
+        max-height: 300px;
+        overflow-y: auto;
+        transition: max-height 0.3s ease;
+        padding: 0.75rem;
+        font-family: 'Consolas', monospace;
+        font-size: 0.75rem;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        background-color: #fafafa;
+      }
+      
+      .reasoning-content.collapsed {
+        max-height: 0;
+        padding: 0;
+      }
+      
+      /* Annotation section */
+      .annotation-section {
+        padding: 0.75rem;
+        background-color: var(--color-card);
+        border-radius: var(--radius);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: var(--shadow-sm);
+      }
+      
+      .annotation-section h3 {
+        margin: 0 0 0.75rem 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--color-primary);
+      }
+      
+      .failure-reasons {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .failure-reason {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        background-color: white;
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      
+      .failure-reason:hover {
+        background-color: rgba(99, 102, 241, 0.05);
+        border-color: var(--color-primary);
+      }
+      
+      .failure-reason input[type="checkbox"] {
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+        accent-color: var(--color-primary);
+      }
+      
+      .failure-reason label {
+        cursor: pointer;
+        font-size: 0.9rem;
+        user-select: none;
+        flex-grow: 1;
+      }
+      
+      .other-reason-input {
+        width: 100%;
+        padding: 0.75rem;
+        font-family: var(--font-base);
+        font-size: 0.9rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        transition: all 0.3s ease;
+        resize: vertical;
+        min-height: 80px;
+      }
+      
+      .other-reason-input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      }
+      
+      /* Main content layout - two columns */
+      .main-content {
+        display: flex;
+        gap: 1.5rem;
+        width: 100%;
+        align-items: flex-start;
+      }
+      
+      .puzzle-column {
+        flex: 0 0 auto;
+        max-width: 60%;
+        min-width: 500px;
+      }
+      
+      .controls-column {
+        flex: 1;
+        min-width: 350px;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      @media (max-width: 1200px) {
+        .main-content {
+          flex-direction: column;
+        }
+        
+        .puzzle-column {
+          max-width: 100%;
+          min-width: 100%;
+        }
+        
+        .controls-column {
+          min-width: 100%;
+        }
+      }
+      
+      /* Solution comparison */
+      .solution-display {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .solution-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background-color: var(--color-card);
+        border-radius: var(--radius);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      
+      .solution-toggle:hover {
+        border-color: var(--color-primary);
+        box-shadow: var(--shadow);
+      }
+      
+      .solution-toggle.active {
+        border-width: 2px;
+      }
+      
+      .solution-toggle.active.model-solution {
+        border-color: var(--color-accent);
+        background-color: rgba(244, 63, 94, 0.05);
+      }
+      
+      .solution-toggle.active.correct-solution {
+        border-color: var(--color-success);
+        background-color: rgba(16, 185, 129, 0.05);
+      }
+      
+      .solution-toggle input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: var(--color-primary);
+      }
+      
+      .solution-toggle.model-solution input[type="checkbox"] {
+        accent-color: var(--color-accent);
+      }
+      
+      .solution-toggle.correct-solution input[type="checkbox"] {
+        accent-color: var(--color-success);
+      }
+      
+      .solution-toggle-content {
+        flex: 1;
+      }
+      
+      .solution-toggle h4 {
+        margin: 0 0 0.25rem 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .solution-toggle.model-solution h4 {
+        color: var(--color-accent);
+      }
+      
+      .solution-toggle.correct-solution h4 {
+        color: var(--color-success);
+      }
+      
+      .path-info {
+        font-size: 0.85rem;
+        color: var(--color-muted);
+        margin: 0;
+      }
+      
+      .solution-nav {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+      }
+      
+      .solution-nav button {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+      }
+
+      /* Inline correct-solution layout */
+      .solution-inline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+      .solution-inline > button {
+        padding: 0.5rem 1rem; /* a bit wider */
+        min-width: 52px; /* a bit wider */
+      }
+      .solution-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        gap: 0.15rem;
+      }
+      
+      /* Analysis section */
+      .analysis-section {
+        padding: 0.5rem; /* more compact */
+        background-color: var(--color-card);
+        border-radius: var(--radius);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: var(--shadow-sm);
+      }
+      
+      .analysis-section h3 {
+        margin: 0 0 0.5rem 0; /* tighter */
+        font-size: 0.9rem; /* smaller */
+        font-weight: 600;
+        color: var(--color-primary);
+      }
+      
+      .analysis-main {
+        margin-bottom: 0.5rem; /* tighter */
+      }
+      
+      .analysis-main-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem; /* tighter */
+        padding: 0.6rem 0.75rem; /* smaller */
+        background-color: white;
+        border-radius: var(--radius);
+        border: 2px solid rgba(226, 232, 240, 0.6);
+        transition: all 0.2s ease;
+        font-size: 1rem; /* slightly smaller */
+        font-weight: 600;
+      }
+      
+      .analysis-main-item.pass {
+        border-color: var(--color-success);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+      }
+      
+      .analysis-main-item.fail {
+        border-color: var(--color-accent);
+        background: linear-gradient(135deg, rgba(244, 63, 94, 0.1), rgba(244, 63, 94, 0.05));
+        box-shadow: 0 2px 8px rgba(244, 63, 94, 0.15);
+      }
+      
+      .analysis-main-item i {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+      }
+      
+      .analysis-main-item.pass i {
+        color: var(--color-success);
+      }
+      
+      .analysis-main-item.fail i {
+        color: var(--color-accent);
+      }
+      
+      .analysis-details-label {
+        font-size: 0.75rem;
+        color: var(--color-muted);
+        margin: 0 0 0.5rem 0;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .analysis-grid {
+        display: flex; /* horizontal list */
+        flex-wrap: wrap; /* wrap to next line if needed */
+        gap: 0.25rem; /* tighter */
+      }
+      
+      .analysis-item {
+        display: inline-flex; /* horizontal pill */
+        align-items: center;
+        gap: 0.4rem; /* tighter */
+        padding: 0.3rem 0.5rem; /* smaller */
+        background-color: white;
+        border-radius: var(--radius-full); /* pill shape */
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        transition: all 0.2s ease;
+        font-size: 0.8rem; /* smaller */
+        white-space: nowrap; /* keep each item on one line */
+      }
+      
+      .analysis-item.pass {
+        border-color: rgba(16, 185, 129, 0.3);
+        background-color: rgba(16, 185, 129, 0.05);
+      }
+      
+      .analysis-item.fail {
+        border-color: rgba(244, 63, 94, 0.3);
+        background-color: rgba(244, 63, 94, 0.05);
+      }
+      
+      .analysis-item i {
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+      
+      .analysis-item.pass i {
+        color: var(--color-success);
+      }
+      
+      .analysis-item.fail i {
+        color: var(--color-accent);
+      }
+      
+      .analysis-item span {
+        flex-grow: 1;
+      }
+      
+      /* Make export button extra prominent */
+      #export-button {
+        padding: 1rem 2rem; /* Extra padding */
+        font-size: 1.2rem; /* Larger font */
+      }
+      
+      /* Make mobile buttons full-width for easy tapping */
+      @media (max-width: 768px) {
+        button, .nav-button {
+          padding: 0.85rem 1.5rem;
+          font-size: 1.125rem;
+        }
+        
+        .solution-controls button {
+          flex-grow: 1;
+          justify-content: center;
+        }
+      }
+      
+      /* More compact header - apply to existing styles */
+      :root {
+        --compact-spacing: 0.75rem;
+      }
+      
+      .site-header {
+        padding: 1.75rem 0 1.5rem !important; /* Reduced padding */
+        margin-bottom: 1.25rem !important; /* Reduced margin */
+      }
+      
+      /* More compact container */
+      .container {
+        padding: 1.25rem !important; /* Reduced padding */
+        margin-bottom: 1rem !important; /* Reduced margin */
+      }
+      
+      /* Tighter navigation buttons spacing */
+      .navigation-buttons {
+        margin-bottom: 1rem !important; /* Reduced margin */
+      }
+      
+      /* More compact sections */
+      .input-section {
+        margin-bottom: 1rem !important; /* Reduced margin */
+      }
+      
+      .input-header {
+        padding: 0.65rem 1rem !important; /* Reduced padding */
+      }
+      
+      /* Compact info sections */
+      .info-compact {
+        padding: 0.75rem 1rem !important; /* Reduced padding */
+        margin-bottom: 0.75rem !important; /* Reduced margin */
+      }
+      
+      .info-compact .info-item {
+        padding: 0.15rem 0.4rem !important; /* Reduced padding */
+      }
+      
+      /* More compact stats container */
+      .stats-container {
+        padding: 0.75rem 1rem !important; /* Reduced padding */
+        margin-bottom: 0.75rem !important; /* Reduced margin */
+      }
+      
+      .stat-item {
+        padding: 0.15rem 0.5rem !important; /* Reduced padding */
+      }
+      
+      /* More compact puzzle container */
+      #puzzle-container {
+        margin: 0.75rem 0 !important; /* Reduced margins */
+        padding: 1rem !important; /* Reduced padding */
+      }
+      
+      /* Compact dataset controls */
+      .dataset-controls {
+        padding: 0.75rem 1rem !important; /* Reduced padding */
+        margin-bottom: 0.75rem !important; /* Reduced margin */
+      }
+      
+      /* More compact messages */
+      .success-message, .error-message {
+        margin: 0.5rem 0 !important; /* Reduced margin */
+        padding: 0.5rem 1rem !important; /* Reduced padding */
+      }
+      
+      /* Tighter export container */
+      .export-container {
+        margin-top: 1rem !important; /* Reduced margin */
+        padding: 0.75rem 0 0.5rem !important; /* Reduced padding */
+      }
+      
+      /* More compact form elements */
+      .buttons {
+        padding: 0.75rem 1.25rem !important; /* Reduced padding */
+      }
+      
+      input[type="text"] {
+        padding: 0.5rem 0.75rem !important; /* Reduced padding */
+      }
+      
+      .dataset-progress {
+        gap: 0.5rem !important; /* Reduced gap */
+      }
+    </style>
+    <script type="text/javascript" src="visualizer/engine/utilities.js"></script>
+    <script type="text/javascript" src="visualizer/engine/svg.js"></script>
+    <script type="text/javascript" src="visualizer/engine/polyominos.js"></script>
+    <script type="text/javascript" src="visualizer/engine/puzzle.js"></script>
+    <script type="text/javascript" src="visualizer/engine/solve.js"></script>
+    <script type="text/javascript" src="visualizer/engine/validate.js"></script>
+    <script type="text/javascript" src="visualizer/engine/display2.js"></script>
+    <script type="text/javascript" src="visualizer/engine/trace2.js"></script>
+    <script type="text/javascript" src="visualizer/engine/serializer.js"></script>
+    <script type="text/javascript" src="visualizer/engine/custom_mechanics.js"></script>
+    <!-- Add js-yaml library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <!-- Add font awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <!-- Hidden elements required by the engine -->
+    <input type="hidden" id="sens" value="1.0">
+    
+    <!-- Header section with particles -->
+    <div class="site-header">
+      <div class="particle-container">
+        <div class="particle particle-1"></div>
+        <div class="particle particle-2"></div>
+        <div class="particle particle-3"></div>
+      </div>
+      <div class="header-content">
+        <h1 class="header-title">SPaRC Model Failure Annotator</h1>
+<p class="tagline">Analyze and annotate why AI models fail to solve SPaRC puzzles</p>
+      </div>
+    </div>
+    
+    <div class="container">
+      <!-- Navigation buttons at the top for better accessibility -->
+      <div class="navigation-buttons">
+        <a href="index.html#tools" class="nav-button back-button">
+          <i class="fas fa-arrow-left"></i> Back to Main Page
+        </a>
+        <a href="https://github.com/lkaesberg/SPaRCWebsite" target="_blank" rel="noopener noreferrer" class="nav-button github-button">
+          <i class="fab fa-github"></i> View on GitHub
+        </a>
+      </div>
+      
+      <div class="input-section">
+        <div class="input-header">
+          <h3><i class="fas fa-database"></i> Dataset Input</h3>
+          <button id="toggle-input" class="toggle-btn"><i class="fas fa-chevron-up"></i></button>
+        </div>
+        <div id="input-content">
+          <div style="padding: 15px;">
+            <div style="margin-bottom: 15px; text-align: center;">
+              <div class="file-upload">
+                <button id="upload-file-btn"><i class="fas fa-file-upload"></i> Load Dataset</button>
+                <input type="file" id="upload-dataset" accept=".jsonl,.json" />
+              </div>
+            </div>
+            <div style="margin-bottom: 15px; display: flex; align-items: center; justify-content: center;">
+              <input type="text" id="url-input" placeholder="Enter URL to JSONL file" style="width: 300px; border-radius: var(--radius-sm); border: 1px solid rgba(226, 232, 240, 0.8); margin-right: 10px;">
+              <button id="load-url-btn"><i class="fas fa-cloud-download-alt"></i> Load from URL</button>
+            </div>
+            <div class="dataset-info" id="dataset-info"></div>
+          </div>
+          
+          <textarea id="puzzle-input" placeholder="Paste a single puzzle JSON string or the entire dataset in JSONL format..." style="display: none;"></textarea>
+          <div class="buttons">
+            <button id="load-puzzle" style="display: none;"><i class="fas fa-play"></i> Load Puzzle</button>
+            <button id="clear-dataset"><i class="fas fa-eraser"></i> Clear Dataset</button>
+          </div>
+        </div>
+      </div>
+      
+      <div id="dataset-controls" class="dataset-controls" style="display: none;">
+        <div class="dataset-nav">
+          <button id="prev-puzzle" title="Previous puzzle"><i class="fas fa-chevron-left"></i> Previous</button>
+          <button id="next-puzzle" title="Next puzzle">Next <i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="dataset-progress">
+          <span id="progress-text">Puzzle 0 of 0</span>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <span id="completion-text">0% complete</span>
+        </div>
+      </div>
+      
+      <div id="puzzle-info-compact" class="info-compact" style="display: none;"></div>
+      
+      <div class="stats-container" id="stats-container" style="display: none;">
+        <div class="stat-item">
+          <i class="fas fa-robot"></i>
+          <span>Model: <span id="model-name">Unknown</span></span>
+        </div>
+        <div class="stat-item solved-indicator" style="display: none;" id="solved-indicator">
+          <i class="fas fa-check-circle"></i>
+          <span>Model Solved</span>
+        </div>
+        <div class="stat-item failed-indicator" id="failed-indicator">
+          <i class="fas fa-times-circle"></i>
+          <span>Model Failed</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-clock"></i>
+          <span id="processing-time">0s</span>
+        </div>
+      </div>
+      
+      
+      
+      <div id="status-messages">
+        <div class="loader" id="loading-indicator"></div>
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
+      </div>
+      
+      <div class="main-content" id="main-content" style="display: none;">
+        <div class="puzzle-column">
+          <div class="analysis-section" style="display: none;">
+            <h3><i class="fas fa-check-double"></i> Path Analysis</h3>
+            <div class="analysis-grid"></div>
+          </div>
+          <div id="puzzle-container">
+            <svg id="puzzle" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+        </div>
+        
+        <div class="controls-column">
+          <div class="solution-display" id="solution-display">
+            <div class="solution-toggle model-solution" id="model-solution-toggle" title="Show/Hide model path">
+              <input type="checkbox" id="show-model-solution" title="Show/Hide model path">
+              <div class="solution-toggle-content">
+                <h4><i class="fas fa-robot"></i> Model's Attempt</h4>
+                <div class="path-info" id="model-path-info" title="Show/Hide model path">Click to show/hide model's path</div>
+              </div>
+            </div>
+            <div class="solution-toggle correct-solution" id="correct-solution-toggle" title="Show/Hide correct solution">
+              <input type="checkbox" id="show-correct-solution" title="Show/Hide correct solution">
+              <div class="solution-toggle-content">
+                <h4><i class="fas fa-check-circle"></i> Correct Solution</h4>
+                <div class="path-info" id="correct-path-hint" title="Show/Hide correct solution">Click to show/hide correct solution</div>
+                <div class="solution-inline" id="solution-inline" style="display: none;">
+                  <button id="prev-correct-solution" type="button" title="Previous correct solution"><i class="fas fa-chevron-left"></i></button>
+                  <div class="solution-center">
+                    <div class="solution-counter" id="solution-counter" style="display: none;"></div>
+                    <div class="path-info" id="correct-path-info" title="Show/Hide correct solution">Click to show/hide correct solution</div>
+                  </div>
+                  <button id="next-correct-solution" type="button" title="Next correct solution"><i class="fas fa-chevron-right"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          
+          
+          <div class="reasoning-section" id="reasoning-section" style="display: none;">
+            <div class="reasoning-header" id="reasoning-header">
+              <h3><i class="fas fa-brain"></i> Model's Reasoning</h3>
+              <button class="toggle-btn" id="toggle-reasoning"><i class="fas fa-chevron-down"></i></button>
+            </div>
+            <div class="reasoning-content collapsed" id="reasoning-content"></div>
+          </div>
+          
+          <div class="annotation-section" id="annotation-section" style="display: none;">
+            <h3><i class="fas fa-clipboard-check"></i> Failure Annotation</h3>
+            <div class="failure-reasons" id="failure-reasons">
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-incorrect-start-end" value="incorrect_start_end">
+                <label for="reason-incorrect-start-end">Incorrect Start/End</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-disconnected-line" value="disconnected_line">
+                <label for="reason-disconnected-line">Disconnected Line</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-self-intersect" value="self_intersecting">
+                <label for="reason-self-intersect">Self-Intersecting</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-rule-violation" value="rule_violation">
+                <label for="reason-rule-violation">Rule Violation</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-dots" value="dot_rule_failure">
+                <label for="reason-dots">Dot Rule Failure</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-gaps" value="gap_rule_failure">
+                <label for="reason-gaps">Gap Rule Failure</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-stones" value="stone_rule_failure">
+                <label for="reason-stones">Stone/Square Failure</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-stars" value="star_rule_failure">
+                <label for="reason-stars">Star Rule Failure</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-poly" value="polyomino_rule_failure">
+                <label for="reason-poly">Polyomino Failure</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-triangle" value="triangle_rule_failure">
+                <label for="reason-triangle">Triangle Failure</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-parsing" value="parsing_error">
+                <label for="reason-parsing">Parsing Error</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-reasoning" value="reasoning_error">
+                <label for="reason-reasoning">Reasoning Error</label>
+              </div>
+            </div>
+            <label for="other-reason" style="display: block; margin: 0.5rem 0 0.25rem 0; font-weight: 500; font-size: 0.85rem;">
+              <i class="fas fa-comment-alt"></i> Other:
+            </label>
+            <textarea class="other-reason-input" id="other-reason" placeholder="Other reasons..."></textarea>
+          </div>
+        </div>
+      </div>
+      
+      <div class="export-container" id="export-container" style="display: none;">
+        <button id="export-button"><i class="fas fa-file-export"></i> Save Annotated Dataset</button>
+      </div>
+      
+      <!-- Bottom navigation buttons -->
+      <div id="dataset-controls-bottom" class="dataset-controls" style="display: none; margin-top: 1rem;">
+        <div class="dataset-nav">
+          <button id="prev-puzzle-bottom" title="Previous puzzle"><i class="fas fa-chevron-left"></i> Previous</button>
+          <button id="next-puzzle-bottom" title="Next puzzle">Next <i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="dataset-progress">
+          <span id="progress-text-bottom">Puzzle 0 of 0</span>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill-bottom"></div>
+          </div>
+          <span id="completion-text-bottom">0% complete</span>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Dataset handling variables
+        let dataset = [];
+        let currentPuzzleIndex = 0;
+        let originalDatasetSize = 0;
+        let currentModelName = 'Unknown';
+        let currentDatasetBaseName = 'dataset';
+        
+        // Current puzzle state variables
+        let currentPuzzle = null;
+        let currentSolutionIndex = 0;
+        let currentModelSolution = null;
+        let currentReasoningTrace = null;
+        let isShowingModelPath = false;
+        
+        // Store the original PLAY_SOUND function once
+        const originalPlaySound = window.PLAY_SOUND;
+        
+        // UI element references
+        const puzzleInput = document.getElementById('puzzle-input');
+        const loadPuzzleBtn = document.getElementById('load-puzzle');
+        const clearDatasetBtn = document.getElementById('clear-dataset');
+        const showModelSolutionCheckbox = document.getElementById('show-model-solution');
+        const showCorrectSolutionCheckbox = document.getElementById('show-correct-solution');
+        const modelSolutionToggle = document.getElementById('model-solution-toggle');
+        const correctSolutionToggle = document.getElementById('correct-solution-toggle');
+        const prevCorrectSolutionBtn = document.getElementById('prev-correct-solution');
+        const nextCorrectSolutionBtn = document.getElementById('next-correct-solution');
+        const solutionDisplay = document.getElementById('solution-display');
+        const solutionNav = document.getElementById('solution-nav');
+        const solutionCounter = document.getElementById('solution-counter');
+        const modelPathInfo = document.getElementById('model-path-info');
+        const correctPathInfo = document.getElementById('correct-path-info');
+        const mainContent = document.getElementById('main-content');
+        const puzzleInfoCompact = document.getElementById('puzzle-info-compact');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        const toggleInputBtn = document.getElementById('toggle-input');
+        const inputContent = document.getElementById('input-content');
+        const statsContainer = document.getElementById('stats-container');
+        const modelNameElement = document.getElementById('model-name');
+        const processingTimeElement = document.getElementById('processing-time');
+        const solvedIndicator = document.getElementById('solved-indicator');
+        const failedIndicator = document.getElementById('failed-indicator');
+        const uploadDataset = document.getElementById('upload-dataset');
+        const datasetInfo = document.getElementById('dataset-info');
+        const datasetControls = document.getElementById('dataset-controls');
+        const prevPuzzleBtn = document.getElementById('prev-puzzle');
+        const nextPuzzleBtn = document.getElementById('next-puzzle');
+        const progressText = document.getElementById('progress-text');
+        const progressFill = document.getElementById('progress-fill');
+        const completionText = document.getElementById('completion-text');
+        const exportButton = document.getElementById('export-button');
+        const exportContainer = document.getElementById('export-container');
+        const analysisSections = document.querySelectorAll('.analysis-section');
+        const urlInput = document.getElementById('url-input');
+        const loadUrlBtn = document.getElementById('load-url-btn');
+        const reasoningSection = document.getElementById('reasoning-section');
+        const reasoningHeader = document.getElementById('reasoning-header');
+        const reasoningContent = document.getElementById('reasoning-content');
+        const toggleReasoningBtn = document.getElementById('toggle-reasoning');
+        const annotationSection = document.getElementById('annotation-section');
+        const otherReasonInput = document.getElementById('other-reason');
+        
+        // Bottom navigation elements
+        const datasetControlsBottom = document.getElementById('dataset-controls-bottom');
+        const prevPuzzleBtnBottom = document.getElementById('prev-puzzle-bottom');
+        const nextPuzzleBtnBottom = document.getElementById('next-puzzle-bottom');
+        const progressTextBottom = document.getElementById('progress-text-bottom');
+        const progressFillBottom = document.getElementById('progress-fill-bottom');
+        const completionTextBottom = document.getElementById('completion-text-bottom');
+        
+        // Check for URL parameter 'url' on page load
+        checkUrlParameter();
+        
+        // Disable localStorage restore to avoid oversized session data
+        
+        // Event listeners for file inputs
+        uploadDataset.addEventListener('change', handleDatasetUpload);
+        loadUrlBtn.addEventListener('click', handleUrlLoad);
+        
+        // Dataset navigation event listeners
+        exportButton.addEventListener('click', exportAnnotatedData);
+        prevPuzzleBtn.addEventListener('click', goToPreviousPuzzle);
+        nextPuzzleBtn.addEventListener('click', goToNextPuzzle);
+        prevPuzzleBtnBottom.addEventListener('click', goToPreviousPuzzle);
+        nextPuzzleBtnBottom.addEventListener('click', goToNextPuzzle);
+        
+        // Solution display event listeners - toggle mode
+        showModelSolutionCheckbox.addEventListener('change', toggleModelSolution);
+        showCorrectSolutionCheckbox.addEventListener('change', toggleCorrectSolution);
+        prevCorrectSolutionBtn.addEventListener('click', function(e) { e.stopPropagation(); prevCorrectSolution(); });
+        nextCorrectSolutionBtn.addEventListener('click', function(e) { e.stopPropagation(); nextCorrectSolution(); });
+        
+        // Click on toggle containers to toggle checkbox
+        modelSolutionToggle.addEventListener('click', function(e) {
+          if (e.target.type !== 'checkbox') {
+            showModelSolutionCheckbox.checked = !showModelSolutionCheckbox.checked;
+            toggleModelSolution();
+          }
+        });
+        correctSolutionToggle.addEventListener('click', function(e) {
+          // Ignore clicks on inline prev/next or inline container
+          if (e.target.closest('#solution-inline')) return;
+          if (e.target.type !== 'checkbox') {
+            showCorrectSolutionCheckbox.checked = !showCorrectSolutionCheckbox.checked;
+            toggleCorrectSolution();
+          }
+        });
+        
+        // Reasoning trace toggle
+        reasoningHeader.addEventListener('click', toggleReasoningTrace);
+        toggleReasoningBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          toggleReasoningTrace();
+        });
+        
+        // Annotation checkboxes - save on change
+        document.querySelectorAll('.failure-reason input[type="checkbox"]').forEach(checkbox => {
+          checkbox.addEventListener('change', saveAnnotation);
+        });
+        
+        // Other reason textarea - save on blur
+        otherReasonInput.addEventListener('blur', saveAnnotation);
+
+        // Auto-save on tab hide/close and warn before unloading
+        document.addEventListener('visibilitychange', function() {
+          if (document.visibilityState === 'hidden') {
+            try { saveAnnotation(); } catch (e) { /* no-op */ }
+          }
+        });
+        window.addEventListener('beforeunload', function(e) {
+          try { saveAnnotation(); } catch (err) { /* no-op */ }
+          if (dataset && dataset.length > 0) {
+            e.preventDefault();
+            e.returnValue = '';
+          }
+        });
+        
+        // Check if the URL contains a 'url' parameter
+        function hasUrlParameter(param) {
+          const urlParams = new URLSearchParams(window.location.search);
+          return urlParams.has(param);
+        }
+        
+        // Check for URL parameter and load dataset if present
+        function checkUrlParameter() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const datasetUrl = urlParams.get('url');
+          
+          if (datasetUrl) {
+            urlInput.value = datasetUrl;
+            
+            // Check if we have existing data before loading
+          loadDatasetFromUrl(datasetUrl);
+          }
+        }
+        
+        // Handle loading dataset from URL input field
+        function handleUrlLoad() {
+          const url = urlInput.value.trim();
+          if (!url) {
+            showMessage('error', 'Please enter a URL to a JSONL file');
+            return;
+          }
+          
+          // Check if we have existing data before loading
+          loadDatasetFromUrl(url);
+        }
+        
+        // Load dataset from a URL
+        async function loadDatasetFromUrl(url) {
+          setLoading(true);
+          try {
+            showMessage('success', 'Fetching dataset from URL...');
+            
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            const content = await response.text();
+            parseDataset(content);
+            
+            // Find the first unlabeled puzzle
+            currentPuzzleIndex = findNextUnlabeledPuzzleIndex(-1);
+            updateDatasetInfo();
+            loadCurrentPuzzle();
+            
+            // Show dataset controls
+            datasetControls.style.display = 'flex';
+            datasetControlsBottom.style.display = 'flex';
+            exportContainer.style.display = 'block';
+            
+            // Set model name from URL
+            currentModelName = extractBaseNameForExport(url);
+            modelNameElement.textContent = currentModelName;
+            // Set dataset base name for export (strip _annotated)
+            currentDatasetBaseName = extractBaseNameForExport(url) || 'dataset';
+
+            // Hide the initial input area after loading
+            inputContent.classList.add('collapsed');
+            const icon = toggleInputBtn.querySelector('i');
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+            
+            // Skip saving to localStorage (disabled due to size)
+            
+            showMessage('success', 'Dataset loaded from URL successfully!');
+            setLoading(false);
+          } catch (error) {
+            console.error('Error loading dataset from URL:', error);
+            showMessage('error', 'Error loading dataset from URL: ' + error.message);
+            setLoading(false);
+          }
+        }
+        
+        // Helper: extract model name from a path/URL (last segment without .jsonl/.json)
+        function extractModelNameFromPath(path) {
+          try {
+            if (!path) return 'Unknown';
+            const noQuery = path.split('?')[0].split('#')[0];
+            const parts = noQuery.split('/');
+            const last = parts[parts.length - 1] || '';
+            const base = last.replace(/\.(jsonl|json)$/i, '');
+            return base || 'Unknown';
+          } catch (_) {
+            return 'Unknown';
+          }
+        }
+        
+        // Helper: extract base name for export, stripping extension and splitting at _annotated
+        function extractBaseNameForExport(path) {
+          const base = extractModelNameFromPath(path);
+          // Split at first occurrence of _annotated (case-insensitive) and take the part before it
+          const idx = base.toLowerCase().indexOf('_annotated');
+          return idx >= 0 ? base.substring(0, idx) : base;
+        }
+
+        // LocalStorage disabled: no-op implementations
+        function saveToLocalStorage() { /* disabled to avoid large storage */ }
+        function loadFromLocalStorage() { return false; }
+        
+        // Initialize annotation data in a puzzle if it doesn't exist
+        function ensureAnnotationData(puzzle) {
+          if (!puzzle.failure_annotation) {
+            puzzle.failure_annotation = {
+              completed: false,
+              failure_reasons: [],
+              other_reason: '',
+              puzzle_id: puzzle.id || `puzzle_${currentPuzzleIndex}`
+            };
+          }
+          return puzzle;
+        }
+        
+        // Toggle reasoning trace display
+        function toggleReasoningTrace() {
+          reasoningContent.classList.toggle('collapsed');
+          const icon = toggleReasoningBtn.querySelector('i');
+          if (reasoningContent.classList.contains('collapsed')) {
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+          } else {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+          }
+        }
+        
+        // Toggle model solution display
+        function toggleModelSolution() {
+          if (showModelSolutionCheckbox.checked) {
+            if (!currentModelSolution || !currentModelSolution.extracted_path) {
+              showMessage('error', 'No model solution path available');
+              showModelSolutionCheckbox.checked = false;
+              return;
+            }
+            displayPath('model', currentModelSolution.extracted_path, '#e11d48');
+            modelPathInfo.textContent = `Path length: ${currentModelSolution.extracted_path.length} points`;
+            modelSolutionToggle.classList.add('active');
+          } else {
+            removePath('model');
+            modelPathInfo.textContent = 'Click to show/hide model\'s path';
+            modelSolutionToggle.classList.remove('active');
+          }
+        }
+        
+        // Toggle correct solution display
+        function toggleCorrectSolution() {
+          if (showCorrectSolutionCheckbox.checked) {
+            if (!currentPuzzle || !currentPuzzle.solutions || currentPuzzle.solutions.length === 0) {
+              showMessage('error', 'No correct solutions available');
+              showCorrectSolutionCheckbox.checked = false;
+              return;
+            }
+            currentSolutionIndex = 0;
+            displayPath('correct', currentPuzzle.solutions[currentSolutionIndex].path, '#10b981');
+            updateSolutionCounter();
+            correctSolutionToggle.classList.add('active');
+            
+            // Show inline controls (prev/center/next)
+            const inline = document.getElementById('solution-inline');
+            inline.style.display = 'flex';
+          } else {
+            removePath('correct');
+            correctPathInfo.textContent = 'Click to show/hide correct solution';
+            correctSolutionToggle.classList.remove('active');
+            const inline = document.getElementById('solution-inline');
+            inline.style.display = 'none';
+            solutionCounter.style.display = 'none';
+          }
+        }
+        
+        // Previous correct solution
+        function prevCorrectSolution() {
+          if (!currentPuzzle || !currentPuzzle.solutions || currentPuzzle.solutions.length <= 1) return;
+          
+          currentSolutionIndex = (currentSolutionIndex - 1 + currentPuzzle.solutions.length) % currentPuzzle.solutions.length;
+          removePath('correct');
+          displayPath('correct', currentPuzzle.solutions[currentSolutionIndex].path, '#10b981');
+          updateSolutionCounter();
+        }
+        
+        // Next correct solution
+        function nextCorrectSolution() {
+          if (!currentPuzzle || !currentPuzzle.solutions || currentPuzzle.solutions.length <= 1) return;
+          
+          currentSolutionIndex = (currentSolutionIndex + 1) % currentPuzzle.solutions.length;
+          removePath('correct');
+          displayPath('correct', currentPuzzle.solutions[currentSolutionIndex].path, '#10b981');
+          updateSolutionCounter();
+        }
+        
+        // Save annotation data
+        function saveAnnotation() {
+          if (dataset.length === 0 || currentPuzzleIndex < 0 || currentPuzzleIndex >= dataset.length) {
+            return;
+          }
+          
+          const puzzle = dataset[currentPuzzleIndex];
+          ensureAnnotationData(puzzle);
+          
+          // Collect selected failure reasons
+          const failureReasons = [];
+          document.querySelectorAll('.failure-reason input[type="checkbox"]:checked').forEach(checkbox => {
+            failureReasons.push(checkbox.value);
+          });
+          
+          // Save annotation
+          puzzle.failure_annotation.failure_reasons = failureReasons;
+          puzzle.failure_annotation.other_reason = otherReasonInput.value.trim();
+          puzzle.failure_annotation.completed = true;
+          
+          // Update dataset info
+          updateDatasetInfo();
+          
+          // Save to localStorage
+          saveToLocalStorage();
+        }
+        
+        // Display analysis results in all analysis sections
+        function displayAnalysisResults(analysis) {
+          analysisSections.forEach(section => {
+            const grid = section.querySelector('.analysis-grid');
+            if (!grid) return;
+
+            // Clear previous content within this section
+            const existingMain = section.querySelector('.analysis-main');
+            const existingLabel = section.querySelector('.analysis-details-label');
+            if (existingMain) existingMain.remove();
+            if (existingLabel) existingLabel.remove();
+            grid.innerHTML = '';
+
+            // If no analysis provided, show placeholder and reveal section
+            if (!analysis) {
+              grid.innerHTML = '<div class="analysis-item"><i class="fas fa-info-circle"></i><span>No analysis available</span></div>';
+              section.style.display = 'block';
+              return;
+            }
+
+            // Main validation result - fully_valid_path
+            if ('fully_valid_path' in analysis) {
+              const mainDiv = document.createElement('div');
+              mainDiv.className = 'analysis-main';
+
+              const mainItem = document.createElement('div');
+              const value = analysis['fully_valid_path'];
+              mainItem.className = `analysis-main-item ${value ? 'pass' : 'fail'}`;
+
+              const icon = document.createElement('i');
+              icon.className = value ? 'fas fa-check-circle' : 'fas fa-times-circle';
+
+              const span = document.createElement('span');
+              span.textContent = value ? 'Path is Valid ✓' : 'Path is Invalid ✗';
+
+              mainItem.appendChild(icon);
+              mainItem.appendChild(span);
+              mainDiv.appendChild(mainItem);
+              grid.parentNode.insertBefore(mainDiv, grid);
+            }
+
+            // Label for sub-checks
+            const label = document.createElement('div');
+            label.className = 'analysis-details-label';
+            label.textContent = 'Validation Details';
+            grid.parentNode.insertBefore(label, grid);
+
+          // Sub-validation checks (more descriptive labels)
+          const subAnalysisItems = [
+            { key: 'starts_at_start_ends_at_exit', label: 'Correct start and exit reached' },
+            { key: 'connected_line', label: 'Single continuous path (no breaks)' },
+            { key: 'non_intersecting_line', label: 'No self-intersections' },
+            { key: 'start_to_exit_connected', label: 'Start is connected to exit' },
+            { key: 'no_rule_crossing', label: 'No illegal crossings of rule cells' }
+          ];
+
+            subAnalysisItems.forEach(item => {
+              if (item.key in analysis) {
+                const value = analysis[item.key];
+                const div = document.createElement('div');
+                div.className = `analysis-item ${value ? 'pass' : 'fail'}`;
+
+                const icon = document.createElement('i');
+                icon.className = value ? 'fas fa-check-circle' : 'fas fa-times-circle';
+
+                const span = document.createElement('span');
+                span.textContent = item.label;
+
+                div.appendChild(icon);
+                div.appendChild(span);
+                grid.appendChild(div);
+              }
+            });
+
+            // Reveal the section
+            section.style.display = 'block';
+          });
+        }
+        
+        // Display a path on the puzzle (supports multiple paths with IDs)
+        function displayPath(pathId, path, color) {
+          if (!path || path.length === 0) return;
+          
+          const pathLength = path.length;
+          const svg = document.getElementById('puzzle');
+          ensurePathEnhancements(svg);
+          ensureSolutionLayers(svg);
+          const underlaysRoot = svg.querySelector('#solution-underlays');
+          const overlaysRoot = svg.querySelector('#solution-overlays');
+
+          // Create separate groups for base and overlay so base is always behind across all paths
+          const baseGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          baseGroup.setAttribute("id", `solution-path-${pathId}-base`);
+          const overlayGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          overlayGroup.setAttribute("id", `solution-path-${pathId}-stroke`);
+          
+          // For very long paths, use line segments instead of a single path
+          if (pathLength > 40) {
+            renderSegmentedPath(baseGroup, overlayGroup, path, color);
+          } else {
+            renderAnimatedPath(baseGroup, overlayGroup, path, color);
+          }
+          
+          underlaysRoot.appendChild(baseGroup);
+          overlaysRoot.appendChild(overlayGroup);
+          console.log(`Displayed ${pathId} path with ${pathLength} points`);
+        }
+        
+        // Remove a specific path from the puzzle
+        function removePath(pathId) {
+          const base = document.getElementById(`solution-path-${pathId}-base`);
+          const stroke = document.getElementById(`solution-path-${pathId}-stroke`);
+          if (base) base.remove();
+          if (stroke) stroke.remove();
+        }
+        
+        // Toggle input section
+        toggleInputBtn.addEventListener('click', function() {
+          inputContent.classList.toggle('collapsed');
+          const icon = toggleInputBtn.querySelector('i');
+          if (inputContent.classList.contains('collapsed')) {
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+          } else {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+          }
+        });
+        
+        // Helper function to show/hide loading
+        function setLoading(isLoading) {
+          loadingIndicator.style.display = isLoading ? 'block' : 'none';
+          if (loadPuzzleBtn) loadPuzzleBtn.disabled = isLoading;
+          clearDatasetBtn.disabled = isLoading;
+          showModelSolutionCheckbox.disabled = isLoading;
+          showCorrectSolutionCheckbox.disabled = isLoading;
+          prevCorrectSolutionBtn.disabled = isLoading;
+          nextCorrectSolutionBtn.disabled = isLoading;
+          exportButton.disabled = isLoading;
+        }
+        
+        // Helper function to show messages
+        function showMessage(type, message) {
+          if (type === 'error') {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+            setTimeout(() => {
+              errorMessage.style.display = 'none';
+            }, 5000);
+          } else {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            setTimeout(() => {
+              successMessage.style.display = 'none';
+            }, 5000);
+          }
+        }
+        
+        // Dataset handling functions
+        async function handleDatasetUpload(event) {
+          setLoading(true);
+          try {
+            const file = event.target.files[0];
+            if (!file) {
+              setLoading(false);
+              return;
+            }
+            
+            const content = await file.text();
+            
+            // Process content as dataset
+            parseDataset(content);
+            
+            // Find the first unlabeled puzzle
+            currentPuzzleIndex = findNextUnlabeledPuzzleIndex(-1);
+            updateDatasetInfo();
+            loadCurrentPuzzle();
+            
+            // Show dataset controls
+            datasetControls.style.display = 'flex';
+            datasetControlsBottom.style.display = 'flex';
+            exportContainer.style.display = 'block';
+            
+            // Set model name from uploaded file name
+            currentModelName = extractBaseNameForExport(file.name);
+            modelNameElement.textContent = currentModelName;
+            // Set dataset base name for export (strip _annotated)
+            currentDatasetBaseName = extractBaseNameForExport(file.name) || 'dataset';
+
+            // Hide the initial input area after loading
+            inputContent.classList.add('collapsed');
+            const icon = toggleInputBtn.querySelector('i');
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+            
+            // Skip saving to localStorage (disabled due to size)
+            
+            // Reset file input so the same file can be loaded again if needed
+            event.target.value = '';
+          } catch (error) {
+            console.error('Error loading dataset:', error);
+            showMessage('error', 'Error loading dataset: ' + error.message);
+            setLoading(false);
+          }
+        }
+        
+        function parseDataset(content) {
+          try {
+            let parsedData;
+            
+            // Check if content is a JSONL file (multiple JSON objects, one per line)
+            if (content.trim().includes('\n')) {
+              // Split by newlines and parse each line as a separate JSON object
+              parsedData = content.split('\n')
+                .filter(line => line.trim())
+                .map(line => JSON.parse(line));
+            } else {
+              try {
+                // Try to parse as a JSON object (could be a single puzzle or exported data)
+                const jsonObject = JSON.parse(content);
+                
+                // Check if it's an exported dataset with annotations
+                if (jsonObject.dataset) {
+                  // It's an exported dataset with annotations, use it directly
+                  parsedData = jsonObject.dataset;
+                  originalDatasetSize = parsedData.length;
+                  showMessage('success', 'Annotated dataset loaded with ' + parsedData.length + ' puzzles');
+                  dataset = parsedData;
+                  setLoading(false);
+                  return;
+                } else {
+                  // It's a single puzzle
+                  parsedData = [jsonObject];
+                }
+              } catch (e) {
+                throw new Error('Invalid JSON format');
+              }
+            }
+            
+            if (parsedData.length === 0) {
+              throw new Error('No valid puzzles found in the dataset');
+            }
+            
+            // Initialize annotation data for each puzzle if not present
+            dataset = parsedData.map(puzzle => ensureAnnotationData(puzzle));
+            originalDatasetSize = dataset.length;
+            
+            showMessage('success', `Dataset loaded with ${dataset.length} puzzles`);
+            setLoading(false);
+          } catch (error) {
+            console.error('Error parsing dataset:', error);
+            showMessage('error', 'Error parsing dataset: ' + error.message);
+            setLoading(false);
+          }
+        }
+        
+        function updateDatasetInfo() {
+          // Calculate completion statistics
+          const completed = dataset.filter(puzzle => 
+            puzzle.failure_annotation && puzzle.failure_annotation.completed
+          ).length;
+          const completionPercentage = Math.round((completed / originalDatasetSize) * 100);
+          
+          // Update UI (top)
+          datasetInfo.textContent = `Dataset: ${originalDatasetSize} puzzles, ${completed} annotated (${completionPercentage}% complete)`;
+          progressText.textContent = `Puzzle ${currentPuzzleIndex + 1} of ${originalDatasetSize}`;
+          progressFill.style.width = `${completionPercentage}%`;
+          completionText.textContent = `${completionPercentage}% complete`;
+          
+          // Update UI (bottom)
+          progressTextBottom.textContent = `Puzzle ${currentPuzzleIndex + 1} of ${originalDatasetSize}`;
+          progressFillBottom.style.width = `${completionPercentage}%`;
+          completionTextBottom.textContent = `${completionPercentage}% complete`;
+        }
+        
+        // Find the next unlabeled puzzle index
+        function findNextUnlabeledPuzzleIndex(fromIndex) {
+          let nextIndex = fromIndex + 1;
+          
+          // Look for the next unlabeled puzzle
+          while (nextIndex < dataset.length) {
+            const puzzle = dataset[nextIndex];
+            if (!puzzle.failure_annotation || !puzzle.failure_annotation.completed) {
+              return nextIndex;
+            }
+            nextIndex++;
+          }
+          
+          // If we've reached the end, check if there are any unlabeled puzzles from the beginning
+          if (fromIndex > 0) {
+            nextIndex = 0;
+            while (nextIndex < fromIndex) {
+              const puzzle = dataset[nextIndex];
+              if (!puzzle.failure_annotation || !puzzle.failure_annotation.completed) {
+                return nextIndex;
+              }
+              nextIndex++;
+            }
+          }
+          
+          // If no unlabeled puzzles found, return the first index
+          return 0;
+        }
+        
+        // Move to the next unlabeled puzzle automatically
+        function moveToNextUnlabeledPuzzle() {
+          // Save current annotation before moving
+          saveAnnotation();
+          
+          // Find the next unlabeled puzzle
+          const nextIndex = findNextUnlabeledPuzzleIndex(currentPuzzleIndex);
+          
+          // Check if we've annotated all puzzles
+          const allCompleted = dataset.every(puzzle => 
+            puzzle.failure_annotation && puzzle.failure_annotation.completed
+          );
+          
+          if (allCompleted) {
+            showMessage('success', 'All puzzles have been annotated!');
+            // Hide the main content
+            mainContent.style.display = 'none';
+            statsContainer.style.display = 'none';
+            puzzleInfoCompact.style.display = 'none';
+          } else {
+            currentPuzzleIndex = nextIndex;
+            loadCurrentPuzzle();
+          }
+        }
+        
+        
+        // Go to previous puzzle
+        function goToPreviousPuzzle() {
+          // Save current annotation before moving
+          saveAnnotation();
+          
+          if (currentPuzzleIndex > 0) {
+            currentPuzzleIndex--;
+            loadCurrentPuzzle();
+          } else {
+            showMessage('error', 'Already at first puzzle');
+          }
+        }
+        
+        // Go to next puzzle
+        function goToNextPuzzle() {
+          // Save current annotation before moving
+          saveAnnotation();
+          
+          if (currentPuzzleIndex < dataset.length - 1) {
+            currentPuzzleIndex++;
+            loadCurrentPuzzle();
+          } else {
+            showMessage('error', 'Already at last puzzle');
+          }
+        }
+        
+        function saveCurrentPuzzleAnnotation() {
+          // Alias for saveAnnotation for compatibility
+          saveAnnotation();
+        }
+        
+        function loadCurrentPuzzle() {
+          setLoading(true);
+          
+          try {
+            if (dataset.length === 0 || currentPuzzleIndex < 0 || currentPuzzleIndex >= dataset.length) {
+              showMessage('error', 'No puzzle available at this index');
+              setLoading(false);
+              return;
+            }
+            
+            // Get current puzzle and ensure it has annotation data
+            const puzzleData = dataset[currentPuzzleIndex];
+            ensureAnnotationData(puzzleData);
+            createPuzzleFromData(puzzleData);
+            
+            // Extract model solution and reasoning from result field
+            currentModelSolution = puzzleData.result || null;
+            currentReasoningTrace = currentModelSolution ? currentModelSolution.message : null;
+            
+            // Reset solution index
+            currentSolutionIndex = 0;
+            updateSolutionCounter();
+            
+            // Update model info in stats
+            if (currentModelSolution) {
+              // Model name already set from file/URL or saved state
+              modelNameElement.textContent = currentModelName;
+              
+              // Display processing time
+              const processingTime = currentModelSolution.processing_time || 0;
+              processingTimeElement.textContent = `${processingTime.toFixed(2)}s`;
+              
+              // Update solved/failed indicators
+              if (currentModelSolution.solved) {
+                solvedIndicator.style.display = 'flex';
+                failedIndicator.style.display = 'none';
+              } else {
+                solvedIndicator.style.display = 'none';
+                failedIndicator.style.display = 'flex';
+              }
+              
+              // Display model path info
+              if (currentModelSolution.extracted_path) {
+                modelPathInfo.textContent = `Path length: ${currentModelSolution.extracted_path.length} points`;
+              }
+            }
+            
+            // Load reasoning trace (always show, expanded by default)
+            if (currentReasoningTrace) {
+              reasoningContent.textContent = currentReasoningTrace;
+            } else {
+              reasoningContent.textContent = 'No reasoning trace available';
+            }
+            reasoningContent.classList.remove('collapsed');
+            const reasoningToggleIcon = toggleReasoningBtn.querySelector('i');
+            reasoningToggleIcon.classList.remove('fa-chevron-down');
+            reasoningToggleIcon.classList.add('fa-chevron-up');
+            
+            // Display analysis results across sections
+            if (currentModelSolution && currentModelSolution.analysis) {
+              displayAnalysisResults(currentModelSolution.analysis);
+            } else {
+              displayAnalysisResults(null);
+            }
+            
+            // Load existing annotations if present
+            const annotation = puzzleData.failure_annotation;
+            if (annotation && annotation.completed) {
+              // Load saved failure reasons
+              document.querySelectorAll('.failure-reason input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = annotation.failure_reasons.includes(checkbox.value);
+              });
+              
+              // Load other reason
+              otherReasonInput.value = annotation.other_reason || '';
+            } else {
+              // Clear annotation fields for new puzzle
+              document.querySelectorAll('.failure-reason input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+              });
+              otherReasonInput.value = '';
+            }
+            
+            // Reset solution toggles
+            showModelSolutionCheckbox.checked = false;
+            showCorrectSolutionCheckbox.checked = false;
+            modelSolutionToggle.classList.remove('active');
+            correctSolutionToggle.classList.remove('active');
+            modelPathInfo.textContent = 'Click to show/hide model\'s path';
+            correctPathInfo.textContent = 'Click to show/hide correct solution';
+            const inline = document.getElementById('solution-inline');
+            inline.style.display = 'none';
+            solutionCounter.style.display = 'none';
+            
+            // Show main content and related UI
+            mainContent.style.display = 'flex';
+            statsContainer.style.display = 'flex';
+            puzzleInfoCompact.style.display = 'flex';
+            reasoningSection.style.display = 'block';
+            annotationSection.style.display = 'block';
+            
+            // Update navigation buttons (top and bottom)
+            prevPuzzleBtn.disabled = (currentPuzzleIndex === 0);
+            nextPuzzleBtn.disabled = (currentPuzzleIndex === dataset.length - 1);
+            prevPuzzleBtnBottom.disabled = (currentPuzzleIndex === 0);
+            nextPuzzleBtnBottom.disabled = (currentPuzzleIndex === dataset.length - 1);
+            
+            // Update dataset info
+            updateDatasetInfo();
+            
+            setLoading(false);
+          } catch (error) {
+            console.error('Error loading puzzle:', error);
+            showMessage('error', 'Error loading puzzle: ' + error.message);
+            setLoading(false);
+          }
+        }
+        
+        function exportAnnotatedData() {
+          try {
+            // Save the current puzzle annotation first
+            saveCurrentPuzzleAnnotation();
+            
+            // Convert dataset to JSONL format (one puzzle per line)
+            let jsonlOutput = '';
+            
+            // Add each puzzle as a single line of JSON
+            dataset.forEach(puzzle => {
+              // Create a copy to ensure we have the latest annotation data
+              jsonlOutput += JSON.stringify(puzzle) + '\n';
+            });
+            
+            // Create download link
+            const blob = new Blob([jsonlOutput], { type: 'application/jsonl' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            
+            // Use uploaded file/URL base name with _annotated postfix
+            link.download = `${currentDatasetBaseName}_annotated.jsonl`;
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showMessage('success', 'Puzzles exported as JSONL successfully!');
+          } catch (error) {
+            console.error('Error exporting annotations:', error);
+            showMessage('error', 'Error saving annotations: ' + error.message);
+          }
+        }
+        
+        // Clear the dataset and UI
+        clearDatasetBtn.addEventListener('click', function() {
+          const svg = document.getElementById('puzzle');
+          while (svg.firstChild) svg.removeChild(svg.firstChild);
+          
+          // Clear dataset
+          dataset = [];
+          currentPuzzleIndex = 0;
+          currentPuzzle = null;
+          currentModelSolution = null;
+          currentReasoningTrace = null;
+          
+          // Reset UI
+          if (puzzleInput) puzzleInput.value = '';
+          puzzleInfoCompact.innerHTML = '';
+          datasetInfo.textContent = '';
+          progressText.textContent = 'Puzzle 0 of 0';
+          progressFill.style.width = '0%';
+          completionText.textContent = '0% complete';
+          reasoningContent.textContent = '';
+          
+          // Clear annotation fields
+          document.querySelectorAll('.failure-reason input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+          });
+          otherReasonInput.value = '';
+          
+          // Hide UI elements
+          mainContent.style.display = 'none';
+          errorMessage.style.display = 'none';
+          successMessage.style.display = 'none';
+          statsContainer.style.display = 'none';
+          puzzleInfoCompact.style.display = 'none';
+          datasetControls.style.display = 'none';
+          datasetControlsBottom.style.display = 'none';
+          exportContainer.style.display = 'none';
+          
+          // Reset sound handler to original
+          window.PLAY_SOUND = originalPlaySound;
+          window.TRACE_COMPLETION_FUNC = null;
+          
+          // localStorage disabled: nothing to clear
+          
+          showMessage('success', 'Dataset cleared!');
+        });
+        
+        
+        // Update solution counter
+        function updateSolutionCounter() {
+          if (currentPuzzle && currentPuzzle.solutions && currentPuzzle.solutions.length > 0) {
+            solutionCounter.textContent = `Solution ${currentSolutionIndex + 1} of ${currentPuzzle.solutions.length}`;
+            solutionCounter.style.display = 'block';
+            correctPathInfo.textContent = `Path length: ${currentPuzzle.solutions[currentSolutionIndex].path.length} points`;
+          }
+        }
+        
+        // Create puzzle from the input data
+        function createPuzzleFromData(puzzleData) {
+          try {
+            // Store the whole puzzle data for solution display
+            currentPuzzle = puzzleData;
+            
+            // Clear previous puzzle if there was one
+            const svg = document.getElementById('puzzle');
+            while (svg.firstChild) svg.removeChild(svg.firstChild);
+            
+            // Extract dimensions and create puzzle
+            const width = puzzleData.grid_size.width;
+            const height = puzzleData.grid_size.height;
+            const puzzle = new Puzzle(width, height);
+            
+            // Parse YAML from text_visualization using js-yaml
+            const yamlData = jsyaml.load(puzzleData.text_visualization);
+            
+            // Set start point
+            const startX = yamlData.puzzle.start.x;
+            const startY = yamlData.puzzle.start.y;
+            puzzle.grid[startX][startY].start = true;
+            
+            // Set end point
+            const endX = yamlData.puzzle.end.x;
+            const endY = yamlData.puzzle.end.y;
+            
+            // Determine end direction based on position
+            let endDirection;
+            if (endX === 0) {
+              endDirection = "left";
+            } else if (endX === width * 2) {
+              endDirection = "right";
+            } else if (endY === 0) {
+              endDirection = "top";
+            } else if (endY === height * 2) {
+              endDirection = "bottom";
+            } else {
+              // Default fallback if not on an edge
+              endDirection = "left";
+            }
+            
+            puzzle.grid[endX][endY].end = endDirection;
+            
+            // Add puzzle elements
+            if (yamlData.puzzle.cells) {
+              yamlData.puzzle.cells.forEach(cell => {
+                const x = cell.position.x;
+                const y = cell.position.y;
+                
+                if (x >= 0 && y >= 0 && x < puzzle.width && y < puzzle.height) {
+                  if (cell.properties.type === 'poly' || cell.properties.type === 'ylop') {
+                    const polyId = cell.properties.polyshape;
+                    const polyshape = puzzleData.polyshapes[polyId];
+                    
+                    // Parse the ASCII polyshape into a numeric value
+                    let polyValue = 0;
+                    if (polyshape && typeof polyshape === 'string') {
+                      const rows = polyshape.split('\n');
+                      for (let y = 0; y < rows.length; y++) {
+                        for (let x = 0; x < rows[y].length; x++) {
+                          if (rows[x][y] === '█') {
+                            // Set the bit for this position in the polyomino
+                            polyValue |= (1 << (y * 4 + x));
+                          }
+                        }
+                      }
+                    }
+                    
+                    puzzle.grid[x][y] = {
+                      type: cell.properties.type,
+                      polyshape: polyValue || polyId, // Use parsed value or fall back to ID
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.type === 'square') {
+                    puzzle.grid[x][y] = {
+                      type: 'square',
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.type === 'star') {
+                    puzzle.grid[x][y] = {
+                      type: 'star',
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.type === 'triangle') {
+                    puzzle.grid[x][y] = {
+                      type: 'triangle',
+                      color: cell.properties.color,
+                      count: cell.properties.count
+                    };
+                  } else if (cell.properties.type === 'nega') {
+                    puzzle.grid[x][y] = {
+                      type: 'nega',
+                      color: cell.properties.color
+                    };
+                  } else if (cell.properties.dot) {
+                    puzzle.grid[x][y] = {
+                      dot: window.DOT_BLACK,
+                      type: 'line',
+                      line: 0
+                    };
+                  } else if (cell.properties.gap) {
+                    puzzle.grid[x][y] = {
+                      gap: 1,
+                      type: 'line',
+                      line: 0
+                    };
+                  }
+                }
+              });
+            }
+            
+            // Draw the puzzle
+            window.draw(puzzle);
+            
+            // Ensure cursorPos element exists in the SVG
+            const cursorPosElement = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+            cursorPosElement.id = "cursorPos";
+            svg.appendChild(cursorPosElement);
+            
+            // Display compact puzzle info
+            puzzleInfoCompact.innerHTML = `
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-puzzle-piece"></i> Dimensions:</span>
+                <span>${width}x${height}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-star"></i> Difficulty:</span>
+                <span>${puzzleData.difficulty_level} (${puzzleData.difficulty_score.toFixed(1)})</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-hashtag"></i> ID:</span>
+                <span>${puzzleData.id}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-list-ol"></i> Solutions:</span>
+                <span>${puzzleData.solution_count}</span>
+              </div>
+            `;
+          } catch (error) {
+            console.error('Error creating puzzle:', error);
+            showMessage('error', 'Error creating puzzle: ' + error.message);
+          }
+        }
+        
+        
+        
+        // Render path as individual line segments for very long paths
+        function renderSegmentedPath(baseGroup, overlayGroup, path, color) {
+          for (let i = 0; i < path.length - 1; i++) {
+            const startX = path[i].x * 41 + 52;
+            const startY = path[i].y * 41 + 52;
+            const endX = path[i + 1].x * 41 + 52;
+            const endY = path[i + 1].y * 41 + 52;
+            
+            // Underlay for contrast
+            const base = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            base.setAttribute("x1", startX);
+            base.setAttribute("y1", startY);
+            base.setAttribute("x2", endX);
+            base.setAttribute("y2", endY);
+            base.setAttribute("stroke", "#ffffff");
+            base.setAttribute("stroke-width", "10");
+            base.setAttribute("stroke-linecap", "round");
+            base.setAttribute("stroke-linejoin", "round");
+            base.style.animation = `fadeIn 0.05s ${i * 0.03}s both`;
+            base.style.opacity = "0";
+
+            // Colored overlay
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", startX);
+            line.setAttribute("y1", startY);
+            line.setAttribute("x2", endX);
+            line.setAttribute("y2", endY);
+            line.setAttribute("stroke", color || "#38b000");
+            line.setAttribute("stroke-width", "8");
+            line.setAttribute("stroke-linecap", "round");
+            line.setAttribute("stroke-linejoin", "round");
+            line.setAttribute("filter", "url(#path-shadow)");
+            // Add delay to create sequential appearance effect
+            line.style.animation = `fadeIn 0.05s ${i * 0.03}s both`;
+            line.style.opacity = "0";
+
+            baseGroup.appendChild(base);
+            overlayGroup.appendChild(line);
+          }
+          // Endpoint markers (after segments appended) on overlay layer
+          addEndpointMarkers(overlayGroup, path, color);
+        }
+        
+        // Render path as a single animated SVG path for normal-length paths
+        function renderAnimatedPath(baseGroup, overlayGroup, path, color) {
+          // Create a path element for the solution
+          const basePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          
+          // Build path data
+          let pathData = "";
+          let totalLength = 0;
+          let prevX = null, prevY = null;
+          
+          path.forEach((point, index) => {
+            const x = point.x * 41 + 52;
+            const y = point.y * 41 + 52;
+            
+            if (index === 0) {
+              pathData += `M ${x} ${y} `;
+            } else {
+              pathData += `L ${x} ${y} `;
+              // Calculate distance for better dash array sizing
+              const dx = x - prevX;
+              const dy = y - prevY;
+              totalLength += Math.sqrt(dx * dx + dy * dy);
+            }
+            
+            prevX = x;
+            prevY = y;
+          });
+          
+          // Underlay for contrast
+          basePath.setAttribute("d", pathData);
+          basePath.setAttribute("stroke", "#ffffff");
+          basePath.setAttribute("stroke-width", "10");
+          basePath.setAttribute("fill", "none");
+          basePath.setAttribute("stroke-linecap", "round");
+          basePath.setAttribute("stroke-linejoin", "round");
+
+          // Colored overlay
+          pathElement.setAttribute("d", pathData);
+          pathElement.setAttribute("stroke", color || "#38b000");
+          pathElement.setAttribute("stroke-width", "8");
+          pathElement.setAttribute("fill", "none");
+          pathElement.setAttribute("stroke-linecap", "round");
+          pathElement.setAttribute("stroke-linejoin", "round");
+          pathElement.setAttribute("filter", "url(#path-shadow)");
+          
+          // Adjust animation for longer paths
+          if (path.length > 20) {
+            const dashArrayValue = Math.max(5000, totalLength * 1.5);
+            pathElement.style.strokeDasharray = dashArrayValue;
+            pathElement.style.animation = `drawLine ${Math.min(3, path.length / 10)}s ease-in-out forwards`;
+          }
+          baseGroup.appendChild(basePath);
+          overlayGroup.appendChild(pathElement);
+          // Endpoint markers on overlay layer
+          addEndpointMarkers(overlayGroup, path, color);
+        }
+
+        // Ensure defs for drop shadow exists
+        function ensurePathEnhancements(svg) {
+          if (!svg) return;
+          let defs = svg.querySelector('#path-enhancements');
+          if (defs) return; // already present
+          defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+          defs.setAttribute('id', 'path-enhancements');
+
+          const filter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+          filter.setAttribute('id', 'path-shadow');
+          filter.setAttribute('x', '-20%');
+          filter.setAttribute('y', '-20%');
+          filter.setAttribute('width', '140%');
+          filter.setAttribute('height', '140%');
+
+          const feDropShadow = document.createElementNS('http://www.w3.org/2000/svg', 'feDropShadow');
+          feDropShadow.setAttribute('dx', '0');
+          feDropShadow.setAttribute('dy', '0');
+          feDropShadow.setAttribute('stdDeviation', '1.2');
+          feDropShadow.setAttribute('flood-color', 'rgba(0,0,0,0.35)');
+          feDropShadow.setAttribute('flood-opacity', '1');
+
+          filter.appendChild(feDropShadow);
+          defs.appendChild(filter);
+          svg.appendChild(defs);
+        }
+
+        // Ensure global underlay/overlay container groups exist (base behind color across all paths)
+        function ensureSolutionLayers(svg) {
+          if (!svg) return;
+          let underlays = svg.querySelector('#solution-underlays');
+          let overlays = svg.querySelector('#solution-overlays');
+          if (!underlays) {
+            underlays = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            underlays.setAttribute('id', 'solution-underlays');
+            svg.appendChild(underlays);
+          }
+          if (!overlays) {
+            overlays = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            overlays.setAttribute('id', 'solution-overlays');
+            svg.appendChild(overlays);
+          }
+        }
+
+        // Add endpoint circles to indicate direction (start hollow, end filled)
+        function addEndpointMarkers(group, path, color) {
+          if (!path || path.length === 0) return;
+          const start = path[0];
+          const end = path[path.length - 1];
+          const sx = start.x * 41 + 52;
+          const sy = start.y * 41 + 52;
+          const ex = end.x * 41 + 52;
+          const ey = end.y * 41 + 52;
+
+          // Start: hollow circle
+          const startCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          startCircle.setAttribute('cx', sx);
+          startCircle.setAttribute('cy', sy);
+          startCircle.setAttribute('r', '6');
+          startCircle.setAttribute('fill', '#ffffff');
+          startCircle.setAttribute('stroke', color || '#38b000');
+          startCircle.setAttribute('stroke-width', '3');
+          startCircle.setAttribute('filter', 'url(#path-shadow)');
+
+          // End: filled circle with white outline
+          const endCircleOuter = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          endCircleOuter.setAttribute('cx', ex);
+          endCircleOuter.setAttribute('cy', ey);
+          endCircleOuter.setAttribute('r', '7');
+          endCircleOuter.setAttribute('fill', '#ffffff');
+          endCircleOuter.setAttribute('stroke', '#ffffff');
+          endCircleOuter.setAttribute('stroke-width', '2');
+
+          const endCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          endCircle.setAttribute('cx', ex);
+          endCircle.setAttribute('cy', ey);
+          endCircle.setAttribute('r', '5');
+          endCircle.setAttribute('fill', color || '#38b000');
+          endCircle.setAttribute('stroke', color || '#38b000');
+          endCircle.setAttribute('stroke-width', '2');
+          endCircle.setAttribute('filter', 'url(#path-shadow)');
+
+          group.appendChild(startCircle);
+          group.appendChild(endCircleOuter);
+          group.appendChild(endCircle);
+        }
+      });
+    </script>
+  </body>
+</html>
