@@ -773,8 +773,12 @@
       }
       
       @keyframes drawLine {
-        from { stroke-dashoffset: 5000; }
-        to { stroke-dashoffset: 0; }
+        from { 
+          stroke-dashoffset: var(--dash-array, 5000); 
+        }
+        to { 
+          stroke-dashoffset: 0; 
+        }
       }
       
       /* Fade-in animation used for segmented solution rendering */
@@ -1062,6 +1066,169 @@
         line-height: 1.5;
         white-space: pre-wrap;
         background-color: #fafafa;
+      }
+      
+      .reasoning-header {
+        position: relative;
+      }
+      
+      .popout-button {
+        position: absolute;
+        right: 2.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(to bottom, var(--color-primary), #5558e6);
+        color: white;
+        border: none;
+        cursor: pointer;
+        padding: 0.4rem 0.6rem;
+        border-radius: var(--radius-sm);
+        transition: all 0.3s ease;
+        font-size: 0.8rem;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        min-width: 32px;
+        height: 32px;
+        justify-content: center;
+      }
+      
+      .popout-button:hover {
+        background: linear-gradient(to bottom, var(--color-accent), #e11d48);
+        transform: translateY(-50%) translateY(-2px);
+        box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
+      }
+      
+      .popout-button:active {
+        transform: translateY(-50%) translateY(-1px);
+      }
+      
+      .popout-button i {
+        font-size: 0.75rem;
+      }
+      
+      /* Modal styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      
+      .modal-overlay.show {
+        display: flex;
+      }
+      
+      .modal-content {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        max-width: 90vw;
+        max-height: 90vh;
+        width: 100%;
+        max-width: 1000px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        background-color: var(--color-bg);
+      }
+      
+      .modal-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--color-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .modal-close {
+        background: none;
+        border: none;
+        color: var(--color-muted);
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: var(--radius-sm);
+        transition: all 0.2s ease;
+        font-size: 1.25rem;
+      }
+      
+      .modal-close:hover {
+        background-color: rgba(148, 163, 184, 0.1);
+        color: var(--color-accent);
+      }
+      
+      .modal-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem;
+        font-family: 'Consolas', monospace;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        background-color: #fafafa;
+      }
+      
+      .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid rgba(226, 232, 240, 0.8);
+        background-color: var(--color-bg);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+      }
+      
+      .modal-footer button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+      
+      /* Mobile responsive adjustments */
+      @media (max-width: 768px) {
+        .modal-content {
+          max-width: 95vw;
+          max-height: 95vh;
+          margin: 0.5rem;
+        }
+        
+        .modal-header, .modal-footer {
+          padding: 0.75rem 1rem;
+        }
+        
+        .modal-body {
+          padding: 1rem;
+          font-size: 0.8rem;
+        }
+        
+        .popout-button {
+          right: 3rem;
+          font-size: 0.75rem;
+          padding: 0.3rem 0.5rem;
+          min-width: 28px;
+          height: 28px;
+        }
+        
+        .popout-button i {
+          font-size: 0.7rem;
+        }
       }
       
       .reasoning-content.collapsed {
@@ -1697,6 +1864,7 @@
           <div class="reasoning-section" id="reasoning-section" style="display: none;">
             <div class="reasoning-header" id="reasoning-header">
               <h3><i class="fas fa-brain"></i> Model's Reasoning</h3>
+              <button class="popout-button" id="popout-reasoning" title="Open reasoning in full screen"><i class="fas fa-external-link-alt"></i></button>
               <button class="toggle-btn" id="toggle-reasoning"><i class="fas fa-chevron-down"></i></button>
             </div>
             <div class="reasoning-content collapsed" id="reasoning-content"></div>
@@ -1782,6 +1950,21 @@
       </div>
     </div>
     
+    <!-- Reasoning Modal -->
+    <div class="modal-overlay" id="reasoning-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-brain"></i> Model's Reasoning</h3>
+          <button class="modal-close" id="close-reasoning-modal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="modal-reasoning-content"></div>
+        <div class="modal-footer">
+          <button id="copy-reasoning" title="Copy to clipboard"><i class="fas fa-copy"></i> Copy</button>
+          <button id="close-reasoning-modal-btn"><i class="fas fa-times"></i> Close</button>
+        </div>
+      </div>
+    </div>
+    
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         // Dataset handling variables
@@ -1850,6 +2033,12 @@
         const toggleReasoningBtn = document.getElementById('toggle-reasoning');
         const annotationSection = document.getElementById('annotation-section');
         const otherReasonInput = document.getElementById('other-reason');
+        const popoutReasoningBtn = document.getElementById('popout-reasoning');
+        const reasoningModal = document.getElementById('reasoning-modal');
+        const modalReasoningContent = document.getElementById('modal-reasoning-content');
+        const closeReasoningModal = document.getElementById('close-reasoning-modal');
+        const closeReasoningModalBtn = document.getElementById('close-reasoning-modal-btn');
+        const copyReasoningBtn = document.getElementById('copy-reasoning');
         
         // Bottom navigation elements
         const datasetControlsBottom = document.getElementById('dataset-controls-bottom');
@@ -1902,6 +2091,33 @@
         toggleReasoningBtn.addEventListener('click', function(e) {
           e.stopPropagation();
           toggleReasoningTrace();
+        });
+        
+        // Popout reasoning modal
+        popoutReasoningBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          openReasoningModal();
+        });
+        
+        // Close modal events
+        closeReasoningModal.addEventListener('click', closeReasoningModalFunc);
+        closeReasoningModalBtn.addEventListener('click', closeReasoningModalFunc);
+        
+        // Copy reasoning to clipboard
+        copyReasoningBtn.addEventListener('click', copyReasoningToClipboard);
+        
+        // Close modal when clicking outside
+        reasoningModal.addEventListener('click', function(e) {
+          if (e.target === reasoningModal) {
+            closeReasoningModalFunc();
+          }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && reasoningModal.classList.contains('show')) {
+            closeReasoningModalFunc();
+          }
         });
         
         // Annotation checkboxes - save on change
@@ -2087,6 +2303,35 @@
           } else {
             icon.classList.remove('fa-chevron-down');
             icon.classList.add('fa-chevron-up');
+          }
+        }
+        
+        // Open reasoning modal
+        function openReasoningModal() {
+          if (!currentReasoningTrace) {
+            showMessage('error', 'No reasoning trace available');
+            return;
+          }
+          
+          modalReasoningContent.textContent = currentReasoningTrace;
+          reasoningModal.classList.add('show');
+          document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+        
+        // Close reasoning modal
+        function closeReasoningModalFunc() {
+          reasoningModal.classList.remove('show');
+          document.body.style.overflow = ''; // Restore scrolling
+        }
+        
+        // Copy reasoning to clipboard
+        async function copyReasoningToClipboard() {
+          try {
+            await navigator.clipboard.writeText(currentReasoningTrace || '');
+            showMessage('success', 'Reasoning copied to clipboard!');
+          } catch (error) {
+            console.error('Failed to copy reasoning:', error);
+            showMessage('error', 'Failed to copy reasoning to clipboard');
           }
         }
         
@@ -2278,7 +2523,7 @@
           overlayGroup.setAttribute("id", `solution-path-${pathId}-stroke`);
           
           // For very long paths, use line segments instead of a single path
-          if (pathLength > 40) {
+          if (pathLength > 50) {
             renderSegmentedPath(baseGroup, overlayGroup, path, color);
           } else {
             renderAnimatedPath(baseGroup, overlayGroup, path, color);
@@ -2922,7 +3167,7 @@
             base.setAttribute("stroke-width", "10");
             base.setAttribute("stroke-linecap", "round");
             base.setAttribute("stroke-linejoin", "round");
-            base.style.animation = `fadeIn 0.05s ${i * 0.03}s both`;
+            base.style.animation = `fadeIn 0.1s ${i * 0.05}s both`;
             base.style.opacity = "0";
 
             // Colored overlay
@@ -2937,7 +3182,7 @@
             line.setAttribute("stroke-linejoin", "round");
             line.setAttribute("filter", "url(#path-shadow)");
             // Add delay to create sequential appearance effect
-            line.style.animation = `fadeIn 0.05s ${i * 0.03}s both`;
+            line.style.animation = `fadeIn 0.1s ${i * 0.05}s both`;
             line.style.opacity = "0";
             
             baseGroup.appendChild(base);
@@ -2993,12 +3238,13 @@
           pathElement.setAttribute("stroke-linejoin", "round");
           pathElement.setAttribute("filter", "url(#path-shadow)");
           
-          // Adjust animation for longer paths
-          if (path.length > 20) {
-            const dashArrayValue = Math.max(5000, totalLength * 1.5);
-            pathElement.style.strokeDasharray = dashArrayValue;
-            pathElement.style.animation = `drawLine ${Math.min(3, path.length / 10)}s ease-in-out forwards`;
-          }
+          // Always apply animation - ensure consistent behavior
+          const dashArrayValue = Math.max(5000, totalLength * 1.5);
+          pathElement.style.strokeDasharray = dashArrayValue;
+          pathElement.style.strokeDashoffset = dashArrayValue;
+          pathElement.style.setProperty('--dash-array', dashArrayValue);
+          pathElement.style.animation = `drawLine ${Math.min(3, Math.max(1, path.length / 15))}s ease-in-out forwards`;
+          
           baseGroup.appendChild(basePath);
           overlayGroup.appendChild(pathElement);
           // Endpoint markers on overlay layer
