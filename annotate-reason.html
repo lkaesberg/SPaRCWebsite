@@ -1342,6 +1342,9 @@
         flex: 0 0 auto;
         max-width: 60%;
         min-width: 500px;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
       }
       
       .controls-column {
@@ -1824,16 +1827,6 @@
       
       <div class="main-content" id="main-content" style="display: none;">
         <div class="puzzle-column">
-          <div class="analysis-section" style="display: none;">
-            <h3><i class="fas fa-check-double"></i> Path Analysis</h3>
-            <div class="analysis-grid"></div>
-          </div>
-          <div id="puzzle-container">
-        <svg id="puzzle" xmlns="http://www.w3.org/2000/svg"></svg>
-          </div>
-      </div>
-      
-        <div class="controls-column">
           <div class="solution-display" id="solution-display">
             <div class="solution-toggle model-solution" id="model-solution-toggle" title="Show/Hide model path">
               <input type="checkbox" id="show-model-solution" title="Show/Hide model path">
@@ -1859,6 +1852,17 @@
             </div>
           </div>
           
+          <div class="analysis-section" style="display: none;">
+            <h3><i class="fas fa-check-double"></i> Path Analysis</h3>
+            <div class="analysis-grid"></div>
+          </div>
+          <div id="puzzle-container">
+        <svg id="puzzle" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+      </div>
+      
+        <div class="controls-column">
+          
           
           
           <div class="reasoning-section" id="reasoning-section" style="display: none;">
@@ -1873,53 +1877,80 @@
           <div class="annotation-section" id="annotation-section" style="display: none;">
             <h3><i class="fas fa-clipboard-check"></i> Failure Annotation</h3>
             <div class="failure-reasons" id="failure-reasons">
+              <!-- A. Critical Board Logic Error -->
               <div class="failure-reason">
-                <input type="checkbox" id="reason-incorrect-start-end" value="incorrect_start_end">
-                <label for="reason-incorrect-start-end">Incorrect Start/End</label>
+                <input type="checkbox" id="reason-a1" value="a1_out_of_bounds">
+                <label for="reason-a1" title="Model does not correctly separate or isolate required groups/colors/zones.">A1 — Out-of-bounds / Leaves puzzle board</label>
+              </div>
+              
+              <!-- B. Puzzle Rule Misunderstanding (Semantic Errors) -->
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-b1" value="b1_color_region_separation">
+                <label for="reason-b1" title="Model does not correctly separate or isolate required groups/colors/zones.">B1 — Misunderstood color/region separation</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-disconnected-line" value="disconnected_line">
-                <label for="reason-disconnected-line">Disconnected Line</label>
+                <input type="checkbox" id="reason-b2" value="b2_dot_star_rules">
+                <label for="reason-b2" title="Stars not paired, dots not collected/enclosed properly, or logic wrongly stated.">B2 — Misapplied dot/star rules</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-self-intersect" value="self_intersecting">
-                <label for="reason-self-intersect">Self-Intersecting</label>
+                <input type="checkbox" id="reason-b3" value="b3_polyomino_shape_logic">
+                <label for="reason-b3" title="Attempts to fit or enclose shapes but uses wrong size, wrong region, or assumes illegal rotation/flipping.">B3 — Incorrect polyomino/shape logic</label>
+              </div>
+              
+              <!-- C. Reasoning and Logical Planning Failures -->
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-c1" value="c1_local_greediness">
+                <label for="reason-c1" title="Focuses on immediate moves, ignoring future constraints and goal feasibility.">C1 — Local greediness (no global plan)</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-rule-violation" value="rule_violation">
-                <label for="reason-rule-violation">Rule Violation</label>
+                <input type="checkbox" id="reason-c2" value="c2_misprioritized_constraints">
+                <label for="reason-c2" title="Fulfills a minor rule but ignores a major rule (e.g. rushes exit, ignores polyomino).">C2 — Misprioritized constraints</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-dots" value="dot_rule_failure">
-                <label for="reason-dots">Dot Rule Failure</label>
+                <input type="checkbox" id="reason-c3" value="c3_contradictory_reasoning">
+                <label for="reason-c3" title="States a rule or plan but executes moves that clearly violate it.">C3 — Contradictory reasoning</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-gaps" value="gap_rule_failure">
-                <label for="reason-gaps">Gap Rule Failure</label>
+                <input type="checkbox" id="reason-c4" value="c4_hallucinated_rule">
+                <label for="reason-c4" title="Uses made-up rules (I must loop around here twice…) not present in the puzzle.">C4 — Hallucinated rule or invented constraint</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-stones" value="stone_rule_failure">
-                <label for="reason-stones">Stone/Square Failure</label>
+                <input type="checkbox" id="reason-c5" value="c5_premature_assumption">
+                <label for="reason-c5" title="Declares the path valid without verifying rule compliance or checking contradictions.">C5 — Premature assumption of correctness</label>
+              </div>
+              
+              <!-- D. Spatial & Geometric Misjudgment -->
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-d1" value="d1_size_parity_reasoning">
+                <label for="reason-d1" title="Miscounts cells needed for a region, e.g. assuming a 4-cell shape fits 5 cells.">D1 — Incorrect size/parity reasoning</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-stars" value="star_rule_failure">
-                <label for="reason-stars">Star Rule Failure</label>
+                <input type="checkbox" id="reason-d2" value="d2_rotation_reflection_confusion">
+                <label for="reason-d2" title="Thinks shape can rotate/flip when rules forbid it, or vice versa.">D2 — Rotation/reflection confusion</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-poly" value="polyomino_rule_failure">
-                <label for="reason-poly">Polyomino Failure</label>
+                <input type="checkbox" id="reason-d3" value="d3_dead_end_trap">
+                <label for="reason-d3" title="Moves into trapped space with no room left to satisfy remaining constraints.">D3 — Dead-end trap / impossible region</label>
+              </div>
+              
+              <!-- E. Meta-Output & Self-Monitoring Failures -->
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-e1" value="e1_false_verification_claim">
+                <label for="reason-e1" title="States \"I checked all constraints\" but clearly didn't.">E1 — False claim of verification</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-triangle" value="triangle_rule_failure">
-                <label for="reason-triangle">Triangle Failure</label>
+                <input type="checkbox" id="reason-e2" value="e2_overconfidence_despite_error">
+                <label for="reason-e2" title="Declares success or \"this is valid\" while violating rules.">E2 — Overconfidence despite error</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-parsing" value="parsing_error">
-                <label for="reason-parsing">Parsing Error</label>
+                <input type="checkbox" id="reason-e3" value="e3_no_correction_despite_noticing">
+                <label for="reason-e3" title="The reasoning acknowledges an error but never fixes or reroutes.">E3 — No correction despite noticing mistake</label>
               </div>
+              
+              <!-- F. Reasoning Style / Other -->
               <div class="failure-reason">
-                <input type="checkbox" id="reason-reasoning" value="reasoning_error">
-                <label for="reason-reasoning">Reasoning Error</label>
+                <input type="checkbox" id="reason-f1" value="f1_vague_missing_reasoning">
+                <label for="reason-f1" title="Gives no meaningful reasoning, just outputs a path blindly.">F1 — Vague / missing reasoning</label>
               </div>
             </div>
             <label for="other-reason" style="display: block; margin: 0.5rem 0 0.25rem 0; font-weight: 500; font-size: 0.85rem;">
