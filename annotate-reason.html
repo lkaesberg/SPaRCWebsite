@@ -2473,6 +2473,28 @@
             label.textContent = 'Validation Details';
             grid.parentNode.insertBefore(label, grid);
 
+            // If the path is geometrically valid but the model didn't solve the puzzle
+            // (or known rule checks failed), show an explicit warning to avoid confusion
+            try {
+              const pathLooksValid = (analysis && analysis.fully_valid_path === true);
+              const rulesCheckFailed = (
+                ('no_rule_crossing' in analysis && analysis.no_rule_crossing === false) ||
+                ('rules_followed' in analysis && analysis.rules_followed === false)
+              );
+              const modelDidNotSolve = (typeof currentModelSolution === 'object' && currentModelSolution && currentModelSolution.solved === false);
+              if (pathLooksValid && (rulesCheckFailed || modelDidNotSolve)) {
+                const warning = document.createElement('div');
+                warning.className = 'analysis-item fail';
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-exclamation-triangle';
+                const span = document.createElement('span');
+                span.textContent = 'Path is valid, but puzzle rules were not satisfied';
+                warning.appendChild(icon);
+                warning.appendChild(span);
+                grid.appendChild(warning);
+              }
+            } catch (_) { /* no-op */ }
+
           // Sub-validation checks (more descriptive labels)
           const subAnalysisItems = [
             { key: 'starts_at_start_ends_at_exit', label: 'Correct start and exit reached' },
