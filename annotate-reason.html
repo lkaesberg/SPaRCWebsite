@@ -1072,133 +1072,203 @@
         position: relative;
       }
       
-      .popout-button {
+      .reasoning-controls {
         position: absolute;
-        right: 2.5rem;
+        right: 5rem;
         top: 50%;
         transform: translateY(-50%);
-        background: linear-gradient(to bottom, var(--color-primary), #5558e6);
-        color: white;
-        border: none;
-        cursor: pointer;
-        padding: 0.4rem 0.6rem;
-        border-radius: var(--radius-sm);
-        transition: all 0.3s ease;
-        font-size: 0.8rem;
-        font-weight: 500;
-        box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
         display: flex;
         align-items: center;
-        gap: 0.3rem;
-        min-width: 32px;
-        height: 32px;
-        justify-content: center;
-      }
-      
-      .popout-button:hover {
-        background: linear-gradient(to bottom, var(--color-accent), #e11d48);
-        transform: translateY(-50%) translateY(-2px);
-        box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
-      }
-      
-      .popout-button:active {
-        transform: translateY(-50%) translateY(-1px);
-      }
-      
-      .popout-button i {
-        font-size: 0.75rem;
-      }
-      
-      /* Modal styles */
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 1rem;
-      }
-      
-      .modal-overlay.show {
-        display: flex;
-      }
-      
-      .modal-content {
-        background: white;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-lg);
-        max-width: 90vw;
-        max-height: 90vh;
-        width: 100%;
-        max-width: 1000px;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-      
-      .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-        background-color: var(--color-bg);
-      }
-      
-      .modal-header h3 {
-        margin: 0;
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--color-primary);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-      
-      .modal-close {
-        background: none;
-        border: none;
-        color: var(--color-muted);
-        cursor: pointer;
-        padding: 0.5rem;
-        border-radius: var(--radius-sm);
-        transition: all 0.2s ease;
-        font-size: 1.25rem;
-      }
-      
-      .modal-close:hover {
-        background-color: rgba(148, 163, 184, 0.1);
-        color: var(--color-accent);
-      }
-      
-      .modal-body {
-        flex: 1;
-        overflow-y: auto;
-        padding: 1.5rem;
-        font-family: 'Consolas', monospace;
-        font-size: 0.9rem;
-        line-height: 1.6;
-        white-space: pre-wrap;
-        background-color: #fafafa;
-      }
-      
-      .modal-footer {
-        padding: 1rem 1.5rem;
-        border-top: 1px solid rgba(226, 232, 240, 0.8);
-        background-color: var(--color-bg);
-        display: flex;
-        justify-content: flex-end;
         gap: 0.75rem;
       }
       
-      .modal-footer button {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
+      .reasoning-toggle-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        color: var(--color-muted);
+        cursor: pointer;
+        user-select: none;
+      }
+      
+      .reasoning-toggle-label input[type="checkbox"] {
+        cursor: pointer;
+      }
+      
+      .reasoning-toggle-label input[type="number"] {
+        padding: 0.2rem 0.4rem;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        text-align: center;
+      }
+      
+      /* Reasoning highlights */
+      .reasoning-highlight {
+        background-color: rgba(99, 102, 241, 0.15);
+        border-bottom: 2px solid rgba(99, 102, 241, 0.4);
+        cursor: pointer;
+        position: relative;
+        transition: background-color 0.2s ease;
+      }
+      
+      .reasoning-highlight:hover {
+        background-color: rgba(99, 102, 241, 0.25);
+      }
+      
+      .reasoning-highlight.highlight-planning {
+        background-color: rgba(59, 130, 246, 0.15);
+        border-bottom-color: rgba(59, 130, 246, 0.4);
+      }
+      
+      .reasoning-highlight.highlight-rule_interpretation {
+        background-color: rgba(168, 85, 247, 0.15);
+        border-bottom-color: rgba(168, 85, 247, 0.4);
+      }
+      
+      .reasoning-highlight.highlight-tradeoff_prioritization {
+        background-color: rgba(249, 115, 22, 0.15);
+        border-bottom-color: rgba(249, 115, 22, 0.4);
+      }
+      
+      .reasoning-highlight.highlight-uncertainty {
+        background-color: rgba(234, 179, 8, 0.15);
+        border-bottom-color: rgba(234, 179, 8, 0.4);
+      }
+      
+      .reasoning-highlight.highlight-verification {
+        background-color: rgba(34, 197, 94, 0.15);
+        border-bottom-color: rgba(34, 197, 94, 0.4);
+      }
+      
+      .reasoning-highlight.highlight-self_correction {
+        background-color: rgba(236, 72, 153, 0.15);
+        border-bottom-color: rgba(236, 72, 153, 0.4);
+      }
+      
+      .reasoning-highlight.highlight-spatial_geometry {
+        background-color: rgba(20, 184, 166, 0.15);
+        border-bottom-color: rgba(20, 184, 166, 0.4);
+      }
+      
+      .reasoning-highlight.highlight-contradiction_signals {
+        background-color: rgba(239, 68, 68, 0.15);
+        border-bottom-color: rgba(239, 68, 68, 0.4);
+      }
+      
+      /* Coordinate highlights */
+      .coordinate-highlight {
+        background-color: rgba(255, 165, 0, 0.2);
+        border-bottom: 2px solid rgba(255, 102, 0, 0.6);
+        cursor: pointer;
+        padding: 0 2px;
+        border-radius: 2px;
+        transition: all 0.2s ease;
+        font-family: 'Consolas', monospace;
+        font-weight: 600;
+      }
+      
+      .coordinate-highlight:hover {
+        background-color: rgba(255, 165, 0, 0.35);
+        border-bottom-color: rgba(255, 102, 0, 0.9);
+      }
+      
+      /* Hover tooltip for suggestions */
+      .highlight-tooltip {
+        position: fixed;
+        background: white;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        padding: 0.75rem;
+        z-index: 10000;
+        max-width: 600px;
+        pointer-events: auto !important;
+        opacity: 0;
+        transition: opacity 0.1s ease;
+        display: none;
+      }
+      
+      .highlight-tooltip.show {
+        opacity: 1;
+        display: block;
+        pointer-events: auto !important;
+      }
+      
+      .highlight-tooltip::before {
+        content: '';
+        position: absolute;
+        top: -3px;
+        left: 10px;
+        right: 10px;
+        height: 5px;
+        background: transparent;
+        pointer-events: auto;
+      }
+      
+      .highlight-tooltip * {
+        pointer-events: auto !important;
+      }
+      
+      .highlight-tooltip-header {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--color-primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        pointer-events: auto;
+      }
+      
+      .highlight-tooltip-text {
+        font-size: 0.8rem;
+        color: var(--color-muted);
+        margin-bottom: 0.75rem;
+        font-style: italic;
+        pointer-events: auto;
+      }
+      
+      .highlight-tooltip-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        pointer-events: auto;
+      }
+      
+      .highlight-tooltip-button {
+        background: var(--color-bg);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        padding: 0.6rem 0.85rem;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 0.75rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.3rem;
+        pointer-events: auto !important;
+        text-align: left;
+        min-width: 180px;
+      }
+      
+      .highlight-tooltip-button:hover {
+        background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+        transform: translateY(-1px);
+      }
+      
+      .highlight-tooltip-button.active {
+        background: linear-gradient(to bottom, var(--color-primary), #5558e6);
+        color: white;
+        border-color: var(--color-primary);
+      }
+      
+      .highlight-tooltip-button i {
+        font-size: 0.7rem;
       }
       
       /* Mobile responsive adjustments */
@@ -1218,22 +1288,23 @@
           font-size: 0.8rem;
         }
         
-        .popout-button {
-          right: 3rem;
-          font-size: 0.75rem;
-          padding: 0.3rem 0.5rem;
-          min-width: 28px;
-          height: 28px;
+        .reasoning-controls {
+          position: relative;
+          right: auto;
+          top: auto;
+          transform: none;
+          margin-top: 0.5rem;
+          flex-direction: column;
+          align-items: flex-start;
         }
         
-        .popout-button i {
-          font-size: 0.7rem;
+        .reasoning-toggle-label {
+          font-size: 0.75rem;
         }
-      }
-      
-      .reasoning-content.collapsed {
-        max-height: 0;
-        padding: 0;
+        
+        .reasoning-toggle-label input[type="number"] {
+          width: 45px;
+        }
       }
       
       /* Annotation section */
@@ -1827,7 +1898,34 @@
       
       <div class="main-content" id="main-content" style="display: none;">
         <div class="puzzle-column">
-          <div class="solution-display" id="solution-display">
+          
+          <div class="analysis-section" style="display: none;">
+            <h3><i class="fas fa-check-double"></i> Path Analysis</h3>
+            <div class="analysis-grid"></div>
+          </div>
+          <div id="puzzle-container">
+        <svg id="puzzle" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+      </div>
+      
+        <div class="controls-column">
+          
+          
+          
+          <div class="reasoning-section" id="reasoning-section" style="display: none;">
+            <div class="reasoning-header" id="reasoning-header">
+              <h3><i class="fas fa-brain"></i> Model's Reasoning</h3>
+              <div class="reasoning-controls">
+                <label class="reasoning-toggle-label" title="Show only last sentences for easier annotation">
+                  <input type="checkbox" id="truncate-reasoning" checked>
+                  <span>Last <input type="number" id="sentence-count" min="5" max="100" value="30" style="width: 50px;"> sentences</span>
+                </label>
+              </div>
+            </div>
+            <div class="reasoning-content" id="reasoning-content"></div>
+          </div>
+          
+          <div class="solution-display" id="solution-display" style="display: none;">
             <div class="solution-toggle model-solution" id="model-solution-toggle" title="Show/Hide model path">
               <input type="checkbox" id="show-model-solution" title="Show/Hide model path">
               <div class="solution-toggle-content">
@@ -1852,105 +1950,63 @@
             </div>
           </div>
           
-          <div class="analysis-section" style="display: none;">
-            <h3><i class="fas fa-check-double"></i> Path Analysis</h3>
-            <div class="analysis-grid"></div>
-          </div>
-          <div id="puzzle-container">
-        <svg id="puzzle" xmlns="http://www.w3.org/2000/svg"></svg>
-          </div>
-      </div>
-      
-        <div class="controls-column">
-          
-          
-          
-          <div class="reasoning-section" id="reasoning-section" style="display: none;">
-            <div class="reasoning-header" id="reasoning-header">
-              <h3><i class="fas fa-brain"></i> Model's Reasoning</h3>
-              <button class="popout-button" id="popout-reasoning" title="Open reasoning in full screen"><i class="fas fa-external-link-alt"></i></button>
-              <button class="toggle-btn" id="toggle-reasoning"><i class="fas fa-chevron-down"></i></button>
-            </div>
-            <div class="reasoning-content collapsed" id="reasoning-content"></div>
-          </div>
-          
           <div class="annotation-section" id="annotation-section" style="display: none;">
             <h3><i class="fas fa-clipboard-check"></i> Failure Annotation</h3>
             <div class="failure-reasons" id="failure-reasons">
-              <!-- A. Critical Board Logic Error -->
+              <!-- A. Reasoning and Logical Planning Failures -->
               <div class="failure-reason">
-                <input type="checkbox" id="reason-a1" value="a1_out_of_bounds">
-                <label for="reason-a1" title="Path leaves puzzle board.">A1 — Out-of-bounds / Leaves puzzle board</label>
+                <input type="checkbox" id="reason-a1" value="a1_local_greediness">
+                <label for="reason-a1" title="Focuses on immediate moves, ignoring future constraints and goal feasibility.">A1 — Local greediness (no global plan)</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-a2" value="a2_misprioritized_constraints">
+                <label for="reason-a2" title="Fulfills a minor rule but ignores a major rule (e.g. rushes exit, ignores polyomino).">A2 — Misprioritized constraints</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-a3" value="a3_contradictory_reasoning">
+                <label for="reason-a3" title="States a rule or plan but executes moves that clearly violate it.">A3 — Contradictory reasoning</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-a4" value="a4_hallucinated_rule">
+                <label for="reason-a4" title="Uses made-up rules (I must loop around here twice…) not present in the puzzle.">A4 — Hallucinated rule or invented constraint</label>
+              </div>
+              <div class="failure-reason">
+                <input type="checkbox" id="reason-a5" value="a5_premature_assumption">
+                <label for="reason-a5" title="Declares the path valid without verifying rule compliance or checking contradictions.">A5 — Premature assumption of correctness</label>
               </div>
               
-              <!-- B. Puzzle Rule Misunderstanding (Semantic Errors) -->
+              <!-- B. Spatial & Geometric Misjudgment -->
               <div class="failure-reason">
-                <input type="checkbox" id="reason-b1" value="b1_color_region_separation">
-                <label for="reason-b1" title="Model does not correctly separate or isolate required groups/colors/zones.">B1 — Misunderstood color/region separation</label>
+                <input type="checkbox" id="reason-b1" value="b1_size_parity_reasoning">
+                <label for="reason-b1" title="Miscounts cells needed for a region, e.g. assuming a 4-cell shape fits 5 cells.">B1 — Incorrect size/parity reasoning</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-b2" value="b2_dot_star_rules">
-                <label for="reason-b2" title="Stars not paired, dots not collected/enclosed properly, or logic wrongly stated.">B2 — Misapplied dot/star rules</label>
+                <input type="checkbox" id="reason-b2" value="b2_rotation_reflection_confusion">
+                <label for="reason-b2" title="Thinks shape can rotate/flip when rules forbid it, or vice versa.">B2 — Rotation/reflection confusion</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-b3" value="b3_polyomino_shape_logic">
-                <label for="reason-b3" title="Attempts to fit or enclose shapes but uses wrong size, wrong region, or assumes illegal rotation/flipping.">B3 — Incorrect polyomino/shape logic</label>
-              </div>
-              
-              <!-- C. Reasoning and Logical Planning Failures -->
-              <div class="failure-reason">
-                <input type="checkbox" id="reason-c1" value="c1_local_greediness">
-                <label for="reason-c1" title="Focuses on immediate moves, ignoring future constraints and goal feasibility.">C1 — Local greediness (no global plan)</label>
-              </div>
-              <div class="failure-reason">
-                <input type="checkbox" id="reason-c2" value="c2_misprioritized_constraints">
-                <label for="reason-c2" title="Fulfills a minor rule but ignores a major rule (e.g. rushes exit, ignores polyomino).">C2 — Misprioritized constraints</label>
-              </div>
-              <div class="failure-reason">
-                <input type="checkbox" id="reason-c3" value="c3_contradictory_reasoning">
-                <label for="reason-c3" title="States a rule or plan but executes moves that clearly violate it.">C3 — Contradictory reasoning</label>
-              </div>
-              <div class="failure-reason">
-                <input type="checkbox" id="reason-c4" value="c4_hallucinated_rule">
-                <label for="reason-c4" title="Uses made-up rules (I must loop around here twice…) not present in the puzzle.">C4 — Hallucinated rule or invented constraint</label>
-              </div>
-              <div class="failure-reason">
-                <input type="checkbox" id="reason-c5" value="c5_premature_assumption">
-                <label for="reason-c5" title="Declares the path valid without verifying rule compliance or checking contradictions.">C5 — Premature assumption of correctness</label>
+                <input type="checkbox" id="reason-b3" value="b3_dead_end_trap">
+                <label for="reason-b3" title="Moves into trapped space with no room left to satisfy remaining constraints.">B3 — Dead-end trap / impossible region</label>
               </div>
               
-              <!-- D. Spatial & Geometric Misjudgment -->
+              <!-- C. Meta-Output & Self-Monitoring Failures -->
               <div class="failure-reason">
-                <input type="checkbox" id="reason-d1" value="d1_size_parity_reasoning">
-                <label for="reason-d1" title="Miscounts cells needed for a region, e.g. assuming a 4-cell shape fits 5 cells.">D1 — Incorrect size/parity reasoning</label>
+                <input type="checkbox" id="reason-c1" value="c1_false_verification_claim">
+                <label for="reason-c1" title="States \"I checked all constraints\" but clearly didn't.">C1 — False claim of verification</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-d2" value="d2_rotation_reflection_confusion">
-                <label for="reason-d2" title="Thinks shape can rotate/flip when rules forbid it, or vice versa.">D2 — Rotation/reflection confusion</label>
+                <input type="checkbox" id="reason-c2" value="c2_overconfidence_despite_error">
+                <label for="reason-c2" title="Declares success or \"this is valid\" while violating rules.">C2 — Overconfidence despite error</label>
               </div>
               <div class="failure-reason">
-                <input type="checkbox" id="reason-d3" value="d3_dead_end_trap">
-                <label for="reason-d3" title="Moves into trapped space with no room left to satisfy remaining constraints.">D3 — Dead-end trap / impossible region</label>
-              </div>
-              
-              <!-- E. Meta-Output & Self-Monitoring Failures -->
-              <div class="failure-reason">
-                <input type="checkbox" id="reason-e1" value="e1_false_verification_claim">
-                <label for="reason-e1" title="States \"I checked all constraints\" but clearly didn't.">E1 — False claim of verification</label>
-              </div>
-              <div class="failure-reason">
-                <input type="checkbox" id="reason-e2" value="e2_overconfidence_despite_error">
-                <label for="reason-e2" title="Declares success or \"this is valid\" while violating rules.">E2 — Overconfidence despite error</label>
-              </div>
-              <div class="failure-reason">
-                <input type="checkbox" id="reason-e3" value="e3_no_correction_despite_noticing">
-                <label for="reason-e3" title="The reasoning acknowledges an error but never fixes or reroutes.">E3 — No correction despite noticing mistake</label>
+                <input type="checkbox" id="reason-c3" value="c3_no_correction_despite_noticing">
+                <label for="reason-c3" title="The reasoning acknowledges an error but never fixes or reroutes.">C3 — No correction despite noticing mistake</label>
               </div>
               
-              <!-- F. Reasoning Style / Other -->
+              <!-- D. Reasoning Style / Other -->
               <div class="failure-reason">
-                <input type="checkbox" id="reason-f1" value="f1_vague_missing_reasoning">
-                <label for="reason-f1" title="Gives no meaningful reasoning, just outputs a path blindly.">F1 — Vague / missing reasoning</label>
+                <input type="checkbox" id="reason-d1" value="d1_vague_missing_reasoning">
+                <label for="reason-d1" title="Gives no meaningful reasoning, just outputs a path blindly.">D1 — Vague / missing reasoning</label>
               </div>
             </div>
             <label for="other-reason" style="display: block; margin: 0.5rem 0 0.25rem 0; font-weight: 500; font-size: 0.85rem;">
@@ -1981,19 +2037,14 @@
       </div>
     </div>
     
-    <!-- Reasoning Modal -->
-    <div class="modal-overlay" id="reasoning-modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3><i class="fas fa-brain"></i> Model's Reasoning</h3>
-          <button class="modal-close" id="close-reasoning-modal"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="modal-body" id="modal-reasoning-content"></div>
-        <div class="modal-footer">
-          <button id="copy-reasoning" title="Copy to clipboard"><i class="fas fa-copy"></i> Copy</button>
-          <button id="close-reasoning-modal-btn"><i class="fas fa-times"></i> Close</button>
-        </div>
+    <!-- Highlight tooltip -->
+    <div class="highlight-tooltip" id="highlight-tooltip">
+      <div class="highlight-tooltip-header">
+        <i class="fas fa-lightbulb"></i>
+        <span id="tooltip-header-text">Suggested Error Types</span>
       </div>
+      <div class="highlight-tooltip-text" id="tooltip-text"></div>
+      <div class="highlight-tooltip-suggestions" id="tooltip-suggestions"></div>
     </div>
     
     <script>
@@ -2061,15 +2112,10 @@
         const reasoningSection = document.getElementById('reasoning-section');
         const reasoningHeader = document.getElementById('reasoning-header');
         const reasoningContent = document.getElementById('reasoning-content');
-        const toggleReasoningBtn = document.getElementById('toggle-reasoning');
         const annotationSection = document.getElementById('annotation-section');
         const otherReasonInput = document.getElementById('other-reason');
-        const popoutReasoningBtn = document.getElementById('popout-reasoning');
-        const reasoningModal = document.getElementById('reasoning-modal');
-        const modalReasoningContent = document.getElementById('modal-reasoning-content');
-        const closeReasoningModal = document.getElementById('close-reasoning-modal');
-        const closeReasoningModalBtn = document.getElementById('close-reasoning-modal-btn');
-        const copyReasoningBtn = document.getElementById('copy-reasoning');
+        const truncateReasoningCheckbox = document.getElementById('truncate-reasoning');
+        const sentenceCountInput = document.getElementById('sentence-count');
         
         // Bottom navigation elements
         const datasetControlsBottom = document.getElementById('dataset-controls-bottom');
@@ -2078,6 +2124,93 @@
         const progressTextBottom = document.getElementById('progress-text-bottom');
         const progressFillBottom = document.getElementById('progress-fill-bottom');
         const completionTextBottom = document.getElementById('completion-text-bottom');
+        
+        // Reasoning highlight configuration
+        const reasoningHighlights = [
+          {
+            name: "planning",
+            pattern: /\b(i will|i'?m going to|i should|i plan to|next(?! to)|from here|then i|to get|i must)\b/gi,
+            suggestRules: ["A1", "B3"],
+            description: "Planning statements"
+          },
+          {
+            name: "rule_interpretation",
+            pattern: /\b(i think|i believe|i assume|it seems|this rule|means that|requires that|i interpret|i guess)\b/gi,
+            suggestRules: ["A4"],
+            description: "Rule interpretation"
+          },
+          {
+            name: "tradeoff_prioritization",
+            pattern: /\b(even though|i (can|will) ignore|it's okay if|it's more important|i'?ll focus on|come back to)\b/gi,
+            suggestRules: ["A2", "A3", "C2"],
+            description: "Tradeoff & prioritization"
+          },
+          {
+            name: "uncertainty",
+            pattern: /\b(maybe|probably|hopefully|i'?m not sure|it might|perhaps)\b/gi,
+            suggestRules: ["A1", "D1"],
+            description: "Uncertainty expressions"
+          },
+          {
+            name: "verification",
+            pattern: /\b(i (have )?checked|this should work|this is correct|i (am|'?m) confident|i verified|certainly)\b/gi,
+            suggestRules: ["C1", "C2", "A5"],
+            description: "Verification claims"
+          },
+          {
+            name: "self_correction",
+            pattern: /\b(actually|on second thought|let me (change|adjust)|i made a mistake|correction)\b/gi,
+            suggestRules: ["C3", "A3"],
+            description: "Self-correction"
+          },
+          {
+            name: "spatial_geometry",
+            pattern: /\b(enough space|fit(s)? here|cover(s)?|rotate|mirror|region (of|for)|area can)\b/gi,
+            suggestRules: ["B1", "B2"],
+            description: "Spatial reasoning"
+          },
+          {
+            name: "contradiction_signals",
+            pattern: /\b(although|despite|but that|even if (it )?breaks|i know this (is|might be) wrong)\b/gi,
+            suggestRules: ["A3", "A2", "C2"],
+            description: "Contradiction signals"
+          }
+        ];
+        
+        // Map error codes to full descriptions
+        const errorCodeDescriptions = {
+          "A1": "Local greediness (no global plan)",
+          "A2": "Misprioritized constraints",
+          "A3": "Contradictory reasoning",
+          "A4": "Hallucinated rule or invented constraint",
+          "A5": "Premature assumption of correctness",
+          "B1": "Incorrect size/parity reasoning",
+          "B2": "Rotation/reflection confusion",
+          "B3": "Dead-end trap / impossible region",
+          "C1": "False claim of verification",
+          "C2": "Overconfidence despite error",
+          "C3": "No correction despite noticing mistake",
+          "D1": "Vague / missing reasoning"
+        };
+        
+        // Map error codes to detailed explanations
+        const errorCodeExplanations = {
+          "A1": "Focuses on immediate moves, ignoring future constraints and goal feasibility.",
+          "A2": "Fulfills a minor rule but ignores a major rule (e.g. rushes exit, ignores polyomino).",
+          "A3": "States a rule or plan but executes moves that clearly violate it.",
+          "A4": "Uses made-up rules (I must loop around here twice…) not present in the puzzle.",
+          "A5": "Declares the path valid without verifying rule compliance or checking contradictions.",
+          "B1": "Miscounts cells needed for a region, e.g. assuming a 4-cell shape fits 5 cells.",
+          "B2": "Thinks shape can rotate/flip when rules forbid it, or vice versa.",
+          "B3": "Moves into trapped space with no room left to satisfy remaining constraints.",
+          "C1": "States \"I checked all constraints\" but clearly didn't.",
+          "C2": "Declares success or \"this is valid\" while violating rules.",
+          "C3": "The reasoning acknowledges an error but never fixes or reroutes.",
+          "D1": "Gives no meaningful reasoning, just outputs a path blindly."
+        };
+        
+        // Store highlight-to-error-code associations
+        let highlightAnnotations = {};
         
         // Check for URL parameter 'url' on page load
         checkUrlParameter();
@@ -2117,37 +2250,55 @@
           }
         });
         
-        // Reasoning trace toggle
-        reasoningHeader.addEventListener('click', toggleReasoningTrace);
-        toggleReasoningBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          toggleReasoningTrace();
+        // Reasoning truncation controls
+        truncateReasoningCheckbox.addEventListener('change', updateReasoningDisplay);
+        sentenceCountInput.addEventListener('change', updateReasoningDisplay);
+        sentenceCountInput.addEventListener('input', function() {
+          // Update on input with debounce
+          clearTimeout(this.updateTimer);
+          this.updateTimer = setTimeout(updateReasoningDisplay, 500);
         });
         
-        // Popout reasoning modal
-        popoutReasoningBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          openReasoningModal();
+        // Tooltip event listeners
+        const tooltip = document.getElementById('highlight-tooltip');
+        
+        // Track mouse position globally for bridge detection
+        document.addEventListener('mousemove', function(e) {
+          window.lastMouseX = e.clientX;
+          window.lastMouseY = e.clientY;
         });
         
-        // Close modal events
-        closeReasoningModal.addEventListener('click', closeReasoningModalFunc);
-        closeReasoningModalBtn.addEventListener('click', closeReasoningModalFunc);
+        // Prevent tooltip from closing when hovering over it
+        tooltip.addEventListener('mouseenter', function() {
+          tooltip.classList.add('show');
+        });
         
-        // Copy reasoning to clipboard
-        copyReasoningBtn.addEventListener('click', copyReasoningToClipboard);
-        
-        // Close modal when clicking outside
-        reasoningModal.addEventListener('click', function(e) {
-          if (e.target === reasoningModal) {
-            closeReasoningModalFunc();
+        tooltip.addEventListener('mouseleave', function(e) {
+          const relatedTarget = e.relatedTarget;
+          
+          // Don't hide if moving back to a highlight
+          if (relatedTarget && relatedTarget.classList && relatedTarget.classList.contains('reasoning-highlight')) {
+            return;
           }
+          
+          // Hide after a significant delay
+          setTimeout(() => {
+            const hoveringTooltip = tooltip.matches(':hover');
+            const hoveringHighlight = document.querySelector('.reasoning-highlight:hover') !== null;
+            
+            if (!hoveringTooltip && !hoveringHighlight) {
+              tooltip.classList.remove('show');
+            }
+          }, 500); // Increased from 200ms to 500ms
         });
         
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape' && reasoningModal.classList.contains('show')) {
-            closeReasoningModalFunc();
+        // Close tooltip when clicking outside
+        document.addEventListener('click', function(e) {
+          const isTooltipClick = tooltip.contains(e.target);
+          const isHighlightClick = e.target.classList.contains('reasoning-highlight');
+          
+          if (!isTooltipClick && !isHighlightClick) {
+            tooltip.classList.remove('show');
           }
         });
         
@@ -2324,46 +2475,385 @@
           return puzzle;
         }
         
-        // Toggle reasoning trace display
-        function toggleReasoningTrace() {
-          reasoningContent.classList.toggle('collapsed');
-          const icon = toggleReasoningBtn.querySelector('i');
-          if (reasoningContent.classList.contains('collapsed')) {
-            icon.classList.remove('fa-chevron-up');
-            icon.classList.add('fa-chevron-down');
+        // Get reasoning text (truncated or full based on settings)
+        function getReasoningText() {
+          if (!currentReasoningTrace) return '';
+          
+          // If truncation is disabled, return full text
+          if (!truncateReasoningCheckbox.checked) {
+            return currentReasoningTrace;
+          }
+          
+          // Get the number of sentences to show
+          const sentenceCount = parseInt(sentenceCountInput.value) || 20;
+          
+          // Split into sentences (looking for . ! ? followed by space or end)
+          // Use a more robust pattern that captures everything including trailing content
+          const sentences = currentReasoningTrace.match(/[^.!?]+[.!?]+/g) || [];
+          
+          // Check if there's any remaining text after the last sentence
+          const lastSentenceEnd = sentences.reduce((pos, s) => pos + s.length, 0);
+          const remainingText = currentReasoningTrace.slice(lastSentenceEnd).trim();
+          
+          // If there's remaining text, add it as a sentence
+          if (remainingText) {
+            sentences.push(remainingText);
+          }
+          
+          // If we have fewer sentences than requested, return all
+          if (sentences.length <= sentenceCount) {
+            return currentReasoningTrace;
+          }
+          
+          // Get the last N sentences
+          const lastSentences = sentences.slice(-sentenceCount);
+          const truncatedText = lastSentences.join('');
+          
+          // Add a prefix indicator
+          const prefix = `[Showing last ${sentenceCount} of ${sentences.length} sentences]\n\n`;
+          return prefix + truncatedText;
+        }
+        
+        // Update reasoning display
+        function updateReasoningDisplay() {
+          const text = getReasoningText();
+          if (text) {
+            applyReasoningHighlightsToElement(reasoningContent, text);
           } else {
-            icon.classList.remove('fa-chevron-down');
-            icon.classList.add('fa-chevron-up');
+            reasoningContent.textContent = 'No reasoning trace available';
           }
         }
         
-        // Open reasoning modal
-        function openReasoningModal() {
-          if (!currentReasoningTrace) {
-            showMessage('error', 'No reasoning trace available');
+        // Apply highlights to reasoning text in a given element
+        function applyReasoningHighlightsToElement(container, text) {
+          // Clear existing content
+          container.innerHTML = '';
+          
+          // Always use full text for position calculations to maintain consistency
+          const fullText = currentReasoningTrace || text;
+          const displayText = text;
+          
+          // Track all matches with their positions IN THE FULL TEXT
+          const matches = [];
+          
+          // FIRST: Find all matches in the full text to get correct positions
+          const fullTextMatches = [];
+          
+          // Add reasoning highlights from full text
+          reasoningHighlights.forEach(highlight => {
+            const regex = new RegExp(highlight.pattern);
+            let match;
+            highlight.pattern.lastIndex = 0;
+            
+            while ((match = highlight.pattern.exec(fullText)) !== null) {
+              fullTextMatches.push({
+                fullTextStart: match.index,
+                fullTextEnd: match.index + match[0].length,
+                text: match[0],
+                type: 'reasoning',
+                highlight: highlight
+              });
+            }
+          });
+          
+          // Add coordinate matches from full text
+          const coordPattern = /\((\d+),\s*(\d+)\)/g;
+          let coordMatch;
+          coordPattern.lastIndex = 0;
+          while ((coordMatch = coordPattern.exec(fullText)) !== null) {
+            fullTextMatches.push({
+              fullTextStart: coordMatch.index,
+              fullTextEnd: coordMatch.index + coordMatch[0].length,
+              text: coordMatch[0],
+              type: 'coordinate',
+              x: parseInt(coordMatch[1]),
+              y: parseInt(coordMatch[2])
+            });
+          }
+          
+          // NOW: Find which of these matches appear in the display text
+          // Remove prefix if present
+          let actualDisplayText = displayText;
+          if (displayText.startsWith('[Showing last')) {
+            const contentStart = displayText.indexOf('\n\n');
+            if (contentStart !== -1) {
+              actualDisplayText = displayText.substring(contentStart + 2);
+            }
+          }
+          
+          // For each full text match, check if it appears in the display text
+          fullTextMatches.forEach(fullMatch => {
+            // Find this exact text in the display text
+            let searchStart = 0;
+            let displayIndex;
+            
+            while ((displayIndex = actualDisplayText.indexOf(fullMatch.text, searchStart)) !== -1) {
+              // Found a match in display text
+              // Adjust position if we removed prefix
+              const prefixLength = displayText.length - actualDisplayText.length;
+              const displayPos = displayIndex + prefixLength;
+              
+              matches.push({
+                start: displayPos,
+                end: displayPos + fullMatch.text.length,
+                text: fullMatch.text,
+                type: fullMatch.type,
+                highlight: fullMatch.highlight,
+                x: fullMatch.x,
+                y: fullMatch.y,
+                fullTextPosition: fullMatch.fullTextStart // CRITICAL: Use position from full text
+              });
+              
+              // Continue searching for more occurrences
+              searchStart = displayIndex + 1;
+              break; // Only take first match for now
+            }
+          });
+          
+          // Sort matches by display position
+          matches.sort((a, b) => a.start - b.start);
+          
+          // Remove overlapping matches (keep first occurrence)
+          const filteredMatches = [];
+          let lastEnd = 0;
+          
+          matches.forEach(match => {
+            if (match.start >= lastEnd) {
+              filteredMatches.push(match);
+              lastEnd = match.end;
+            }
+          });
+          
+          // Build the highlighted HTML
+          let currentPos = 0;
+          const fragment = document.createDocumentFragment();
+          
+          filteredMatches.forEach((match, index) => {
+            // Add text before the match
+            if (currentPos < match.start) {
+              const textNode = document.createTextNode(displayText.substring(currentPos, match.start));
+              fragment.appendChild(textNode);
+            }
+            
+            // Add highlighted text
+            const span = document.createElement('span');
+            
+            if (match.type === 'reasoning') {
+              // Reasoning highlight
+              span.className = `reasoning-highlight highlight-${match.highlight.name}`;
+              span.textContent = match.text;
+              span.dataset.highlightIndex = index;
+              span.dataset.highlightName = match.highlight.name;
+              span.dataset.description = match.highlight.description;
+              span.dataset.rules = JSON.stringify(match.highlight.suggestRules);
+              span.dataset.position = match.fullTextPosition; // Use full text position
+              
+              // Add event listeners for tooltip
+              span.addEventListener('mouseenter', showHighlightTooltip);
+              span.addEventListener('mouseleave', hideHighlightTooltip);
+            } else if (match.type === 'coordinate') {
+              // Coordinate highlight
+              span.className = 'coordinate-highlight';
+              span.textContent = match.text;
+              span.dataset.x = match.x;
+              span.dataset.y = match.y;
+              
+              // Add event listeners for coordinate hover
+              span.addEventListener('mouseenter', highlightCoordinateOnPuzzle);
+              span.addEventListener('mouseleave', removeCoordinateHighlight);
+            }
+            
+            fragment.appendChild(span);
+            currentPos = match.end;
+          });
+          
+          // Add remaining text
+          if (currentPos < displayText.length) {
+            const textNode = document.createTextNode(displayText.substring(currentPos));
+            fragment.appendChild(textNode);
+          }
+          
+          container.appendChild(fragment);
+        }
+        
+        // Show tooltip on highlight hover
+        function showHighlightTooltip(event) {
+          const span = event.currentTarget;
+          const rules = JSON.parse(span.dataset.rules);
+          const description = span.dataset.description;
+          const position = span.dataset.position;
+          
+          const tooltip = document.getElementById('highlight-tooltip');
+          const tooltipHeaderText = document.getElementById('tooltip-header-text');
+          const tooltipText = document.getElementById('tooltip-text');
+          const tooltipSuggestions = document.getElementById('tooltip-suggestions');
+          
+          // Set tooltip content
+          tooltipHeaderText.textContent = description;
+          tooltipText.textContent = `"${span.textContent}"`;
+          
+          // Clear previous suggestions
+          tooltipSuggestions.innerHTML = '';
+          
+          // Add suggestion buttons with descriptions
+          rules.forEach(ruleCode => {
+            const button = document.createElement('button');
+            button.className = 'highlight-tooltip-button';
+            
+            // Check if this rule is already selected for this position
+            const puzzleId = currentPuzzle?.id || currentPuzzleIndex;
+            const key = `${puzzleId}-${position}`;
+            const isActive = highlightAnnotations[key]?.includes(ruleCode);
+            
+            // Create button content with code, short description, and explanation
+            const ruleDesc = errorCodeDescriptions[ruleCode] || ruleCode;
+            const ruleExplanation = errorCodeExplanations[ruleCode] || '';
+            const buttonContent = document.createElement('div');
+            buttonContent.style.cssText = 'display: flex; flex-direction: column; align-items: flex-start; gap: 0.25rem; width: 100%;';
+            
+            const codeSpan = document.createElement('span');
+            codeSpan.style.cssText = 'font-weight: 600; font-size: 0.8rem;';
+            if (isActive) {
+              codeSpan.innerHTML = `<i class="fas fa-check"></i> ${ruleCode}`;
+            } else {
+              codeSpan.textContent = ruleCode;
+            }
+            
+            const descSpan = document.createElement('span');
+            descSpan.style.cssText = 'font-size: 0.7rem; opacity: 0.9; font-weight: 500;';
+            descSpan.textContent = ruleDesc;
+            
+            const explanationSpan = document.createElement('span');
+            explanationSpan.style.cssText = 'font-size: 0.65rem; opacity: 0.7; font-weight: normal; line-height: 1.3;';
+            explanationSpan.textContent = ruleExplanation;
+            
+            buttonContent.appendChild(codeSpan);
+            buttonContent.appendChild(descSpan);
+            buttonContent.appendChild(explanationSpan);
+            button.appendChild(buttonContent);
+            
+            if (isActive) {
+              button.classList.add('active');
+            }
+            
+            button.title = `${ruleDesc}\n${ruleExplanation}`;
+            button.dataset.ruleCode = ruleCode;
+            button.dataset.position = position;
+            
+            button.addEventListener('click', (e) => {
+              e.stopPropagation();
+              toggleErrorCodeForHighlight(ruleCode, position, button, codeSpan);
+            });
+            
+            tooltipSuggestions.appendChild(button);
+          });
+          
+          // Position tooltip near the highlight with minimal gap
+          const rect = span.getBoundingClientRect();
+          tooltip.style.left = `${rect.left}px`;
+          tooltip.style.top = `${rect.bottom + 2}px`; // Reduced gap from 5px to 2px
+          
+          // Adjust if tooltip goes off-screen
+          setTimeout(() => {
+            const tooltipRect = tooltip.getBoundingClientRect();
+            if (tooltipRect.right > window.innerWidth) {
+              tooltip.style.left = `${window.innerWidth - tooltipRect.width - 10}px`;
+            }
+            if (tooltipRect.bottom > window.innerHeight) {
+              tooltip.style.top = `${rect.top - tooltipRect.height - 2}px`; // Reduced gap
+            }
+          }, 0);
+          
+          tooltip.classList.add('show');
+          tooltip.dataset.activePosition = position; // Store which position this tooltip is for
+          tooltip.dataset.highlightElement = JSON.stringify({
+            top: rect.top,
+            bottom: rect.bottom,
+            left: rect.left,
+            right: rect.right
+          });
+        }
+        
+        // Hide tooltip
+        function hideHighlightTooltip(event) {
+          const tooltip = document.getElementById('highlight-tooltip');
+          const relatedTarget = event.relatedTarget;
+          
+          // Don't hide if moving to the tooltip itself or any of its children
+          if (relatedTarget && (relatedTarget === tooltip || tooltip.contains(relatedTarget))) {
             return;
           }
           
-          modalReasoningContent.textContent = currentReasoningTrace;
-          reasoningModal.classList.add('show');
-          document.body.style.overflow = 'hidden'; // Prevent background scrolling
+          // Significantly increased delay to allow moving to tooltip
+          setTimeout(() => {
+            // Check if we're hovering over the tooltip or any highlight
+            const hoveringTooltip = tooltip.matches(':hover');
+            const hoveringHighlight = document.querySelector('.reasoning-highlight:hover') !== null;
+            
+            // Also check if mouse is in the "bridge" area between highlight and tooltip
+            if (tooltip.dataset.highlightElement) {
+              try {
+                const highlightRect = JSON.parse(tooltip.dataset.highlightElement);
+                const tooltipRect = tooltip.getBoundingClientRect();
+                const mouseX = window.lastMouseX || 0;
+                const mouseY = window.lastMouseY || 0;
+                
+                // Check if mouse is between the highlight and tooltip
+                const inBridge = mouseY >= highlightRect.bottom && 
+                               mouseY <= tooltipRect.top &&
+                               mouseX >= Math.min(highlightRect.left, tooltipRect.left) &&
+                               mouseX <= Math.max(highlightRect.right, tooltipRect.right);
+                
+                if (inBridge) {
+                  return; // Don't close if in bridge area
+                }
+              } catch (e) {
+                // Ignore JSON parse errors
+              }
+            }
+            
+            if (!hoveringTooltip && !hoveringHighlight) {
+              tooltip.classList.remove('show');
+            }
+          }, 500); // Increased from 200ms to 500ms
         }
         
-        // Close reasoning modal
-        function closeReasoningModalFunc() {
-          reasoningModal.classList.remove('show');
-          document.body.style.overflow = ''; // Restore scrolling
-        }
-        
-        // Copy reasoning to clipboard
-        async function copyReasoningToClipboard() {
-          try {
-            await navigator.clipboard.writeText(currentReasoningTrace || '');
-            showMessage('success', 'Reasoning copied to clipboard!');
-          } catch (error) {
-            console.error('Failed to copy reasoning:', error);
-            showMessage('error', 'Failed to copy reasoning to clipboard');
+        // Toggle error code selection for a highlight
+        function toggleErrorCodeForHighlight(ruleCode, position, button, codeSpan) {
+          const puzzleId = currentPuzzle?.id || currentPuzzleIndex;
+          const key = `${puzzleId}-${position}`;
+          
+          // Initialize if needed
+          if (!highlightAnnotations[key]) {
+            highlightAnnotations[key] = [];
           }
+          
+          // Toggle the rule code
+          const index = highlightAnnotations[key].indexOf(ruleCode);
+          if (index > -1) {
+            highlightAnnotations[key].splice(index, 1);
+            button.classList.remove('active');
+            if (codeSpan) {
+              codeSpan.innerHTML = ruleCode;
+            }
+          } else {
+            highlightAnnotations[key].push(ruleCode);
+            button.classList.add('active');
+            if (codeSpan) {
+              codeSpan.innerHTML = `<i class="fas fa-check"></i> ${ruleCode}`;
+            }
+          }
+          
+          // Also check/uncheck the corresponding checkbox in the annotation section
+          const checkboxId = `reason-${ruleCode.toLowerCase()}`;
+          const checkbox = document.getElementById(checkboxId);
+          if (checkbox && !checkbox.checked) {
+            checkbox.checked = true;
+          }
+          
+          // Save annotation
+          saveAnnotation();
+          markDirty();
         }
         
         // Toggle model solution display
@@ -2449,6 +2939,16 @@
           puzzle.failure_annotation.failure_reasons = failureReasons;
           puzzle.failure_annotation.other_reason = otherReasonInput.value.trim();
           puzzle.failure_annotation.completed = true;
+          
+          // Save highlight annotations for this puzzle
+          const puzzleId = puzzle.id || currentPuzzleIndex;
+          const puzzleHighlights = {};
+          Object.keys(highlightAnnotations).forEach(key => {
+            if (key.startsWith(`${puzzleId}-`)) {
+              puzzleHighlights[key] = highlightAnnotations[key];
+            }
+          });
+          puzzle.failure_annotation.highlight_annotations = puzzleHighlights;
           
           // Update dataset info
           updateDatasetInfo();
@@ -2593,6 +3093,54 @@
           const stroke = document.getElementById(`solution-path-${pathId}-stroke`);
           if (base) base.remove();
           if (stroke) stroke.remove();
+        }
+        
+        // Highlight a coordinate on the puzzle
+        function highlightCoordinateOnPuzzle(event) {
+          const span = event.currentTarget;
+          const x = parseInt(span.dataset.x);
+          const y = parseInt(span.dataset.y);
+          
+          const svg = document.getElementById('puzzle');
+          if (!svg) return;
+          
+          // Create a highlight circle at the coordinate position
+          const highlightGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          highlightGroup.setAttribute("id", "coordinate-highlight");
+          
+          // Calculate the SVG position (same as path rendering: point.x * 41 + 52)
+          const svgX = x * 41 + 52;
+          const svgY = y * 41 + 52;
+          
+          // Create pulsing circle
+          const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          circle.setAttribute("cx", svgX);
+          circle.setAttribute("cy", svgY);
+          circle.setAttribute("r", "15");
+          circle.setAttribute("fill", "rgba(255, 165, 0, 0.3)");
+          circle.setAttribute("stroke", "#ff6500");
+          circle.setAttribute("stroke-width", "3");
+          
+          // Add pulsing animation
+          const animate = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+          animate.setAttribute("attributeName", "r");
+          animate.setAttribute("values", "12;18;12");
+          animate.setAttribute("dur", "1.5s");
+          animate.setAttribute("repeatCount", "indefinite");
+          
+          circle.appendChild(animate);
+          highlightGroup.appendChild(circle);
+          
+          // Add to SVG (on top of everything)
+          svg.appendChild(highlightGroup);
+        }
+        
+        // Remove coordinate highlight from puzzle
+        function removeCoordinateHighlight() {
+          const highlight = document.getElementById("coordinate-highlight");
+          if (highlight) {
+            highlight.remove();
+          }
         }
         
         // Toggle input section
@@ -2890,16 +3438,14 @@
               }
             }
             
-            // Load reasoning trace (always show, expanded by default)
-            if (currentReasoningTrace) {
-              reasoningContent.textContent = currentReasoningTrace;
-              } else {
-              reasoningContent.textContent = 'No reasoning trace available';
-            }
-            reasoningContent.classList.remove('collapsed');
-            const reasoningToggleIcon = toggleReasoningBtn.querySelector('i');
-            reasoningToggleIcon.classList.remove('fa-chevron-down');
-            reasoningToggleIcon.classList.add('fa-chevron-up');
+            // Load reasoning trace (always show expanded)
+            // Reset to default truncation settings: show only last 30 sentences
+            truncateReasoningCheckbox.checked = true;
+            sentenceCountInput.value = 30;
+            updateReasoningDisplay();
+            
+            // Scroll reasoning content to top
+            reasoningContent.scrollTop = 0;
             
             // Display analysis results across sections
             if (currentModelSolution && currentModelSolution.analysis) {
@@ -2918,12 +3464,28 @@
               
               // Load other reason
               otherReasonInput.value = annotation.other_reason || '';
+              
+              // Load highlight annotations
+              if (annotation.highlight_annotations) {
+                const puzzleId = puzzleData.id || currentPuzzleIndex;
+                Object.keys(annotation.highlight_annotations).forEach(key => {
+                  highlightAnnotations[key] = annotation.highlight_annotations[key];
+                });
+              }
             } else {
               // Clear annotation fields for new puzzle
               document.querySelectorAll('.failure-reason input[type="checkbox"]').forEach(checkbox => {
                 checkbox.checked = false;
               });
               otherReasonInput.value = '';
+              
+              // Clear highlight annotations for this puzzle
+              const puzzleId = puzzleData.id || currentPuzzleIndex;
+              Object.keys(highlightAnnotations).forEach(key => {
+                if (key.startsWith(`${puzzleId}-`)) {
+                  delete highlightAnnotations[key];
+                }
+              });
             }
             
             // Reset solution toggles
@@ -2942,6 +3504,7 @@
             statsContainer.style.display = 'flex';
             puzzleInfoCompact.style.display = 'flex';
             reasoningSection.style.display = 'block';
+            solutionDisplay.style.display = 'block';
             annotationSection.style.display = 'block';
             
             // Update navigation buttons (top and bottom)
