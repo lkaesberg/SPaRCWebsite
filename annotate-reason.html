@@ -2533,82 +2533,64 @@
           const fullText = currentReasoningTrace || text;
           const displayText = text;
           
-          // Track all matches with their positions IN THE FULL TEXT
+          // Calculate offset for reasoning highlights (they need stable positions)
+          let textOffset = 0;
+          let actualDisplayText = displayText;
+          if (displayText.startsWith('[Showing last')) {
+            const contentStart = displayText.indexOf('\n\n');
+            if (contentStart !== -1) {
+              actualDisplayText = displayText.substring(contentStart + 2);
+              // Find where this content appears in the full text
+              textOffset = fullText.indexOf(actualDisplayText);
+              if (textOffset === -1) textOffset = 0;
+            }
+          }
+          
+          // Track all matches with their positions
           const matches = [];
           
-          // FIRST: Find all matches in the full text to get correct positions
-          const fullTextMatches = [];
-          
-          // Add reasoning highlights from full text
+          // Add reasoning highlights - these need stable positions for annotations
           reasoningHighlights.forEach(highlight => {
             const regex = new RegExp(highlight.pattern);
             let match;
             highlight.pattern.lastIndex = 0;
             
-            while ((match = highlight.pattern.exec(fullText)) !== null) {
-              fullTextMatches.push({
-                fullTextStart: match.index,
-                fullTextEnd: match.index + match[0].length,
+            while ((match = highlight.pattern.exec(displayText)) !== null) {
+              // Skip the prefix if present
+              if (displayText.startsWith('[Showing last') && match.index < displayText.indexOf('\n\n') + 2) {
+                continue;
+              }
+              
+              matches.push({
+                start: match.index,
+                end: match.index + match[0].length,
                 text: match[0],
                 type: 'reasoning',
-                highlight: highlight
+                highlight: highlight,
+                fullTextPosition: textOffset + match.index - (displayText.length - actualDisplayText.length)
               });
             }
           });
           
-          // Add coordinate matches from full text
+          // Add coordinate matches - these are just for visual highlighting, no annotation needed
           const coordPattern = /\((\d+),\s*(\d+)\)/g;
           let coordMatch;
           coordPattern.lastIndex = 0;
-          while ((coordMatch = coordPattern.exec(fullText)) !== null) {
-            fullTextMatches.push({
-              fullTextStart: coordMatch.index,
-              fullTextEnd: coordMatch.index + coordMatch[0].length,
+          while ((coordMatch = coordPattern.exec(displayText)) !== null) {
+            // Skip the prefix if present
+            if (displayText.startsWith('[Showing last') && coordMatch.index < displayText.indexOf('\n\n') + 2) {
+              continue;
+            }
+            
+            matches.push({
+              start: coordMatch.index,
+              end: coordMatch.index + coordMatch[0].length,
               text: coordMatch[0],
               type: 'coordinate',
               x: parseInt(coordMatch[1]),
               y: parseInt(coordMatch[2])
             });
           }
-          
-          // NOW: Find which of these matches appear in the display text
-          // Remove prefix if present
-          let actualDisplayText = displayText;
-          if (displayText.startsWith('[Showing last')) {
-            const contentStart = displayText.indexOf('\n\n');
-            if (contentStart !== -1) {
-              actualDisplayText = displayText.substring(contentStart + 2);
-            }
-          }
-          
-          // For each full text match, check if it appears in the display text
-          fullTextMatches.forEach(fullMatch => {
-            // Find this exact text in the display text
-            let searchStart = 0;
-            let displayIndex;
-            
-            while ((displayIndex = actualDisplayText.indexOf(fullMatch.text, searchStart)) !== -1) {
-              // Found a match in display text
-              // Adjust position if we removed prefix
-              const prefixLength = displayText.length - actualDisplayText.length;
-              const displayPos = displayIndex + prefixLength;
-              
-              matches.push({
-                start: displayPos,
-                end: displayPos + fullMatch.text.length,
-                text: fullMatch.text,
-                type: fullMatch.type,
-                highlight: fullMatch.highlight,
-                x: fullMatch.x,
-                y: fullMatch.y,
-                fullTextPosition: fullMatch.fullTextStart // CRITICAL: Use position from full text
-              });
-              
-              // Continue searching for more occurrences
-              searchStart = displayIndex + 1;
-              break; // Only take first match for now
-            }
-          });
           
           // Sort matches by display position
           matches.sort((a, b) => a.start - b.start);
