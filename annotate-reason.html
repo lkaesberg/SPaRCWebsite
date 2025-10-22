@@ -1806,37 +1806,37 @@
               <!-- A. Planning / Logical Reasoning Flaw -->
               <div class="failure-reason">
                 <input type="checkbox" id="reason-a" value="a_planning_logical_flaw">
-                <label for="reason-a" title="Focuses on local moves or inconsistent logic. Often builds a path that works step-by-step but cannot satisfy all constraints in the end.">A — Planning / Logical reasoning flaw</label>
+                <label for="reason-a" title="Focuses on local moves or inconsistent logic. Often builds a path that works step-by-step but cannot satisfy all constraints in the end.">A — Planning / Logical Reasoning Flaw</label>
               </div>
               
               <!-- B. Misunderstood or Invented Rule -->
               <div class="failure-reason">
                 <input type="checkbox" id="reason-b" value="b_misunderstood_invented_rule">
-                <label for="reason-b" title="Misinterprets what a rule means, ignores it, or invents new constraints not part of the puzzle (e.g., assumes illegal symmetry or shape rules).">B — Misunderstood or invented rule</label>
+                <label for="reason-b" title="Misinterprets what a rule means, ignores it, or invents new constraints not part of the puzzle (e.g., assumes illegal symmetry or shape rules).">B — Misunderstood or Invented Rule</label>
               </div>
               
               <!-- C. Spatial / Geometric Misjudgment -->
               <div class="failure-reason">
                 <input type="checkbox" id="reason-c" value="c_spatial_geometric_misjudgment">
-                <label for="reason-c" title="Includes geometric or coordinate mistakes such as wrong shape size, rotation, region estimation, or referencing the wrong grid cells (indexing or coordinate confusion).">C — Spatial / geometric misjudgment</label>
+                <label for="reason-c" title="Makes geometric mistakes such as wrong shape size, rotation, or region estimation. Often traps itself in areas too small for the required pattern.">C — Spatial / Geometric Misjudgment</label>
               </div>
               
               <!-- D. Premature Verification / Overconfidence -->
               <div class="failure-reason">
                 <input type="checkbox" id="reason-d" value="d_premature_verification">
-                <label for="reason-d" title="Claims the solution is correct or fully verified without checking key rules. Typical statements include 'this should work' while violations remain.">D — Premature verification / overconfidence</label>
+                <label for="reason-d" title="Claims the solution is correct or fully verified without checking key rules. Typical statements include 'this should work' while violations remain.">D — Premature Verification / Overconfidence</label>
               </div>
               
               <!-- E. No Correction Despite Noticing Issue -->
               <div class="failure-reason">
                 <input type="checkbox" id="reason-e" value="e_no_correction_despite_noticing">
-                <label for="reason-e" title="Recognizes a contradiction or error in reasoning but never adjusts the plan or recomputes the path.">E — No correction despite noticing issue</label>
+                <label for="reason-e" title="Recognizes a contradiction or error in reasoning but never adjusts the plan or recomputes the path.">E — No Correction Despite Noticing Issue</label>
               </div>
               
-              <!-- F. Vague or Missing Reasoning -->
+              <!-- F. Grid / Coordinate Error -->
               <div class="failure-reason">
-                <input type="checkbox" id="reason-f" value="f_vague_missing_reasoning">
-                <label for="reason-f" title="Provides almost no usable reasoning — just vague statements or generic path descriptions without real justification.">F — Vague or missing reasoning</label>
+                <input type="checkbox" id="reason-f" value="f_grid_coordinate_error">
+                <label for="reason-f" title="Uses incorrect coordinates or indexing (off-by-one, swapped x/y, or path steps outside the defined board) due to coordinate confusion.">F — Grid / Coordinate Error</label>
               </div>
             </div>
             <label for="other-reason" style="display: block; margin: 0.5rem 0 0.25rem 0; font-weight: 500; font-size: 0.85rem;">
