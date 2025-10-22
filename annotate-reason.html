@@ -1991,8 +1991,11 @@
         
         // Check for URL parameter 'url' on page load
         checkUrlParameter();
-        
-        // Disable localStorage restore to avoid oversized session data
+
+        // If URL parameter is not present, check localStorage for saved data
+        if (!hasUrlParameter('url')) {
+          loadFromLocalStorage();
+        }
         
         // Event listeners for file inputs
         uploadDataset.addEventListener('change', handleDatasetUpload);
@@ -2163,9 +2166,10 @@
             const icon = toggleInputBtn.querySelector('i');
             icon.classList.remove('fa-chevron-up');
             icon.classList.add('fa-chevron-down');
-            
-            // Skip saving to localStorage (disabled due to size)
-            
+
+            // Save the loaded dataset to localStorage
+            saveToLocalStorage();
+
             showMessage('success', 'Dataset loaded from URL successfully!');
             setLoading(false);
           } catch (error) {
@@ -2197,9 +2201,81 @@
           return idx >= 0 ? base.substring(0, idx) : base;
         }
 
-        // LocalStorage disabled: no-op implementations
-        function saveToLocalStorage() { /* disabled to avoid large storage */ }
-        function loadFromLocalStorage() { return false; }
+        // LocalStorage handling functions (enabled)
+        function saveToLocalStorage() {
+          try {
+            const dataToSave = {
+              dataset: dataset,
+              currentPuzzleIndex: currentPuzzleIndex,
+              originalDatasetSize: originalDatasetSize,
+              lastUpdated: new Date().toISOString()
+            };
+
+            const jsonData = JSON.stringify(dataToSave);
+
+            // Clear previous data
+            localStorage.removeItem('sparcAnnotatorData');
+
+            // Store the data
+            localStorage.setItem('sparcAnnotatorData', jsonData);
+
+            console.log('Saved annotation data to localStorage');
+          } catch (error) {
+            console.error('Error saving to localStorage:', error);
+            if (error.name === 'QuotaExceededError') {
+              showMessage('error', 'Warning: Dataset too large to save locally. Export your progress regularly!');
+            }
+          }
+        }
+
+        function loadFromLocalStorage() {
+          try {
+            const savedData = localStorage.getItem('sparcAnnotatorData');
+
+            if (!savedData) {
+              console.log('No saved data found in localStorage');
+              return false;
+            }
+
+            const parsedData = JSON.parse(savedData);
+
+            dataset = parsedData.dataset || [];
+            currentPuzzleIndex = parsedData.currentPuzzleIndex || 0;
+            originalDatasetSize = parsedData.originalDatasetSize || 0;
+
+            console.log(`Loaded saved data from ${parsedData.lastUpdated}`);
+
+            if (dataset.length > 0) {
+              // Respect the saved currentPuzzleIndex. Only adjust if it's out of range.
+              if (typeof currentPuzzleIndex !== 'number' || currentPuzzleIndex < 0 || currentPuzzleIndex >= dataset.length) {
+                // If saved index is invalid, fallback to 0 (do NOT auto-advance)
+                currentPuzzleIndex = 0;
+              }
+
+              // Update UI and load the current puzzle (do not auto-advance on reload)
+              updateDatasetInfo();
+              loadCurrentPuzzle();
+
+              // Show dataset controls
+              datasetControls.style.display = 'flex';
+              exportContainer.style.display = 'block';
+
+              // Hide the initial input area
+              inputContent.classList.add('collapsed');
+              const icon = toggleInputBtn.querySelector('i');
+              icon.classList.remove('fa-chevron-up');
+              icon.classList.add('fa-chevron-down');
+
+              showMessage('success', 'Loaded your saved progress!');
+              return true;
+            }
+
+            return false;
+          } catch (error) {
+            console.error('Error loading from localStorage:', error);
+            return false;
+          }
+        }
         
         // Initialize annotation data in a puzzle if it doesn't exist
         function ensureAnnotationData(puzzle) {
@@ -2723,9 +2799,9 @@
             const icon = toggleInputBtn.querySelector('i');
             icon.classList.remove('fa-chevron-up');
             icon.classList.add('fa-chevron-down');
-            
-            // Skip saving to localStorage (disabled due to size)
-            
+
+            // Save the loaded dataset to localStorage
+            saveToLocalStorage();
             // Reset file input so the same file can be loaded again if needed
             event.target.value = '';
           } catch (error) {
@@ -2862,9 +2938,8 @@
         
         // Go to previous puzzle
         function goToPreviousPuzzle() {
-          // Save current annotation and mark as completed before moving
+          // Save current annotation before moving (do NOT mark as completed)
           saveAnnotation();
-          markCurrentPuzzleAsCompleted();
           
           if (currentPuzzleIndex > 0) {
             currentPuzzleIndex--;
@@ -3091,7 +3166,13 @@
           window.PLAY_SOUND = originalPlaySound;
           window.TRACE_COMPLETION_FUNC = null;
           
-          // localStorage disabled: nothing to clear
+          // Clear saved localStorage data for this annotator
+          try {
+            localStorage.removeItem('sparcAnnotatorData');
+            console.log('Cleared saved annotation data from localStorage');
+          } catch (e) {
+            console.warn('Could not clear localStorage item:', e);
+          }
           
           showMessage('success', 'Dataset cleared!');
         });
