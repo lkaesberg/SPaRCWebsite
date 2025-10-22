@@ -1070,16 +1070,56 @@
       
       .reasoning-header {
         position: relative;
+        padding-right: 8rem;
+        min-height: 32px;
+        display: flex;
+        align-items: center;
       }
       
       .reasoning-controls {
         position: absolute;
-        right: 5rem;
+        right: 0;
         top: 50%;
         transform: translateY(-50%);
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 0.5rem;
+      }
+      
+      .expand-sentences-btn {
+        min-width: 24px;
+        height: 16px;
+        padding: 0 0.25rem;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: transparent;
+        color: var(--color-primary);
+        border: 1px solid var(--color-primary);
+        border-radius: 8px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+        font-family: inherit;
+        white-space: nowrap;
+        line-height: 1;
+      }
+      
+      .expand-sentences-btn:hover:not(:disabled) {
+        background: var(--color-primary);
+        color: white;
+      }
+      
+      .expand-sentences-btn:active:not(:disabled) {
+        transform: scale(0.95);
+      }
+      
+      .expand-sentences-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        border-color: var(--color-muted);
+        color: var(--color-muted);
       }
       
       .reasoning-toggle-label {
@@ -1766,10 +1806,10 @@
             <div class="reasoning-header" id="reasoning-header">
               <h3><i class="fas fa-brain"></i> Model's Reasoning</h3>
               <div class="reasoning-controls">
-                <label class="reasoning-toggle-label" title="Show only last sentences for easier annotation">
-                  <input type="checkbox" id="truncate-reasoning" checked>
-                  <span>Last <input type="number" id="sentence-count" min="5" max="100" value="30" style="width: 50px;"> sentences</span>
-                </label>
+                <span style="color: #666; font-size: 0.75rem;">Last <span id="sentence-count-display">40</span> sentences</span>
+                <button id="expand-sentences-btn" class="expand-sentences-btn" title="Show 10 more sentences">
+                  +10
+                </button>
               </div>
             </div>
             <div class="reasoning-content" id="reasoning-content"></div>
@@ -1934,8 +1974,12 @@
         const reasoningContent = document.getElementById('reasoning-content');
         const annotationSection = document.getElementById('annotation-section');
         const otherReasonInput = document.getElementById('other-reason');
-        const truncateReasoningCheckbox = document.getElementById('truncate-reasoning');
-        const sentenceCountInput = document.getElementById('sentence-count');
+        const sentenceCountDisplay = document.getElementById('sentence-count-display');
+        const expandSentencesBtn = document.getElementById('expand-sentences-btn');
+        
+        // Sentence count state
+        let currentSentenceCount = 40;
+        const maxSentenceCount = 100;
         
         // Bottom navigation elements
         const datasetControlsBottom = document.getElementById('dataset-controls-bottom');
@@ -1983,13 +2027,18 @@
           }
         });
         
-        // Reasoning truncation controls
-        truncateReasoningCheckbox.addEventListener('change', updateReasoningDisplay);
-        sentenceCountInput.addEventListener('change', updateReasoningDisplay);
-        sentenceCountInput.addEventListener('input', function() {
-          // Update on input with debounce
-          clearTimeout(this.updateTimer);
-          this.updateTimer = setTimeout(updateReasoningDisplay, 500);
+        // Expand sentences button
+        
+        expandSentencesBtn.addEventListener('click', function() {
+          currentSentenceCount = Math.min(currentSentenceCount + 10, maxSentenceCount);
+          sentenceCountDisplay.textContent = currentSentenceCount;
+          updateReasoningDisplay();
+          
+          // Disable button if at max
+          if (currentSentenceCount >= maxSentenceCount) {
+            expandSentencesBtn.disabled = true;
+            expandSentencesBtn.title = 'Maximum sentences reached';
+          }
         });
         
         // Annotation checkboxes - save on change
@@ -2165,17 +2214,12 @@
           return puzzle;
         }
         
-        // Get reasoning text (truncated or full based on settings)
+        // Get reasoning text (always truncated to last N sentences)
         function getReasoningText() {
           if (!currentReasoningTrace) return '';
           
-          // If truncation is disabled, return full text
-          if (!truncateReasoningCheckbox.checked) {
-            return currentReasoningTrace;
-          }
-          
           // Get the number of sentences to show
-          const sentenceCount = parseInt(sentenceCountInput.value) || 20;
+          const sentenceCount = currentSentenceCount;
           
           // Split into sentences (looking for . ! ? followed by space or end)
           // Use a more robust pattern that captures everything including trailing content
@@ -2209,6 +2253,29 @@
           const text = getReasoningText();
           if (text) {
             applyReasoningHighlightsToElement(reasoningContent, text);
+            
+            // Update button state based on sentence count
+            if (!currentReasoningTrace) return;
+            
+            const sentences = currentReasoningTrace.match(/[^.!?]+[.!?]+/g) || [];
+            const lastSentenceEnd = sentences.reduce((pos, s) => pos + s.length, 0);
+            const remainingText = currentReasoningTrace.slice(lastSentenceEnd).trim();
+            if (remainingText) {
+              sentences.push(remainingText);
+            }
+            
+            // Disable expand button if showing all sentences or at max
+            if (currentSentenceCount >= sentences.length || currentSentenceCount >= maxSentenceCount) {
+              expandSentencesBtn.disabled = true;
+              if (currentSentenceCount >= maxSentenceCount) {
+                expandSentencesBtn.title = 'Maximum sentences reached';
+              } else {
+                expandSentencesBtn.title = 'All sentences shown';
+              }
+            } else {
+              expandSentencesBtn.disabled = false;
+              expandSentencesBtn.title = 'Show 10 more sentences';
+            }
           } else {
             reasoningContent.textContent = 'No reasoning trace available';
           }
@@ -2853,10 +2920,12 @@
               }
             }
             
-            // Load reasoning trace (always show expanded)
-            // Reset to default truncation settings: show only last 30 sentences
-            truncateReasoningCheckbox.checked = true;
-            sentenceCountInput.value = 30;
+            // Load reasoning trace
+            // Reset to default: show only last 40 sentences
+            currentSentenceCount = 40;
+            sentenceCountDisplay.textContent = currentSentenceCount;
+            expandSentencesBtn.disabled = false;
+            expandSentencesBtn.title = 'Show 10 more sentences';
             updateReasoningDisplay();
             
             // Scroll reasoning content to top
