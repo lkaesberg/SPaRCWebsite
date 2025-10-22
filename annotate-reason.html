@@ -2430,13 +2430,30 @@
           // Save annotation
           puzzle.failure_annotation.failure_reasons = failureReasons;
           puzzle.failure_annotation.other_reason = otherReasonInput.value.trim();
-          puzzle.failure_annotation.completed = true;
+          
+          // Only mark as completed if something was actually annotated
+          const hasAnnotation = failureReasons.length > 0 || puzzle.failure_annotation.other_reason.length > 0;
+          if (hasAnnotation) {
+            puzzle.failure_annotation.completed = true;
+          }
           
           // Update dataset info
           updateDatasetInfo();
           
           // Save to localStorage
           saveToLocalStorage();
+        }
+        
+        // Mark current puzzle as completed when navigating away
+        function markCurrentPuzzleAsCompleted() {
+          if (dataset.length === 0 || currentPuzzleIndex < 0 || currentPuzzleIndex >= dataset.length) {
+            return;
+          }
+          
+          const puzzle = dataset[currentPuzzleIndex];
+          if (puzzle.failure_annotation) {
+            puzzle.failure_annotation.completed = true;
+          }
         }
         
         // Display analysis results in all analysis sections
@@ -2818,8 +2835,9 @@
         
         // Move to the next unlabeled puzzle automatically
         function moveToNextUnlabeledPuzzle() {
-          // Save current annotation before moving
+          // Save current annotation and mark as completed before moving
           saveAnnotation();
+          markCurrentPuzzleAsCompleted();
           
           // Find the next unlabeled puzzle
           const nextIndex = findNextUnlabeledPuzzleIndex(currentPuzzleIndex);
@@ -2844,8 +2862,9 @@
         
         // Go to previous puzzle
         function goToPreviousPuzzle() {
-          // Save current annotation before moving
+          // Save current annotation and mark as completed before moving
           saveAnnotation();
+          markCurrentPuzzleAsCompleted();
           
           if (currentPuzzleIndex > 0) {
             currentPuzzleIndex--;
@@ -2857,8 +2876,9 @@
         
         // Go to next puzzle
         function goToNextPuzzle() {
-          // Save current annotation before moving
+          // Save current annotation and mark as completed before moving
           saveAnnotation();
+          markCurrentPuzzleAsCompleted();
           
           if (currentPuzzleIndex < dataset.length - 1) {
             currentPuzzleIndex++;
