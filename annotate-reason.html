@@ -2214,10 +2214,10 @@
             const jsonData = JSON.stringify(dataToSave);
 
             // Clear previous data
-            localStorage.removeItem('sparcAnnotatorData');
+            localStorage.removeItem('sparcReasonAnnotatorData');
 
             // Store the data
-            localStorage.setItem('sparcAnnotatorData', jsonData);
+            localStorage.setItem('sparcReasonAnnotatorData', jsonData);
 
             console.log('Saved annotation data to localStorage');
           } catch (error) {
@@ -2230,7 +2230,7 @@
 
         function loadFromLocalStorage() {
           try {
-            const savedData = localStorage.getItem('sparcAnnotatorData');
+            const savedData = localStorage.getItem('sparcReasonAnnotatorData');
 
             if (!savedData) {
               console.log('No saved data found in localStorage');
@@ -3168,7 +3168,7 @@
           
           // Clear saved localStorage data for this annotator
           try {
-            localStorage.removeItem('sparcAnnotatorData');
+            localStorage.removeItem('sparcReasonAnnotatorData');
             console.log('Cleared saved annotation data from localStorage');
           } catch (e) {
             console.warn('Could not clear localStorage item:', e);
