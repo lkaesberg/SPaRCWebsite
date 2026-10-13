@@ -301,18 +301,14 @@
       @media (max-width: 860px) { .dataset { grid-template-columns: 1fr; } }
 
       /* ---------- Citation ---------- */
-      .cite-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr); gap: 2rem; align-items: start; }
-      .cite-blocks { display: grid; gap: 1rem; min-width: 0; }
-      .citation-block { margin: 0; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--cell); border-radius: var(--radius-sm); padding: 2.3rem 1.1rem 1.1rem; font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.6; white-space: pre; overflow-x: auto; }
-      #citation .copy-btn { border-color: var(--line); color: var(--ink); background: var(--surface); }
-      #citation .copy-btn:hover { background: var(--ink); color: #fff; }
-      .related-title { font-size: 1rem; margin-bottom: 0.9rem; }
-      .related-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
-      .related-list li { display: grid; gap: 0.15rem; padding-left: 1rem; border-left: 2px solid var(--line); }
-      .related-list a { font-weight: 700; text-decoration: none; color: var(--ink); line-height: 1.35; }
-      .related-list a:hover { color: var(--accent); text-decoration: underline; }
-      .related-list span { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-      @media (max-width: 860px) { .cite-grid { grid-template-columns: 1fr; } }
+      .bib { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 0.45rem 1rem; margin-bottom: 1.6rem; }
+      .bib-label { font-weight: 700; font-size: 0.95rem; }
+      #citation .copy-btn { position: static; font: 600 0.8rem var(--font-body); padding: 0.28rem 0.7rem; border: 1px solid #c8ced2; border-radius: 4px; background: #fff; color: var(--ink); }
+      #citation .copy-btn:hover { background: #eef1f2; }
+      .citation-block { grid-column: 1 / -1; margin: 0; background: #fff; border: 1px solid #dde1e4; border-radius: 4px; padding: 1rem 1.1rem; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; color: var(--ink); white-space: pre; overflow-x: auto; }
+      .related-title { font-size: 1.05rem; margin: 2.2rem 0 0.6rem; }
+      .related-list { margin: 0; padding-left: 1.2rem; max-width: 920px; }
+      .related-list li { margin-bottom: 0.35rem; }
 
       /* ---------- Footer ---------- */
       .site-footer { background: var(--ink); color: rgba(255, 255, 255, 0.72); padding-block: 3.2rem 2.4rem; }
@@ -919,9 +915,10 @@ print(len(puzzle["solutions"]))    # number of valid solutions</pre></div>
             <h2>Citation</h2>
             <p>If you use SPaRC, please cite the EMNLP 2025 paper. If you use the step-by-step environment, please also cite Spatial-Gym.</p>
           </div>
-          <div class="cite-grid">
-            <div class="cite-blocks">
-              <div class="code-wrap"><button type="button" class="copy-btn" aria-label="Copy SPaRC BibTeX">Copy</button><div class="citation-block">@inproceedings{kaesberg-etal-2025-sparc,
+          <div class="bib">
+            <span class="bib-label">SPaRC · EMNLP 2025</span>
+            <button type="button" class="copy-btn" aria-label="Copy SPaRC BibTeX">Copy</button>
+            <pre class="citation-block">@inproceedings{kaesberg-etal-2025-sparc,
   title     = "{SP}a{RC}: A Spatial Pathfinding Reasoning Challenge",
   author    = "Kaesberg, Lars Benedikt and Wahle, Jan Philip and Ruas, Terry and Gipp, Bela",
   booktitle = "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing",
@@ -932,27 +929,26 @@ print(len(puzzle["solutions"]))    # number of valid solutions</pre></div>
   url       = "https://aclanthology.org/2025.emnlp-main.526/",
   doi       = "10.18653/v1/2025.emnlp-main.526",
   pages     = "10359--10390"
-}
-</div></div>
-          <div class="code-wrap"><button type="button" class="copy-btn" aria-label="Copy Spatial-Gym BibTeX">Copy</button><div class="citation-block">@misc{kaesberg2026spatialgym,
+}</pre>
+          </div>
+          <div class="bib">
+            <span class="bib-label">Spatial-Gym · arXiv 2026</span>
+            <button type="button" class="copy-btn" aria-label="Copy Spatial-Gym BibTeX">Copy</button>
+            <pre class="citation-block">@misc{kaesberg2026spatialgym,
   title  = {Mind the Gap Between Spatial Reasoning and Acting! Step-by-Step Evaluation of Agents With Spatial-Gym},
   author = {Kaesberg, Lars Benedikt and Yang, Tianyu and Bauer, Niklas and Ruas, Terry and Wahle, Jan Philip and Gipp, Bela},
   year   = {2026},
   eprint = {2604.09338},
   archivePrefix = {arXiv}
-}
-</div></div>
-            </div>
-            <div>
-              <h3 class="related-title">Related work from our group</h3>
-              <ul class="related-list">
-                <li><a href="https://aclanthology.org/2025.emnlp-main.526/" target="_blank" rel="noopener">SPaRC: A Spatial Pathfinding Reasoning Challenge</a><span>EMNLP 2025 (Main)</span></li>
-                <li><a href="https://arxiv.org/abs/2604.09338" target="_blank" rel="noopener">Mind the Gap Between Spatial Reasoning and Acting! Step-by-Step Evaluation of Agents With Spatial-Gym</a><span>arXiv preprint, 2026</span></li>
-                <li><a href="https://arxiv.org/abs/2608.21170" target="_blank" rel="noopener">Is Visual Prompting All You Need? Studying VLM Spatial Reasoning under Progressive Visual Scaffolds</a><span>arXiv preprint, 2026</span></li>
-                <li><a href="https://aclanthology.org/2025.findings-acl.606/" target="_blank" rel="noopener">Voting or Consensus? Decision-Making in Multi-Agent Debate</a><span>Findings of ACL 2025</span></li>
-              </ul>
-            </div>
+}</pre>
           </div>
+          <h3 class="related-title">Related work from our group</h3>
+          <ul class="related-list">
+            <li><a href="https://aclanthology.org/2025.emnlp-main.526/" target="_blank" rel="noopener">SPaRC: A Spatial Pathfinding Reasoning Challenge</a>. EMNLP 2025.</li>
+            <li><a href="https://arxiv.org/abs/2604.09338" target="_blank" rel="noopener">Mind the Gap Between Spatial Reasoning and Acting! Step-by-Step Evaluation of Agents With Spatial-Gym</a>. arXiv preprint, 2026.</li>
+            <li><a href="https://arxiv.org/abs/2608.21170" target="_blank" rel="noopener">Is Visual Prompting All You Need? Studying VLM Spatial Reasoning under Progressive Visual Scaffolds</a>. Findings of EMNLP 2026.</li>
+            <li><a href="https://aclanthology.org/2025.findings-acl.606/" target="_blank" rel="noopener">Voting or Consensus? Decision-Making in Multi-Agent Debate</a>. Findings of ACL 2025.</li>
+          </ul>
         </div>
       </section>
     </main>
