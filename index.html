@@ -270,6 +270,14 @@
       #lb-table .lb-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 0.08rem 0.45rem; border-radius: 999px; border: 1px solid var(--amber); color: var(--amber); margin-left: 0.45rem; vertical-align: 1px; }
       #lb-table .lb-subset { border-color: rgba(246, 240, 226, 0.35); color: var(--path-dim); }
       .lb-note { font-size: 0.88rem; color: var(--path-dim); margin-top: 1rem; max-width: 80ch; }
+      .table-container { position: relative; }
+      #lb-live.is-collapsed::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 72px; background: linear-gradient(to bottom, rgba(17, 56, 79, 0), var(--board-2) 85%); pointer-events: none; border-radius: 0 0 var(--radius) var(--radius); }
+      .lb-more { display: flex; justify-content: center; margin-top: 1rem; }
+      .lb-more[hidden] { display: none; }
+      .band .lb-more .btn { border-color: rgba(246, 240, 226, 0.55); color: var(--path); }
+      .band .lb-more .btn:hover { background: var(--path); color: var(--board); }
+      .lb-more .btn svg { transition: transform 0.2s; }
+      .lb-more .btn[aria-expanded="true"] svg { transform: rotate(180deg); }
       .lb-note code { background: rgba(246, 240, 226, 0.1); color: var(--path); }
       .findings { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; margin-top: 3rem; }
       .findings figure { margin: 0; background: var(--path); color: var(--ink); border-radius: var(--radius); padding: 1.1rem; display: flex; flex-direction: column; gap: 0.7rem; min-width: 0; }
@@ -599,6 +607,9 @@
               <tbody></tbody>
             </table>
           </div>
+          <div class="lb-more" id="lb-more" hidden>
+            <button type="button" class="btn" id="lb-toggle" aria-expanded="false" aria-controls="lb-table">Show all rows</button>
+          </div>
           <p class="lb-note" id="lb-note" hidden>
             Paper rows come from the SPaRC paper (Tables 6 and 7) and the Spatial-Gym paper (Tables 2 to 4).
             "GippLab run" rows are other complete runs from our group, recomputed from the per-puzzle results.
@@ -640,7 +651,8 @@
                 { key: "n", label: "n", num: true },
                 { key: "source", label: "Source" }
               ];
-              var state = { setting: "single-shot", key: "accuracy_all", dir: -1, rows: [] };
+              var state = { setting: "single-shot", key: "accuracy_all", dir: -1, rows: [], expanded: false };
+              var LIMIT = 10;
               var LOGO_DIR = "graphics/images/logos/models/";
               var LOGOS = [
                 [/^human/i, "human.svg"], [/claude/i, "anthropic.svg"], [/gemini/i, "gemini.svg"],
@@ -724,8 +736,9 @@
                   if (y === null || y === undefined) return -1;
                   return (x < y ? -1 : x > y ? 1 : 0) * state.dir;
                 });
-                rows.forEach(function (row) {
+                rows.forEach(function (row, idx) {
                   var tr = document.createElement("tr");
+                  if (!state.expanded && idx >= LIMIT) tr.hidden = true;
                   if (row.type === "human") tr.className = "human-row";
                   COLS.forEach(function (col) {
                     var td = document.createElement("td");
@@ -768,6 +781,14 @@
                   });
                   body.appendChild(tr);
                 });
+                var more = document.getElementById("lb-more");
+                var toggle = document.getElementById("lb-toggle");
+                var collapsible = rows.length > LIMIT;
+                more.hidden = !collapsible;
+                document.getElementById("lb-live").classList.toggle("is-collapsed", collapsible && !state.expanded);
+                toggle.setAttribute("aria-expanded", state.expanded ? "true" : "false");
+                toggle.innerHTML = (state.expanded ? "Show top " + LIMIT : "Show all " + rows.length + " rows") +
+                  ' <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
               }
               function load(i) {
                 if (i >= SOURCES.length) return;
@@ -795,6 +816,11 @@
                   state.dir = -1;
                   if (state.rows.length) render();
                 });
+              });
+              document.getElementById("lb-toggle").addEventListener("click", function () {
+                state.expanded = !state.expanded;
+                render();
+                if (!state.expanded) document.getElementById("lb-toggle").scrollIntoView({ block: "nearest" });
               });
               load(0);
             })();
