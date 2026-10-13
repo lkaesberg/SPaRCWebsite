@@ -1648,9 +1648,166 @@
             <h2 class="section-title">Leaderboard</h2>
           </div>
           <p>
-            Model performance on SPaRC puzzles by difficulty level. Performance generally decreases sharply as difficulty increases.
+            Accuracy on the 500 SPaRC test puzzles. "Hard" is difficulty level 5. "Invalid path" is the share of
+            answers that are not a valid line from start to end (Table 7 in the paper). Click a column to sort.
           </p>
-          <div class="table-container">
+          <div class="lb-tabs" role="tablist" aria-label="Evaluation setting">
+            <button type="button" class="lb-tab active" data-setting="single-shot">Single-shot</button>
+            <button type="button" class="lb-tab" data-setting="step-by-step">Step-by-step</button>
+            <button type="button" class="lb-tab" data-setting="step-by-step + backtracking">Step-by-step + backtracking</button>
+          </div>
+          <div class="table-container" id="lb-live" hidden>
+            <table id="lb-table">
+              <thead><tr></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="lb-note" id="lb-note" hidden>
+            Paper rows come from the SPaRC paper (Tables 6 and 7) and the Spatial-Gym paper (Tables 2 to 4).
+            Rerun rows were produced with <code>leaderboard/run.py</code>, which runs the Inspect task
+            <code>sparc</code>. The column n is the number of puzzles a row is based on. The human row uses 100
+            puzzles with three annotators each (majority vote).
+          </p>
+          <style>
+            .lb-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0 0; }
+            .lb-tab { border: 1px solid #e2e8f0; background: white; border-radius: var(--radius-sm); padding: 0.45rem 0.9rem; font: inherit; font-size: 0.9rem; cursor: pointer; color: var(--color-text); }
+            .lb-tab.active { background: var(--color-primary); border-color: var(--color-primary); color: white; }
+            #lb-table th { cursor: pointer; white-space: nowrap; user-select: none; }
+            #lb-table th[aria-sort="descending"]::after { content: " \25BE"; }
+            #lb-table th[aria-sort="ascending"]::after { content: " \25B4"; }
+            #lb-table td:first-child, #lb-table td.lb-src { white-space: nowrap; }
+            #lb-table td.num, #lb-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+            #lb-table tr.human-row { background-color: rgba(16, 185, 129, 0.1); }
+            #lb-table .lb-src { font-size: 0.85rem; color: var(--color-muted); }
+            #lb-table .lb-badge { display: inline-block; font-size: 0.72rem; padding: 0.05rem 0.4rem; border-radius: 999px; background: rgba(99, 102, 241, 0.12); color: var(--color-primary); margin-left: 0.4rem; vertical-align: middle; }
+            .lb-note { font-size: 0.9rem; color: var(--color-muted); }
+            @media (max-width: 600px) { #lb-table th, #lb-table td { padding: 0.6rem 0.5rem; font-size: 0.85rem; } }
+          </style>
+          <script>
+            (function () {
+              var SOURCES = [
+                "https://raw.githubusercontent.com/lkaesberg/SPaRC/main/leaderboard/results.json",
+                "leaderboard/results.json"
+              ];
+              var COLS = [
+                { key: "model", label: "Model" },
+                { key: "accuracy_all", label: "All", num: true },
+                { key: "accuracy_hard", label: "Hard (L5)", num: true },
+                { key: "invalid_path_rate", label: "Invalid path", num: true },
+                { key: "l1", label: "L1", num: true, level: "1" },
+                { key: "l2", label: "L2", num: true, level: "2" },
+                { key: "l3", label: "L3", num: true, level: "3" },
+                { key: "l4", label: "L4", num: true, level: "4" },
+                { key: "n", label: "n", num: true },
+                { key: "source", label: "Source" }
+              ];
+              var state = { setting: "single-shot", key: "accuracy_all", dir: -1, rows: [] };
+
+              function value(row, col) {
+                if (col.level) return row.accuracy_by_level ? row.accuracy_by_level[col.level] : null;
+                if (col.key === "source") return row.source === "paper" ? row.reference : "rerun " + row.date;
+                return row[col.key];
+              }
+              function fmt(v, col) {
+                if (v === null || v === undefined) return "–";
+                return col.num && col.key !== "n" ? v.toFixed(1) + "%" : String(v);
+              }
+              function sourceCell(td, row) {
+                var a = document.createElement("a");
+                if (row.source === "paper") {
+                  var sg = (row.reference || "").indexOf("Spatial-Gym") === 0;
+                  a.href = sg ? "https://arxiv.org/abs/2604.09338" : "https://aclanthology.org/2025.emnlp-main.526/";
+                  a.textContent = sg ? "Spatial-Gym paper" : "SPaRC paper";
+                  a.title = row.reference || "";
+                } else {
+                  a.href = "https://github.com/lkaesberg/SPaRC/tree/main/leaderboard";
+                  a.textContent = "Rerun " + row.date;
+                  a.title = (row.model_id || "") + (row.reasoning_effort ? ", reasoning effort " + row.reasoning_effort : "");
+                }
+                td.className = "lb-src";
+                td.appendChild(a);
+              }
+              function render() {
+                var head = document.querySelector("#lb-table thead tr");
+                var body = document.querySelector("#lb-table tbody");
+                head.textContent = "";
+                body.textContent = "";
+                COLS.forEach(function (col) {
+                  var th = document.createElement("th");
+                  th.textContent = col.label;
+                  if (col.num) th.className = "num";
+                  if (col.key === state.key) th.setAttribute("aria-sort", state.dir < 0 ? "descending" : "ascending");
+                  th.addEventListener("click", function () {
+                    state.dir = state.key === col.key ? -state.dir : (col.num ? -1 : 1);
+                    state.key = col.key;
+                    render();
+                  });
+                  head.appendChild(th);
+                });
+                var sortCol = COLS.filter(function (c) { return c.key === state.key; })[0];
+                var rows = state.rows.filter(function (r) { return r.setting === state.setting; });
+                rows.sort(function (a, b) {
+                  var x = value(a, sortCol), y = value(b, sortCol);
+                  if (x === null || x === undefined) return 1;
+                  if (y === null || y === undefined) return -1;
+                  return (x < y ? -1 : x > y ? 1 : 0) * state.dir;
+                });
+                rows.forEach(function (row) {
+                  var tr = document.createElement("tr");
+                  if (row.type === "human") tr.className = "human-row";
+                  COLS.forEach(function (col) {
+                    var td = document.createElement("td");
+                    if (col.key === "source") { sourceCell(td, row); }
+                    else if (col.key === "model") {
+                      var strong = document.createElement(row.type === "human" ? "strong" : "span");
+                      strong.textContent = row.model;
+                      td.appendChild(strong);
+                      if (row.source === "rerun") {
+                        var b = document.createElement("span");
+                        b.className = "lb-badge";
+                        b.textContent = "new";
+                        td.appendChild(b);
+                      }
+                    } else {
+                      td.textContent = fmt(value(row, col), col);
+                      if (col.num) td.className = "num";
+                    }
+                    tr.appendChild(td);
+                  });
+                  body.appendChild(tr);
+                });
+              }
+              function load(i) {
+                if (i >= SOURCES.length) return;
+                var ctrl = window.AbortController ? new AbortController() : null;
+                var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 3000) : null;
+                fetch(SOURCES[i], ctrl ? { signal: ctrl.signal, cache: "no-cache" } : {})
+                  .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+                  .then(function (rows) {
+                    clearTimeout(timer);
+                    if (!Array.isArray(rows) || !rows.length) throw new Error("empty");
+                    state.rows = rows;
+                    document.getElementById("lb-static").hidden = true;
+                    document.getElementById("lb-live").hidden = false;
+                    document.getElementById("lb-note").hidden = false;
+                    render();
+                  })
+                  .catch(function () { clearTimeout(timer); load(i + 1); });
+              }
+              document.querySelectorAll(".lb-tab").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                  document.querySelectorAll(".lb-tab").forEach(function (b) { b.classList.remove("active"); });
+                  btn.classList.add("active");
+                  state.setting = btn.getAttribute("data-setting");
+                  state.key = "accuracy_all";
+                  state.dir = -1;
+                  if (state.rows.length) render();
+                });
+              });
+              load(0);
+            })();
+          </script>
+          <div class="table-container" id="lb-static">
             <table>
               <thead>
                 <tr>
@@ -1941,16 +2098,16 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
             <h2 class="section-title">Citation</h2>
           </div>
           <div class="citation-block">@inproceedings{kaesberg-etal-2025-sparc,
-    title = "{SP}a{RC}: A Spatial Pathfinding Reasoning Challenge",
-    author = "Kaesberg, Lars Benedikt and Wahle, Jan Philip and Ruas, Terry and Gipp, Bela",
-    booktitle = "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing",
-    month = nov,
-    year = "2025",
-    address = "Suzhou, China",
-    publisher = "Association for Computational Linguistics",
-    url = "https://aclanthology.org/2025.emnlp-main.526/",
-    doi = "10.18653/v1/2025.emnlp-main.526",
-    pages = "10370--10401"
+  title     = "{SP}a{RC}: A Spatial Pathfinding Reasoning Challenge",
+  author    = "Kaesberg, Lars Benedikt and Wahle, Jan Philip and Ruas, Terry and Gipp, Bela",
+  booktitle = "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing",
+  month     = nov,
+  year      = "2025",
+  address   = "Suzhou, China",
+  publisher = "Association for Computational Linguistics",
+  url       = "https://aclanthology.org/2025.emnlp-main.526/",
+  doi       = "10.18653/v1/2025.emnlp-main.526",
+  pages     = "10359--10390"
 }
 </div>
       </section>
