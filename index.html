@@ -47,7 +47,7 @@
       "description": "1,000 two-dimensional grid pathfinding puzzles (500 train, 500 test) for testing multi-step spatial and rule-based reasoning in language models. Each puzzle comes with all of its valid solutions.",
       "url": "https://sparc.gipplab.org/",
       "sameAs": ["https://huggingface.co/datasets/lkaesberg/SPaRC", "https://github.com/lkaesberg/SPaRC"],
-      "license": "https://huggingface.co/datasets/lkaesberg/SPaRC",
+      "license": "https://creativecommons.org/licenses/by-sa/4.0/",
       "keywords": ["spatial reasoning", "pathfinding", "benchmark", "large language models", "puzzles"],
       "creator": [
         {"@type": "Person", "name": "Lars Benedikt Kaesberg"},
@@ -118,7 +118,7 @@
       /* ---------- Header ---------- */
       .hero { background: var(--paper); color: var(--ink); border-bottom: 1px solid var(--line); }
       .hero .wrap { position: relative; }
-      .hero .hero-main { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; padding-block: clamp(3rem, 6vw, 4.5rem) clamp(2rem, 4vw, 3rem); }
+      .hero .hero-main { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; padding-block: clamp(2.5rem, 5vw, 4rem) clamp(2rem, 4vw, 3rem); }
       .hero-text { min-width: 0; }
       .venue { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.1rem; }
       .venue span { margin-right: 0.3rem; }
@@ -152,18 +152,17 @@
 
       /* ---------- Sticky navigation with a progress line ---------- */
       .main-nav { position: sticky; top: 0; z-index: 40; background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
-      .main-nav .wrap { display: flex; align-items: center; gap: 1.2rem; height: 58px; }
+      .main-nav .wrap { display: flex; align-items: center; gap: 1.5rem; height: 60px; }
       .nav-brand { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 900; font-size: 1.15rem; color: var(--ink); text-decoration: none; flex: none; }
       .nav-brand img { width: 26px; height: 26px; }
       .nav-list { display: flex; gap: 0.1rem; list-style: none; margin: 0 0 0 auto; padding: 0; overflow-x: auto; scrollbar-width: none; min-width: 0; }
       .nav-list::-webkit-scrollbar { display: none; }
-      .nav-link { display: block; padding: 0.42rem 0.75rem; border-radius: 999px; color: var(--muted); font-weight: 700; font-size: 0.93rem; text-decoration: none; white-space: nowrap; }
+      .nav-link { display: block; padding: 1.15rem 0.7rem; color: var(--muted); font-weight: 700; font-size: 0.93rem; text-decoration: none; white-space: nowrap; line-height: 1.2; }
       .nav-link:hover { color: var(--ink); }
-      .nav-link.active { background: var(--accent-soft); color: var(--accent); }
-      .nav-progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; pointer-events: none; }
-      .nav-progress::before { content: ""; position: absolute; left: 0; top: 0; height: 3px; width: calc(var(--p, 0) * 100%); background: var(--cell); border-radius: 0 3px 3px 0; }
-      .nav-progress::after { content: ""; position: absolute; top: -3.5px; left: calc(var(--p, 0) * 100% - 5px); width: 10px; height: 10px; border-radius: 50%; background: var(--cell); box-shadow: 0 0 0 3px #fff; }
-      @media (max-width: 640px) { .nav-brand span { display: none; } .main-nav .wrap { gap: 0.6rem; } }
+      .nav-link.active { color: var(--accent); background: transparent; box-shadow: inset 0 -2px 0 var(--accent); border-radius: 0; }
+      .nav-progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; pointer-events: none; }
+      .nav-progress::before { content: ""; position: absolute; left: 0; top: 0; height: 2px; width: calc(var(--p, 0) * 100%); background: var(--cell); }
+      @media (max-width: 640px) { .nav-brand span { display: none; } .main-nav .wrap { gap: 0.6rem; } .nav-list { -webkit-mask-image: linear-gradient(to right, #000 82%, transparent); mask-image: linear-gradient(to right, #000 82%, transparent); padding-right: 1.5rem; } }
 
       /* ---------- News ---------- */
       .news { padding-block: 1.8rem; border-bottom: 1px solid var(--line); }
@@ -328,6 +327,23 @@
     </style>
   </head>
   <body>
+    <nav class="main-nav" aria-label="Sections">
+      <div class="wrap">
+        <a class="nav-brand" href="#top" aria-label="SPaRC, back to top"><img src="favicon/favicon.svg" alt="" width="26" height="26"><span>SPaRC</span></a>
+        <ul class="nav-list">
+          <li><a href="#overview" class="nav-link">Overview</a></li>
+          <li><a href="#puzzle-rules" class="nav-link">Rules</a></li>
+          <li><a href="#example" class="nav-link">Try it</a></li>
+          <li><a href="#leaderboard" class="nav-link">Results</a></li>
+          <li><a href="#evaluate" class="nav-link">Evaluate</a></li>
+          <li><a href="#tools" class="nav-link">Tools</a></li>
+          <li><a href="#dataset" class="nav-link">Dataset</a></li>
+          <li><a href="#citation" class="nav-link">Cite</a></li>
+        </ul>
+      </div>
+      <div class="nav-progress" aria-hidden="true"></div>
+    </nav>
+
     <header class="hero" id="top">
       <div class="wrap hero-main">
         <div class="hero-text">
@@ -340,7 +356,6 @@
             <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" target="_blank" rel="noopener" class="btn">Dataset</a>
             <a href="/annotate.html?url=https://huggingface.co/datasets/lkaesberg/SPaRC/raw/main/puzzle_all_test.jsonl" target="_blank" rel="noopener" class="btn">Solve puzzles</a>
             <a href="https://github.com/lkaesberg/SPaRC" target="_blank" rel="noopener" class="btn">Code</a>
-            <a href="#citation" class="btn">Cite</a>
           </div>
         </div>
         <figure class="hero-board">
@@ -370,22 +385,6 @@
       </div>
     </header>
 
-    <nav class="main-nav" aria-label="Sections">
-      <div class="wrap">
-        <a class="nav-brand" href="#top"><img src="favicon/favicon.svg" alt="" width="26" height="26"><span>SPaRC</span></a>
-        <ul class="nav-list">
-          <li><a href="#overview" class="nav-link">Overview</a></li>
-          <li><a href="#puzzle-rules" class="nav-link">Rules</a></li>
-          <li><a href="#example" class="nav-link">Try it</a></li>
-          <li><a href="#leaderboard" class="nav-link">Results</a></li>
-          <li><a href="#evaluate" class="nav-link">Evaluate</a></li>
-          <li><a href="#tools" class="nav-link">Tools</a></li>
-          <li><a href="#dataset" class="nav-link">Dataset</a></li>
-          <li><a href="#citation" class="nav-link">Cite</a></li>
-        </ul>
-      </div>
-      <div class="nav-progress" aria-hidden="true"></div>
-    </nav>
 
     <main>
       <section class="news" aria-labelledby="news-title">
@@ -970,7 +969,7 @@ print(len(puzzle["solutions"]))    # number of valid solutions</pre></div>
           <a href="https://aclanthology.org/2025.emnlp-main.526/" target="_blank" rel="noopener">Paper</a>
           <a href="https://github.com/lkaesberg/Spatial-Gym" target="_blank" rel="noopener">Spatial-Gym</a>
         </div>
-        <p class="fine">Dataset released under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC-BY-4.0</a> · © 2025 SPaRC Authors · University of Göttingen</p>
+        <p class="fine">Dataset released under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC-BY-SA-4.0</a> · © 2025 SPaRC Authors · University of Göttingen</p>
       </div>
     </footer>
 

@@ -35,4 +35,4 @@ For questions: l.kaesberg@uni-goettingen.de
 ## License
 
 - **Code**: BSD 3-Clause
-- **Dataset**: CC-BY-4.0 · © 2025 SPaRC Authors 
+- **Dataset**: CC-BY-SA-4.0 · © 2025 SPaRC Authors 
