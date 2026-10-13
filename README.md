@@ -4,7 +4,7 @@
 
 # SPaRC Website
 
-**SPaRC: A Spatial Pathfinding and Reasoning Challenge**
+**SPaRC: A Spatial Pathfinding Reasoning Challenge**
 
 A web-based visualization and puzzle annotation tool for SPaRC spatial reasoning puzzles.
 

@@ -20,8 +20,10 @@
     <!-- Open Graph metadata for social sharing -->
     <meta property="og:title" content="SPaRC – Spatial Pathfinding Reasoning Challenge">
     <meta property="og:description" content="A dataset of 1,000 spatial reasoning puzzles revealing significant gaps between human and AI performance.">
-    <meta property="og:image" content="graphics/images/teaser.png">
-    <meta property="og:url" content="https://lkaesberg.github.io/SPaRC/">
+    <meta property="og:image" content="https://sparc.gipplab.org/graphics/images/teaser.png">
+    <meta property="og:url" content="https://sparc.gipplab.org/">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://sparc.gipplab.org/">
     <meta property="og:type" content="website">
     
     <!-- Google Scholar metadata -->
@@ -30,7 +32,34 @@
     <meta name="citation_author" content="Wahle, Jan Philip">
     <meta name="citation_author" content="Ruas, Terry">
     <meta name="citation_author" content="Gipp, Bela">
-    <meta name="citation_publication_date" content="2025">
+    <meta name="citation_publication_date" content="2025/11">
+    <meta name="citation_conference_title" content="Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing">
+    <meta name="citation_publisher" content="Association for Computational Linguistics">
+    <meta name="citation_firstpage" content="10359">
+    <meta name="citation_lastpage" content="10390">
+    <meta name="citation_doi" content="10.18653/v1/2025.emnlp-main.526">
+    <meta name="citation_pdf_url" content="https://aclanthology.org/2025.emnlp-main.526.pdf">
+    <meta name="citation_arxiv_id" content="2505.16686">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Dataset",
+      "name": "SPaRC: A Spatial Pathfinding Reasoning Challenge",
+      "description": "1,000 two-dimensional grid pathfinding puzzles (500 train, 500 test) for testing multi-step spatial and rule-based reasoning in language models. Each puzzle comes with all of its valid solutions.",
+      "url": "https://sparc.gipplab.org/",
+      "sameAs": ["https://huggingface.co/datasets/lkaesberg/SPaRC", "https://github.com/lkaesberg/SPaRC"],
+      "license": "https://huggingface.co/datasets/lkaesberg/SPaRC",
+      "keywords": ["spatial reasoning", "pathfinding", "benchmark", "large language models", "puzzles"],
+      "creator": [
+        {"@type": "Person", "name": "Lars Benedikt Kaesberg"},
+        {"@type": "Person", "name": "Jan Philip Wahle"},
+        {"@type": "Person", "name": "Terry Ruas"},
+        {"@type": "Person", "name": "Bela Gipp"}
+      ],
+      "citation": "Kaesberg, L. B., Wahle, J. P., Ruas, T., and Gipp, B. (2025). SPaRC: A Spatial Pathfinding Reasoning Challenge. In Proceedings of EMNLP 2025, pages 10359-10390. https://doi.org/10.18653/v1/2025.emnlp-main.526",
+      "distribution": [{"@type": "DataDownload", "encodingFormat": "application/jsonl", "contentUrl": "https://huggingface.co/datasets/lkaesberg/SPaRC/resolve/main/puzzle_all_test.jsonl"}]
+    }
+    </script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1050,7 +1079,7 @@
             SPaRC
           </h1>
           <p class="tagline" style="font-size: 1.2rem; max-width: 700px; margin: 0 auto 1.5rem; line-height: 1.5; color: rgba(255, 255, 255, 0.95); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); font-weight: 400;">
-            A Spatial Pathfinding and Reasoning Challenge for grounding language models in spatial cognition
+            A Spatial Pathfinding Reasoning Challenge for grounding language models in spatial cognition
           </p>
           
           <div class="header-meta" style="display: flex; justify-content: center; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; padding: 1.2rem 1.5rem; background: rgba(255, 255, 255, 0.12); border-radius: var(--radius); backdrop-filter: blur(10px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.1);">
@@ -1065,7 +1094,7 @@
               </div>
               <div class="header-stat" style="text-align: center; position: relative;">
                 <div class="stat-number" style="font-size: 2.2rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">15.8%</div>
-                <div class="stat-label" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; opacity: 0.9;">AI Success</div>
+                <div class="stat-label" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; opacity: 0.9;">Best AI (paper)</div>
               </div>
             </div>
             
@@ -1134,6 +1163,7 @@
             <li class="nav-item"><a href="#puzzle-rules" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Rules</a></li>
             <li class="nav-item"><a href="#example" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Example</a></li>
             <li class="nav-item"><a href="#leaderboard" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Results</a></li>
+            <li class="nav-item"><a href="#evaluate" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Evaluate</a></li>
             <li class="nav-item"><a href="#tools" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Tools</a></li>
             <li class="nav-item"><a href="#dataset" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Dataset</a></li>
             <li class="nav-item"><a href="#citation" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Citation</a></li>
@@ -1220,6 +1250,27 @@
     <!-- Main Content -->
     <main class="main-content" style="width: 100%; overflow-x: hidden; max-width: 100vw; position: relative; z-index: 1;">
       <div class="container">
+        <!-- News -->
+        <section class="news" aria-labelledby="news-title">
+          <h2 class="news-title" id="news-title">News</h2>
+          <ul class="news-list">
+            <li><time datetime="2026-10-13">Oct 2026</time><span>Leaderboard update with newer models. GPT-6.1 Sol solves 83.6% of the test puzzles but only 49.4% of the hardest ones; humans solve 94.5% of those. <a href="#leaderboard">See the leaderboard</a>.</span></li>
+            <li><time datetime="2026-10-13">Oct 2026</time><span>SPaRC now runs in Inspect AI, lm-evaluation-harness and Prime Intellect verifiers. <a href="#evaluate">Evaluate a model</a>.</span></li>
+            <li><time datetime="2026-08-21">Aug 2026</time><span><a href="https://arxiv.org/abs/2608.21170" target="_blank" rel="noopener">Is Visual Prompting All You Need?</a> studies vision-language models on SPaRC with visual scaffolds.</span></li>
+            <li><time datetime="2026-04-10">Apr 2026</time><span><a href="https://arxiv.org/abs/2604.09338" target="_blank" rel="noopener">Spatial-Gym</a> turns SPaRC into a step-by-step environment for agents.</span></li>
+            <li><time datetime="2025-11">Nov 2025</time><span>SPaRC was presented at <a href="https://aclanthology.org/2025.emnlp-main.526/" target="_blank" rel="noopener">EMNLP 2025</a> in Suzhou.</span></li>
+          </ul>
+        </section>
+        <style>
+          .news { background: var(--color-card); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 1.25rem 1.5rem; margin-bottom: 2.5rem; }
+          .news-title { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-primary); margin: 0 0 0.75rem; }
+          .news-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+          .news-list li { display: grid; grid-template-columns: 5.5rem 1fr; gap: 1rem; align-items: baseline; font-size: 0.95rem; line-height: 1.5; }
+          .news-list time { font-size: 0.8rem; font-weight: 600; color: var(--color-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+          .news-list span { min-width: 0; }
+          .news-list a { color: var(--color-primary); }
+          @media (max-width: 600px) { .news-list li { grid-template-columns: 1fr; gap: 0.1rem; } }
+        </style>
         <!-- Hero Grid -->
         <div class="hero-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-bottom: 3rem; width: 100%; max-width: 100%; overflow: hidden;">
           <!-- Main visualization - keep this important image -->
@@ -1275,7 +1326,7 @@
           </div>
           <div class="stat-card" style="text-align: center; background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: var(--transition); padding: 2rem; border-top: 4px solid var(--color-accent);">
             <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-accent); line-height: 1; margin-bottom: 0.5rem;">15.8%</div>
-            <div style="color: var(--color-text); font-weight: 500; font-size: 1.1rem;">Best AI Performance</div>
+            <div style="color: var(--color-text); font-weight: 500; font-size: 1.1rem;">Best AI in the paper</div>
           </div>
           <div class="stat-card" style="text-align: center; background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: var(--transition); padding: 2rem; border-top: 4px solid #7c3aed;">
             <div style="font-size: 2.5rem; font-weight: 700; color: #7c3aed; line-height: 1; margin-bottom: 0.5rem;">15+</div>
@@ -1294,9 +1345,10 @@
           spatial reasoning abilities under‑explored. We introduce <strong>SPaRC</strong>, a
           dataset of 1,000 two‑dimensional grid puzzles that require joint
           <em>path‑planning</em>, <em>rule satisfaction</em>, and <em>numeric‑geometric
-            arithmetic</em>. Humans solve 98% of puzzles in &lt; 20 seconds on
-          average, whereas state‑of‑the‑art language‑vision models achieve only
-            1–16% accuracy—underscoring a significant reasoning gap.
+            arithmetic</em>. Humans solve 98% of the puzzles. Their median time per puzzle ranges from
+          7.1 seconds at level 1 to 85.6 seconds at level 5. The models in the paper solve only
+          0.4% to 15.8%. Newer models do much better, but they still fail on most of the hardest
+          puzzles (see the <a href="#leaderboard">leaderboard</a>).
         </p>
       </section>
 
@@ -1650,6 +1702,7 @@
           <p>
             Accuracy on the 500 SPaRC test puzzles. "Hard" is difficulty level 5. "Invalid path" is the share of
             answers that are not a valid line from start to end (Table 7 in the paper). Click a column to sort.
+            Bold marks the best model in each column among runs on (nearly) all 500 puzzles. Last updated: 13 October 2026.
           </p>
           <div class="lb-tabs" role="tablist" aria-label="Evaluation setting">
             <button type="button" class="lb-tab active" data-setting="single-shot">Single-shot</button>
@@ -1681,6 +1734,9 @@
             #lb-table td.num, #lb-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
             #lb-table tr.human-row { background-color: rgba(16, 185, 129, 0.1); }
             #lb-table .lb-src { font-size: 0.85rem; color: var(--color-muted); }
+            #lb-table .lb-logo { width: 18px; height: 18px; object-fit: contain; vertical-align: -3px; margin-right: 0.5rem; color: var(--color-muted); }
+            #lb-table td.lb-best { font-weight: 700; color: var(--color-text); }
+            #lb-table .lb-subset { background: rgba(148, 163, 184, 0.18); color: #475569; }
             #lb-table .lb-badge { display: inline-block; font-size: 0.72rem; padding: 0.05rem 0.4rem; border-radius: 999px; background: rgba(99, 102, 241, 0.12); color: var(--color-primary); margin-left: 0.4rem; vertical-align: middle; }
             .lb-note { font-size: 0.9rem; color: var(--color-muted); }
             @media (max-width: 600px) { #lb-table th, #lb-table td { padding: 0.6rem 0.5rem; font-size: 0.85rem; } }
@@ -1704,6 +1760,33 @@
                 { key: "source", label: "Source" }
               ];
               var state = { setting: "single-shot", key: "accuracy_all", dir: -1, rows: [] };
+              var LOGO_DIR = "graphics/images/logos/models/";
+              var LOGOS = [
+                [/^human/i, "human.svg"], [/claude/i, "anthropic.svg"], [/gemini/i, "gemini.svg"],
+                [/gemma/i, "gemma.svg"], [/gpt|o4-mini|o3-mini/i, "openai.png"], [/deepseek|^r1 /i, "deepseek.svg"],
+                [/qwen|qwq/i, "qwen.svg"], [/llama/i, "llama.svg"], [/mistral|magistral/i, "mistral.png"],
+                [/nemotron/i, "nvidia.png"], [/olmo/i, "olmo.png"], [/glm/i, "glm.png"]
+              ];
+              var AGENT_ICON = '<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" class="lb-logo"><rect x="1.5" y="1.5" width="13" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M4 12V8h4V4h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+              function logoFor(name) {
+                for (var i = 0; i < LOGOS.length; i++) if (LOGOS[i][0].test(name)) return LOGO_DIR + LOGOS[i][1];
+                return null;
+              }
+              function bestValues(rows) {
+                var best = {};
+                COLS.forEach(function (col) {
+                  if (!col.num || col.key === "n") return;
+                  var lowIsBetter = col.key === "invalid_path_rate";
+                  rows.forEach(function (r) {
+                    // Subset runs (fewer puzzles) are shown but never marked best.
+                    if (r.type === "human" || r.type === "baseline" || (r.n && r.n < 450)) return;
+                    var v = value(r, col);
+                    if (v === null || v === undefined) return;
+                    if (best[col.key] === undefined || (lowIsBetter ? v < best[col.key] : v > best[col.key])) best[col.key] = v;
+                  });
+                });
+                return best;
+              }
 
               function value(row, col) {
                 if (col.level) return row.accuracy_by_level ? row.accuracy_by_level[col.level] : null;
@@ -1753,6 +1836,7 @@
                 });
                 var sortCol = COLS.filter(function (c) { return c.key === state.key; })[0];
                 var rows = state.rows.filter(function (r) { return r.setting === state.setting; });
+                var best = bestValues(rows);
                 rows.sort(function (a, b) {
                   var x = value(a, sortCol), y = value(b, sortCol);
                   if (x === null || x === undefined) return 1;
@@ -1766,6 +1850,15 @@
                     var td = document.createElement("td");
                     if (col.key === "source") { sourceCell(td, row); }
                     else if (col.key === "model") {
+                      var logo = logoFor(row.model);
+                      if (logo) {
+                        var img = document.createElement("img");
+                        img.src = logo; img.alt = ""; img.width = 18; img.height = 18;
+                        img.className = "lb-logo"; img.loading = "lazy"; img.decoding = "async";
+                        td.appendChild(img);
+                      } else if (row.type === "baseline") {
+                        td.insertAdjacentHTML("beforeend", AGENT_ICON);
+                      }
                       var strong = document.createElement(row.type === "human" ? "strong" : "span");
                       strong.textContent = row.model;
                       td.appendChild(strong);
@@ -1775,9 +1868,20 @@
                         b.textContent = "new";
                         td.appendChild(b);
                       }
+                      if (row.n && row.n < 500 && row.type !== "human") {
+                        var sub = document.createElement("span");
+                        sub.className = "lb-badge lb-subset";
+                        sub.textContent = row.n + " puzzles";
+                        sub.title = "Run on " + row.n + " of the 500 test puzzles";
+                        td.appendChild(sub);
+                      }
                     } else {
-                      td.textContent = fmt(value(row, col), col);
+                      var v = value(row, col);
+                      td.textContent = fmt(v, col);
                       if (col.num) td.className = "num";
+                      if (v !== null && v !== undefined && best[col.key] === v && row.type !== "human" && row.type !== "baseline") {
+                        td.classList.add("lb-best");
+                      }
                     }
                     tr.appendChild(td);
                   });
@@ -1813,6 +1917,22 @@
               });
               load(0);
             })();
+            document.addEventListener("click", function (e) {
+              var btn = e.target.closest && e.target.closest(".copy-btn");
+              if (!btn) return;
+              var box = btn.parentElement.querySelector("pre, .citation-block");
+              if (!box) return;
+              var text = box.innerText.trim();
+              var done = function () { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1500); };
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(done, function () { selectText(box); });
+              } else { selectText(box); }
+              function selectText(el) {
+                var range = document.createRange(); range.selectNodeContents(el);
+                var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+                btn.textContent = "Press Ctrl+C";
+              }
+            });
           </script>
           <div class="table-container" id="lb-static">
             <table>
@@ -1980,6 +2100,69 @@
           </style>
       </section>
 
+        <!-- Evaluate Section -->
+        <section id="evaluate" class="section">
+          <div class="section-header">
+            <h2 class="section-title">Evaluate a Model</h2>
+          </div>
+          <p>
+            SPaRC runs in the evaluation tools that many groups already use. All of them use the paper's prompt and
+            count a path as correct only if it matches one of the puzzle's stored solutions.
+          </p>
+          <div class="eval-grid">
+            <div class="eval-card">
+              <h3>Inspect AI</h3>
+              <p>Tasks <code>sparc</code> (500 test puzzles) and <code>sparc_hard</code> (level 5). Reports accuracy per level and the invalid-path rate.</p>
+              <div class="code-wrap"><button type="button" class="copy-btn" aria-label="Copy Inspect AI commands">Copy</button><pre class="code-block">pip install git+https://github.com/lkaesberg/SPaRC.git
+inspect eval sparc --model openai/gpt-4.1-mini
+inspect eval sparc_hard --model openai/gpt-4.1-mini</pre></div>
+              <a class="eval-link" href="https://github.com/lkaesberg/SPaRC/blob/main/sparc/README.md" target="_blank" rel="noopener">Options and reproduced numbers</a>
+            </div>
+            <div class="eval-card">
+              <h3>lm-evaluation-harness</h3>
+              <p>Task <code>sparc</code> with <code>acc</code>, <code>acc_level_1</code> to <code>acc_level_5</code> and <code>invalid_path</code>. Submitted to the main repository; until it is merged, install it from our fork.</p>
+              <div class="code-wrap"><button type="button" class="copy-btn" aria-label="Copy lm-evaluation-harness commands">Copy</button><pre class="code-block">pip install "lm_eval[api] @ git+https://github.com/lkaesberg/lm-evaluation-harness@add-sparc-task"
+lm_eval --model local-chat-completions \
+  --model_args model=&lt;model&gt;,base_url=&lt;server&gt;/v1/chat/completions \
+  --tasks sparc --apply_chat_template</pre></div>
+              <a class="eval-link" href="https://github.com/lkaesberg/lm-evaluation-harness/tree/add-sparc-task/lm_eval/tasks/sparc" target="_blank" rel="noopener">Task folder</a>
+            </div>
+            <div class="eval-card">
+              <h3>Spatial-Gym for agents</h3>
+              <p>Step-by-step play, with or without backtracking, as a Gymnasium environment or a Prime Intellect <code>verifiers</code> environment for evaluation and RL.</p>
+              <div class="code-wrap"><button type="button" class="copy-btn" aria-label="Copy Spatial-Gym commands">Copy</button><pre class="code-block">git clone https://github.com/lkaesberg/Spatial-Gym.git
+uv pip install -e Spatial-Gym/environments/spatial_gym
+vf-eval spatial-gym-env -m &lt;model&gt; --client.base-url &lt;url&gt; -n 20</pre></div>
+              <a class="eval-link" href="https://github.com/lkaesberg/Spatial-Gym" target="_blank" rel="noopener">Spatial-Gym on GitHub</a>
+            </div>
+            <div class="eval-card">
+              <h3>SPaRC command line</h3>
+              <p>The original evaluation script from the paper, with resume support and a step-by-step gym mode.</p>
+              <div class="code-wrap"><button type="button" class="copy-btn" aria-label="Copy SPaRC CLI commands">Copy</button><pre class="code-block">pip install sparc-puzzle
+sparc --api-key "$OPENAI_API_KEY" --model gpt-4.1</pre></div>
+              <a class="eval-link" href="https://github.com/lkaesberg/SPaRC#cli-reference" target="_blank" rel="noopener">CLI reference</a>
+            </div>
+          </div>
+          <p class="eval-note">
+            To add a model to the leaderboard, run <code>python leaderboard/run.py --model &lt;inspect-model-id&gt;</code> in the
+            <a href="https://github.com/lkaesberg/SPaRC" target="_blank" rel="noopener">SPaRC repository</a> and open a pull request with the new row.
+          </p>
+          <style>
+            .eval-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin: 1.5rem 0; }
+            @media (max-width: 760px) { .eval-grid { grid-template-columns: 1fr; } }
+            .eval-card { background: var(--color-card); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 1.25rem 1.25rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+            .eval-card h3 { margin: 0; font-size: 1.15rem; }
+            .eval-card p { margin: 0; font-size: 0.92rem; line-height: 1.5; }
+            .eval-card code, .eval-note code { font-family: 'SF Mono', 'Consolas', monospace; font-size: 0.85em; background: #f1f5f9; padding: 0.05rem 0.3rem; border-radius: 4px; }
+            .eval-card .code-block { margin: 0.25rem 0 0; font-size: 0.8rem; padding: 2.1rem 1rem 1rem; }
+            .eval-link { margin-top: auto; font-size: 0.9rem; color: var(--color-primary); font-weight: 500; }
+            .eval-note { font-size: 0.92rem; color: var(--color-text); }
+            .code-wrap { position: relative; min-width: 0; }
+            .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 1; font: inherit; font-size: 0.75rem; padding: 0.2rem 0.55rem; border-radius: 6px; border: 1px solid rgba(148, 163, 184, 0.5); background: rgba(255, 255, 255, 0.92); color: #334155; cursor: pointer; }
+            .copy-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+          </style>
+        </section>
+
         <!-- Tools Section -->
         <section id="tools" class="section">
           <div class="section-header">
@@ -2104,7 +2287,8 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
           <div class="section-header">
             <h2 class="section-title">Citation</h2>
           </div>
-          <div class="citation-block">@inproceedings{kaesberg-etal-2025-sparc,
+          <p>If you use SPaRC, please cite the EMNLP 2025 paper. If you use the step-by-step environment, please also cite Spatial-Gym.</p>
+          <div class="code-wrap"><button type="button" class="copy-btn" aria-label="Copy SPaRC BibTeX">Copy</button><div class="citation-block">@inproceedings{kaesberg-etal-2025-sparc,
   title     = "{SP}a{RC}: A Spatial Pathfinding Reasoning Challenge",
   author    = "Kaesberg, Lars Benedikt and Wahle, Jan Philip and Ruas, Terry and Gipp, Bela",
   booktitle = "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing",
@@ -2116,7 +2300,29 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
   doi       = "10.18653/v1/2025.emnlp-main.526",
   pages     = "10359--10390"
 }
-</div>
+</div></div>
+          <div class="code-wrap"><button type="button" class="copy-btn" aria-label="Copy Spatial-Gym BibTeX">Copy</button><div class="citation-block">@misc{kaesberg2026spatialgym,
+  title  = {Mind the Gap Between Spatial Reasoning and Acting! Step-by-Step Evaluation of Agents With Spatial-Gym},
+  author = {Kaesberg, Lars Benedikt and Yang, Tianyu and Bauer, Niklas and Ruas, Terry and Wahle, Jan Philip and Gipp, Bela},
+  year   = {2026},
+  eprint = {2604.09338},
+  archivePrefix = {arXiv}
+}
+</div></div>
+          <h3 class="related-title">Related work from our group</h3>
+          <ul class="related-list">
+            <li><a href="https://aclanthology.org/2025.emnlp-main.526/" target="_blank" rel="noopener">SPaRC: A Spatial Pathfinding Reasoning Challenge</a> <span>EMNLP 2025 (Main)</span></li>
+            <li><a href="https://arxiv.org/abs/2604.09338" target="_blank" rel="noopener">Mind the Gap Between Spatial Reasoning and Acting! Step-by-Step Evaluation of Agents With Spatial-Gym</a> <span>arXiv preprint, 2026</span></li>
+            <li><a href="https://arxiv.org/abs/2608.21170" target="_blank" rel="noopener">Is Visual Prompting All You Need? Studying VLM Spatial Reasoning under Progressive Visual Scaffolds</a> <span>arXiv preprint, 2026</span></li>
+            <li><a href="https://aclanthology.org/2025.findings-acl.606/" target="_blank" rel="noopener">Voting or Consensus? Decision-Making in Multi-Agent Debate</a> <span>Findings of ACL 2025</span></li>
+          </ul>
+          <style>
+            #citation .citation-block { margin: 0 0 1.25rem; padding-top: 2.4rem; }
+            .related-title { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
+            .related-list { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.5rem; }
+            .related-list a { color: var(--color-primary); }
+            .related-list span { color: var(--color-muted); font-size: 0.9rem; white-space: nowrap; }
+          </style>
       </section>
 
         <!-- Contact Section -->
