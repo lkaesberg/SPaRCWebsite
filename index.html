@@ -1664,9 +1664,11 @@
           </div>
           <p class="lb-note" id="lb-note" hidden>
             Paper rows come from the SPaRC paper (Tables 6 and 7) and the Spatial-Gym paper (Tables 2 to 4).
+            "GippLab run" rows are other complete runs from our group, recomputed from the per-puzzle results.
             Rerun rows were produced with <code>leaderboard/run.py</code>, which runs the Inspect task
-            <code>sparc</code>. The column n is the number of puzzles a row is based on. The human row uses 100
-            puzzles with three annotators each (majority vote).
+            <code>sparc</code>. Runs differ in date, prompt version and sampling settings, so small gaps between
+            rows are not meaningful. The column n is the number of puzzles a row is based on. The human row uses
+            100 puzzles with three annotators each (majority vote).
           </p>
           <style>
             .lb-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0 0; }
@@ -1719,6 +1721,11 @@
                   a.href = sg ? "https://arxiv.org/abs/2604.09338" : "https://aclanthology.org/2025.emnlp-main.526/";
                   a.textContent = sg ? "Spatial-Gym paper" : "SPaRC paper";
                   a.title = row.reference || "";
+                } else if (row.source === "lab") {
+                  td.className = "lb-src";
+                  td.textContent = "GippLab run";
+                  td.title = (row.notes || "") + (row.date ? " (" + row.date + ")" : "");
+                  return;
                 } else {
                   a.href = "https://github.com/lkaesberg/SPaRC/tree/main/leaderboard";
                   a.textContent = "Rerun " + row.date;
