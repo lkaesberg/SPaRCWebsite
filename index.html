@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SPaRC – Spatial Pathfinding Reasoning Challenge</title>
-    
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
@@ -60,1404 +59,432 @@
       "distribution": [{"@type": "DataDownload", "encodingFormat": "application/jsonl", "contentUrl": "https://huggingface.co/datasets/lkaesberg/SPaRC/resolve/main/puzzle_all_test.jsonl"}]
     }
     </script>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
-      /* Base styles */
+      /* Layout: a puzzle board. Dark "board" bands (hero, results, footer) sit on a pale paper page;
+         lines, cells and round path caps from SPaRC puzzles shape every component. */
       :root {
-        --color-bg: #fafafa;
-        --color-text: #333;
-        --color-primary: #6366f1; /* Indigo */
-        --color-accent: #f43f5e; /* Rose */
-        --color-muted: #94a3b8; /* Slate */
-        --color-success: #10b981; /* Emerald */
-        --color-card: #ffffff;
-        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-        --shadow: 0 4px 6px rgba(0, 0, 0, 0.04), 0 10px 15px rgba(0, 0, 0, 0.04);
-        --radius-sm: 8px;
-        --radius: 12px;
-        --radius-lg: 16px;
-        --font-base: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --board: #0b2a3f;        /* deep navy of the SPaRC logo */
+        --board-2: #11384f;      /* raised board surface */
+        --track: #1f5568;        /* grid tracks */
+        --cell: #0e9a7f;         /* puzzle cells */
+        --path: #f6f0e2;         /* the drawn line, and text on boards */
+        --path-dim: rgba(246, 240, 226, 0.68);
+        --amber: #f2b33d;        /* stars, highlights */
+        --paper: #f2f5f3;
+        --surface: #ffffff;
+        --ink: #10222e;
+        --muted: #56676f;
+        --line: #d6e0dd;
+        --teal: #0a6f6a;         /* links on paper */
+        --human: #1fb385;
+        --radius: 14px;
+        --radius-sm: 9px;
+        --font-display: "Unbounded", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+        --font-body: "Instrument Sans", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+        --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
+        --wrap: 1120px;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.6; overflow-x: hidden; }
+      img { max-width: 100%; }
+      a { color: var(--teal); text-underline-offset: 3px; }
+      a:hover { color: var(--ink); }
+      :focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; border-radius: 4px; }
+      h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; margin: 0; text-wrap: balance; }
+      h2 { font-size: clamp(1.6rem, 3.2vw, 2.25rem); font-weight: 600; letter-spacing: -0.01em; }
+      h3 { font-size: 1.05rem; font-weight: 600; letter-spacing: 0; }
+      p { margin: 0 0 1rem; }
+      code { font-family: var(--font-mono); font-size: 0.86em; background: rgba(10, 111, 106, 0.08); padding: 0.06rem 0.32rem; border-radius: 5px; }
+      .wrap { max-width: var(--wrap); margin: 0 auto; padding-inline: 24px; }
+      .measure { max-width: 68ch; }
+      .eyebrow { display: inline-flex; align-items: center; gap: 0.55rem; font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.9rem; }
+      .eyebrow::before { content: ""; flex: none; width: 34px; height: 12px; background: radial-gradient(circle at calc(100% - 6px) 50%, currentColor 5.5px, transparent 6px), linear-gradient(currentColor, currentColor) left center / calc(100% - 8px) 4px no-repeat; }
+      .section { padding-block: clamp(3.5rem, 8vw, 6rem); }
+      .section + .section { border-top: 1px solid var(--line); }
+      .section-head { margin-bottom: 2rem; }
+      .section-head p { color: var(--muted); margin-top: 0.8rem; max-width: 64ch; }
+
+      /* Buttons: rounded like a path cap */
+      .btn { display: inline-flex; align-items: center; gap: 0.5rem; font: 600 0.95rem/1 var(--font-body); padding: 0.8rem 1.15rem; border-radius: 999px; border: 2px solid var(--ink); background: transparent; color: var(--ink); text-decoration: none; cursor: pointer; transition: background-color 0.2s, color 0.2s, transform 0.2s; }
+      .btn:hover { background: var(--ink); color: var(--paper); }
+      .btn-accent { background: var(--cell); border-color: var(--cell); color: #fff; }
+      .btn-accent:hover { background: var(--teal); border-color: var(--teal); color: #fff; }
+      .btn svg { flex: none; }
+
+      /* ---------- Hero board ---------- */
+      .hero { background: var(--board); color: var(--path); position: relative; overflow: hidden; }
+      .hero::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 1px 1px, rgba(246, 240, 226, 0.08) 1.2px, transparent 0); background-size: 34px 34px; pointer-events: none; }
+      .hero .wrap { position: relative; }
+      .hero .hero-main { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; padding-block: clamp(3rem, 7vw, 5.5rem) clamp(2.5rem, 5vw, 4rem); }
+      .hero-text { min-width: 0; }
+      .venue { display: inline-flex; align-items: center; gap: 0.6rem; font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--amber); margin-bottom: 1.4rem; }
+      .venue span { border: 1px solid rgba(242, 179, 61, 0.55); border-radius: 999px; padding: 0.25rem 0.7rem; }
+      .wordmark { font-size: clamp(3.6rem, 10vw, 6.6rem); font-weight: 700; letter-spacing: -0.02em; line-height: 0.95; }
+      .wordmark .lo { font-weight: 500; opacity: 0.9; }
+      .paper-title { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.05rem, 2.1vw, 1.35rem); line-height: 1.35; margin: 1.1rem 0 1.4rem; color: var(--path); max-width: 30ch; }
+      .authors { color: var(--path-dim); font-size: 0.98rem; margin-bottom: 1.8rem; }
+      .authors strong { color: var(--path); font-weight: 600; }
+      .hero-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+      .hero .btn { border-color: rgba(246, 240, 226, 0.55); color: var(--path); }
+      .hero .btn:hover { background: var(--path); border-color: var(--path); color: var(--board); }
+      .hero .btn-accent { background: var(--path); border-color: var(--path); color: var(--board); }
+      .hero .btn-accent:hover { background: var(--amber); border-color: var(--amber); color: var(--board); }
+      .board-art { width: 100%; max-width: 560px; justify-self: end; filter: drop-shadow(0 30px 45px rgba(0, 0, 0, 0.35)); }
+      .board-art .trace { stroke-dasharray: 1; stroke-dashoffset: 1; animation: trace 2.6s cubic-bezier(0.65, 0, 0.35, 1) 0.5s forwards; }
+      .board-art .glow { stroke-dasharray: 1; stroke-dashoffset: 1; animation: trace 2.6s cubic-bezier(0.65, 0, 0.35, 1) 0.5s forwards; }
+      .board-art .start { animation: pop 0.5s ease-out 0.1s both; transform-origin: 70px 385px; }
+      @keyframes trace { to { stroke-dashoffset: 0; } }
+      @keyframes pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) { .board-art .trace, .board-art .glow { animation: none; stroke-dashoffset: 0; } .board-art .start { animation: none; } }
+      .stats { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid rgba(246, 240, 226, 0.14); }
+      .stat { padding: 1.4rem 1.2rem 1.6rem 0; min-width: 0; }
+      .stat + .stat { padding-left: 1.2rem; border-left: 1px solid rgba(246, 240, 226, 0.14); }
+      .stat b { display: block; font-family: var(--font-mono); font-size: clamp(1.5rem, 3.4vw, 2.2rem); font-weight: 600; color: var(--path); font-variant-numeric: tabular-nums; }
+      .stat span { font-size: 0.86rem; color: var(--path-dim); line-height: 1.35; display: block; margin-top: 0.2rem; }
+      .stat.hl b { color: var(--amber); }
+      @media (max-width: 900px) {
+        .hero .hero-main { grid-template-columns: 1fr; }
+        .board-art { justify-self: center; max-width: 440px; order: -1; }
+        .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .stat:nth-child(3) { padding-left: 0; border-left: 0; }
+        .stat:nth-child(n+3) { border-top: 1px solid rgba(246, 240, 226, 0.14); }
       }
 
-      /* Prevent horizontal scrolling while allowing sticky elements */
-      html {
-        overflow-x: hidden;
-        width: 100%;
-        scroll-behavior: smooth;
-      }
-      
-      body {
-        width: 100%;
-        position: relative;
-        overflow-x: clip; /* Modern alternative to hidden that allows sticky */
-        font-family: var(--font-base);
-        background-color: var(--color-bg);
-        color: var(--color-text);
-        line-height: 1.7;
-        font-weight: 400;
-        font-size: 16px;
-        margin: 0;
-        padding: 0;
-      }
-      
-      /* Ensure all elements respect viewport width */
-      * {
-        max-width: 100%;
-        box-sizing: border-box;
-      }
-      
-      /* Reset & globals */
-      *, *::before, *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-      
-      img {
-        max-width: 100%;
-        height: auto;
-      }
-      
-      a {
-        color: var(--color-primary);
-        text-decoration: none;
-        transition: var(--transition);
-      }
-      
-      a:hover {
-        color: var(--color-accent);
-      }
-      
-      /* Typography */
-      h1, h2, h3, h4, h5 {
-        font-weight: 600;
-        line-height: 1.2;
-        margin-bottom: 1rem;
-      }
-      
-      h1 {
-        font-size: clamp(2.5rem, 5vw, 3.5rem);
-        letter-spacing: -0.03em;
-      }
-      
-      h2 {
-        font-size: clamp(1.8rem, 3vw, 2.2rem);
-        letter-spacing: -0.02em;
-      }
-      
-      h3 {
-        font-size: 1.5rem;
-        letter-spacing: -0.015em;
-      }
-      
-      p {
-        margin-bottom: 1.5rem;
-      }
-      
-      strong {
-        font-weight: 600;
-      }
-      
-      /* Layout */
-      .container {
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1.5rem;
-        box-sizing: border-box;
-        overflow-x: hidden;
-      }
-      
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        gap: 2rem;
-      }
-      
-      /* Components */
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--color-primary);
-        color: white;
-        font-weight: 500;
-        padding: 0.75rem 1.5rem;
-        border-radius: var(--radius-sm);
-        transition: var(--transition);
-        border: none;
-        cursor: pointer;
-      }
-      
-      .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-        color: white;
-      }
-      
-      .btn-accent {
-        background: var(--color-accent);
-      }
-      
-      .btn-accent:hover {
-        box-shadow: 0 4px 12px rgba(244, 63, 94, 0.2);
-      }
-      
-      .card {
-        background: var(--color-card);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-sm);
-        padding: 2rem;
-        transition: var(--transition);
-      }
-      
-      .card:hover {
-        box-shadow: var(--shadow);
-      }
-      
-      /* Header */
-      .site-header {
-        position: relative;
-        width: 100%;
-        overflow: hidden;
-        padding: 4rem 0;
-        background: linear-gradient(135deg, #6366f1 0%, #818cf8 40%, #a5b4fc 100%);
-        color: white;
-      }
-      
-      @keyframes float {
-        0% { transform: translateY(0px) translateX(0px); }
-        50% { transform: translateY(-20px) translateX(10px); }
-        100% { transform: translateY(0px) translateX(0px); }
-      }
-      
-      @keyframes float-reverse {
-        0% { transform: translateY(0px) translateX(0px); }
-        50% { transform: translateY(20px) translateX(-10px); }
-        100% { transform: translateY(0px) translateX(0px); }
-      }
-      
-      @keyframes pulse {
-        0% { opacity: 0.5; }
-        50% { opacity: 0.8; }
-        100% { opacity: 0.5; }
-      }
-      
-      @keyframes gradientShift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-      }
-      
-      .site-header::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2V6h4V4H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        z-index: 0;
-      }
-      
-      .header-content {
-        position: relative;
-        z-index: 1;
-        text-align: center;
-        max-width: 900px;
-        margin: 0 auto;
-      }
-      
-      /* Particle animation - enhanced */
-      .particle-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        z-index: 0;
-        opacity: 0.7;
-      }
-      
-      .particle {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
-        pointer-events: none;
-      }
-      
-      .particle-1 {
-        width: 400px;
-        height: 400px;
-        top: -100px;
-        right: -100px;
-        animation: float 15s ease-in-out infinite, pulse 8s ease-in-out infinite;
-      }
-      
-      .particle-2 {
-        width: 300px;
-        height: 300px;
-        bottom: -80px;
-        left: -80px;
-        animation: float-reverse 18s ease-in-out infinite, pulse 10s ease-in-out infinite;
-      }
-      
-      .particle-3 {
-        width: 200px;
-        height: 200px;
-        top: 40%;
-        right: 25%;
-        animation: float 12s ease-in-out infinite, pulse 6s ease-in-out infinite;
-      }
-      
-      /* Title styling */
-      .header-title {
-        margin: 0;
-        font-size: 4.5rem;
-        font-weight: 700;
-        letter-spacing: -0.03em;
-        line-height: 1;
-        margin-bottom: 0.5rem;
-        background: linear-gradient(to right, #ffffff, #e0e7ff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-      
-      .title-highlight {
-        position: relative;
-        display: inline-block;
-      }
-      
-      .title-highlight::after {
-        content: "";
-        position: absolute;
-        bottom: 0.1em;
-        left: 0;
-        width: 100%;
-        height: 0.15em;
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 4px;
-      }
-      
-      .tagline {
-        font-size: 1.2rem;
-        margin-bottom: 1.5rem;
-        font-weight: 300;
-        opacity: 0.95;
-        line-height: 1.5;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      }
-      
-      /* Header meta section - combines stats and authors */
-      .header-meta {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 2rem;
-        margin-bottom: 1.5rem;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: var(--radius);
-        backdrop-filter: blur(5px);
-      }
-      
-      .authors {
-        font-size: 0.9rem;
-        font-weight: 400;
-        opacity: 0.9;
-        line-height: 1.5;
-        text-align: left;
-        padding-left: 1.5rem;
-        border-left: 1px solid rgba(255, 255, 255, 0.2);
-      }
-      
-      .authors small {
-        display: block;
-        font-size: 0.8rem;
-        opacity: 0.8;
-      }
-      
-      /* Header stats */
-      .header-stats {
-        display: flex;
-        gap: 1.5rem;
-      }
-      
-      .header-stat {
-        text-align: center;
-      }
-      
-      .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        line-height: 1;
-        margin-bottom: 0.25rem;
-        color: white;
-      }
-      
-      .stat-label {
-        font-size: 0.8rem;
-        font-weight: 500;
-        opacity: 0.8;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-      
-      /* Header buttons */
-      .header-buttons {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        position: relative;
-        z-index: 5;
-        margin-bottom: 1rem;
-      }
-      
-      .header-btn {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.7rem 1.5rem;
-        font-weight: 500;
-        font-size: 1rem;
-        border-radius: 50px;
-        transition: all 0.3s ease;
-      }
-      
-      .header-btn-primary {
-        background-color: white;
-        color: var(--color-primary);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      }
-      
-      .header-btn-primary:hover {
-        box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-      }
-      
-      .header-btn-secondary {
-        background-color: rgba(255, 255, 255, 0.15);
-        color: white;
-        backdrop-filter: blur(5px);
-      }
-      
-      .header-btn-secondary:hover {
-        background-color: rgba(255, 255, 255, 0.25);
-        transform: translateY(-2px);
-      }
-      
-      /* Responsive styles for header */
-      @media (max-width: 768px) {
-        .site-header {
-          padding: 2rem 0;
-        }
-        
-        .header-title {
-          font-size: 3.5rem;
-        }
-        
-        .tagline {
-          font-size: 1rem;
-        }
-        
-        .header-meta {
-          flex-direction: column;
-          gap: 1rem;
-        }
-        
-        .authors {
-          padding-left: 0;
-          border-left: none;
-          text-align: center;
-          padding-top: 1rem;
-          border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .header-stats {
-        width: 100%;
-          justify-content: center;
-        }
-        
-        .stat-number {
-          font-size: 1.8rem;
-        }
-      }
-      
-      @media (max-width: 680px) {
-        .header-buttons {
-          flex-direction: column;
-          gap: 0.5rem;
-          margin-bottom: 2.5rem !important; /* Extra space on small mobile */
-          padding-bottom: 1rem;
-        }
-        
-        /* Adjust the spacing above the wave */
-        .site-header {
-          padding-bottom: 2rem;
-        }
-      }
-      
-      /* Navigation */
-      .nav-container {
-        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 1000;
-        background: white;
-        width: 100%;
-        will-change: transform;
-      }
-      
-      .main-nav {
-        display: flex;
-        justify-content: center;
-        padding: 1rem 0;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-      
-      .nav-list {
-        display: flex;
-        gap: 1.5rem;
-        list-style: none;
-      }
-      
-      .nav-item {
-        white-space: nowrap;
-      }
-      
-      .nav-link {
-        color: var(--color-text);
-        font-weight: 500;
-        padding: 0.5rem 0.75rem;
-        border-radius: var(--radius-sm);
-        transition: var(--transition);
-      }
-      
-      .nav-link:hover, .nav-link.active {
-        color: var(--color-primary);
-        background: rgba(99, 102, 241, 0.1);
-      }
-      
-      /* Main content */
-      .main-content {
-        padding: 4rem 0;
-      }
-      
-      .section {
-        margin-bottom: 4rem;
-      }
-      
-      .section-header {
-        margin-bottom: 2rem;
-        position: relative;
-        display: flex;
-        align-items: center;
-      }
-      
-      .section-header::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: #e2e8f0;
-        margin-left: 1rem;
-      }
-      
-      .section-title {
-        font-size: 1.8rem;
-        margin-bottom: 0;
-        color: var(--color-primary);
-      }
-      
-      /* Hero Grid */
-      .hero-grid {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 2rem;
-        margin-bottom: 3rem;
-        width: 100%;
-        max-width: 100%;
-        overflow: hidden;
-      }
-      
-      .visual-card {
-        aspect-ratio: 16/9;
-        border-radius: var(--radius);
-        overflow: hidden;
-        box-shadow: var(--shadow-sm);
-        background: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: var(--transition);
-        position: relative;
-      }
-      
-      .visual-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow);
-      }
-      
-      .visual-card img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        padding: 1rem;
-      }
-      
-      .placeholder-text {
-        color: var(--color-muted);
-        font-weight: 500;
-      }
-      
-      /* Stats Display */
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 1.5rem;
-        margin: 1rem 0 4rem;
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        padding: 2rem;
-        border-radius: var(--radius-lg);
-      }
-      
-      .stat-card {
-        text-align: center;
-        background: white;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-sm);
-        transition: var(--transition);
-        padding: 2rem;
-        border-top: 4px solid var(--color-primary);
-      }
-      
-      .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow);
-      }
-      
-      .stat-value {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: var(--color-primary);
-        line-height: 1;
-        margin-bottom: 0.5rem;
-      }
-      
-      .stat-label {
-        color: var(--color-text);
-        font-weight: 500;
-        font-size: 1.1rem;
-      }
-      
-      /* Feature Cards */
-      .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-      }
-      
-      .feature-card {
-        background: white;
-        border-radius: var(--radius);
-        padding: 1.5rem;
-        box-shadow: var(--shadow-sm);
-        transition: var(--transition);
-        border-top: 4px solid var(--color-primary);
-      }
-      
-      .feature-card:hover {
-        transform: translateY(-7px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-      }
-      
-      .feature-card h3 {
-        margin-top: 0;
-        font-size: 1.25rem;
-      }
-      
-      /* Table Styles */
-      .table-container {
-        overflow-x: auto;
-        margin: 2rem 0;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-sm);
-      }
-      
-      table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        background: white;
-      }
-      
-      th, td {
-        padding: 1rem;
-        text-align: left;
-        border-bottom: 1px solid #f1f5f9;
-      }
-      
-      th {
-        background: #f8fafc;
-        font-weight: 600;
-        color: var(--color-primary);
-      }
-      
-      tbody tr:hover {
-        background: #f8fafc;
-      }
-      
-      /* Code Blocks */
-      .code-block {
-        background: #1e293b;
-        color: #e2e8f0;
-        padding: 1.5rem;
-        border-radius: var(--radius);
-        overflow-x: auto;
-        margin: 1.5rem 0;
-        font-family: 'SF Mono', 'Consolas', monospace;
-        font-size: 0.9rem;
-        line-height: 1.6;
-        white-space: pre;
-        tab-size: 2;
-      }
-      
-      .code-block .comment {
-        color: #94a3b8;
-        font-style: italic;
-      }
-      
-      .code-block .keyword {
-        color: #c084fc;
-      }
-      
-      .code-block .string {
-        color: #4ade80;
-      }
-      
-      .code-block .function {
-        color: #60a5fa;
-      }
-      
-      /* Citation */
-      .citation-block {
-        background: #f8fafc;
-        border-left: 4px solid var(--color-primary);
-        padding: 1.5rem;
-        border-radius: 0 var(--radius) var(--radius) 0;
-        margin: 2rem 0;
-        font-family: 'SF Mono', 'Consolas', monospace;
-        font-size: 0.9rem;
-        line-height: 1.5;
-        white-space: pre-wrap;
-      }
-      
-      /* Footer */
-      .site-footer {
-        background: white;
-        padding: 4rem 0;
-        text-align: center;
-        color: var(--color-muted);
-        border-top: 1px solid #f1f5f9;
-      }
-      
-      .footer-content {
-        max-width: 640px;
-        margin: 0 auto;
-      }
-      
-      .footer-links {
-        display: flex;
-        justify-content: center;
-        gap: 1.5rem;
-        margin: 1.5rem 0;
-      }
-      
-      /* Results visualization */
-      .results-visual img {
-        max-width: 100%;
-        height: auto;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-sm);
-      }
-      
-      /* Tool visualization */
-      .tool-image {
-        width: 100%;
-        height: auto;
-        border-radius: var(--radius);
-        margin: 1rem 0;
-        box-shadow: var(--shadow-sm);
-        transition: var(--transition);
-      }
-      
-      .tool-image:hover {
-        transform: scale(1.02);
-        box-shadow: var(--shadow);
-      }
-      
-      /* Add new hover styles */
-      .visual-card {
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-      
-      .visual-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow);
-      }
-      
-      .card-overlay {
-        transition: opacity 0.3s ease;
-      }
-      
-      .visual-card:hover .card-overlay {
-        opacity: 1;
-      }
-      
-      .feature-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-      
-      .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow);
-      }
-      
-      .btn {
-        transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-      }
-      
-      .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-      }
-      
-      /* Add image zoom effect on hover */
-      .feature-card .image-container {
-        overflow: hidden;
-      }
-      
-      .feature-card .image-container img {
-        transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      }
-      
-      .feature-card:hover .image-container img {
-        transform: scale(1.05);
-      }
-      
-      /* Add gradient overlay on images */
-      .feature-card .image-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 40%);
-        pointer-events: none;
-        opacity: 0.7;
-        transition: opacity 0.3s ease;
-      }
-      
-      .feature-card:hover .image-overlay {
-        opacity: 0.4;
-      }
-      
-      /* Responsive styles for hero grid */
-      @media (max-width: 1024px) {
-        .hero-grid {
-          grid-template-columns: repeat(6, 1fr);
-        }
-        
-        .hero-grid .visual-card:nth-child(1) {
-          grid-column: span 6;
-        }
-        
-        .hero-grid .visual-card:nth-child(2) {
-          grid-column: span 6;
-        }
-        
-        .hero-grid .visual-card:nth-child(3),
-        .hero-grid .visual-card:nth-child(4),
-        .hero-grid .visual-card:nth-child(5) {
-          grid-column: span 2;
-        }
-      }
-      
-      @media (max-width: 768px) {
-        .hero-grid {
-          grid-template-columns: repeat(2, 1fr);
-          gap: 1rem;
-        }
-        
-        .hero-grid .visual-card:nth-child(1),
-        .hero-grid .visual-card:nth-child(2) {
-          grid-column: span 2;
-        }
-        
-        .hero-grid .visual-card:nth-child(3),
-        .hero-grid .visual-card:nth-child(4),
-        .hero-grid .visual-card:nth-child(5) {
-          grid-column: span 1;
-        }
-        
-        .example-content {
-          grid-template-columns: 1fr;
-        }
-      }
-      
-      @media (max-width: 680px) {
-        .hero-grid .visual-card:nth-child(3),
-        .hero-grid .visual-card:nth-child(4),
-        .hero-grid .visual-card:nth-child(5) {
-          grid-column: span 2;
-        }
-      }
+      /* ---------- Sticky nav with a progress line ---------- */
+      .main-nav { position: sticky; top: 0; z-index: 40; background: rgba(242, 245, 243, 0.92); backdrop-filter: saturate(1.2) blur(10px); -webkit-backdrop-filter: saturate(1.2) blur(10px); border-bottom: 1px solid var(--line); }
+      .main-nav .wrap { display: flex; align-items: center; gap: 1.2rem; height: 60px; }
+      .nav-brand { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: var(--ink); text-decoration: none; flex: none; }
+      .nav-brand img { width: 26px; height: 26px; }
+      .nav-list { display: flex; gap: 0.15rem; list-style: none; margin: 0 0 0 auto; padding: 0; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+      .nav-list::-webkit-scrollbar { display: none; }
+      .nav-link { display: block; padding: 0.45rem 0.75rem; border-radius: 999px; color: var(--muted); font-weight: 500; font-size: 0.93rem; text-decoration: none; white-space: nowrap; }
+      .nav-link:hover { color: var(--ink); }
+      .nav-link.active { background: var(--board); color: var(--path); }
+      .nav-progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; pointer-events: none; }
+      .nav-progress::before { content: ""; position: absolute; left: 0; top: 0; height: 3px; width: calc(var(--p, 0) * 100%); background: var(--cell); border-radius: 0 3px 3px 0; }
+      .nav-progress::after { content: ""; position: absolute; top: -3.5px; left: calc(var(--p, 0) * 100% - 5px); width: 10px; height: 10px; border-radius: 50%; background: var(--cell); box-shadow: 0 0 0 3px var(--paper); }
+      @media (max-width: 640px) { .nav-brand span { display: none; } .main-nav .wrap { gap: 0.6rem; } }
 
-      /* Hide scrollbar but keep functionality */
-      .nav-list::-webkit-scrollbar {
-        display: none;
-      }
-      
-      /* Add fading edges to indicate scrollable content */
-      @media (max-width: 768px) {
-        .nav-container::before,
-        .nav-container::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          width: 30px;
-          z-index: 2;
-          pointer-events: none;
-        }
-        
-        .nav-container::before {
-          left: 0;
-          background: linear-gradient(to right, white, rgba(255, 255, 255, 0));
-        }
-        
-        .nav-container::after {
-          right: 0;
-          background: linear-gradient(to left, white, rgba(255, 255, 255, 0));
-        }
-        
-        /* Larger touch targets for mobile */
-        .nav-link {
-          padding: 0.8rem 0.9rem !important; 
-          font-size: 0.9rem !important;
-        }
-        
-        /* More compact spacing for small screens */
-        .nav-list {
-          padding: 0.3rem 0 !important;
-          justify-content: flex-start !important;
-          padding-left: 0.5rem !important;
-          scroll-behavior: smooth; /* Add smooth scrolling */
-        }
-        
-        /* Add smooth transition for active state */
-        .nav-link.active {
-          transition: all 0.3s ease;
-        }
-      }
-      
-      /* Additional fixes for mobile layout */
-      @media (max-width: 768px) {
-        /* Fix potential overflow issues */
-        .container {
-          padding-left: 1rem;
-          padding-right: 1rem;
-          max-width: 100%;
-        }
-        
-        /* Ensure all grids are responsive */
-        [class*="grid"] {
-          width: 100%;
-          margin-left: 0;
-          margin-right: 0;
-        }
-        
-        /* Rules container fix */
-        .rules-container {
-          margin-left: -0.5rem;
-          margin-right: -0.5rem;
-          width: calc(100% + 1rem);
-          padding-left: 0.5rem;
-          padding-right: 0.5rem;
-        }
-      }
-      
-      /* Tablet layout (768px to 991px) */
-      @media (min-width: 768px) and (max-width: 991px) {
-        .hero-grid {
-          grid-template-columns: repeat(12, 1fr) !important;
-          gap: 1.5rem !important;
-        }
-        
-        .grid-item-format,
-        .grid-item-performance {
-          grid-column: span 6 !important; /* Equal width on tablets */
-        }
-        
-        .visual-card {
-          height: 300px !important; /* Slightly reduced height on tablets */
-        }
-      }
-      
-      /* Mobile-specific grid layout to stack items vertically */
-      @media (max-width: 767px) {
-        .hero-grid {
-          grid-template-columns: 1fr !important;
-          gap: 2rem !important;
-        }
-        
-        .grid-item-format,
-        .grid-item-performance {
-          grid-column: span 12 !important;
-        }
-        
-        .visual-card {
-          height: 250px !important; /* More compact on phones */
-        }
-      }
+      /* ---------- News ---------- */
+      .news { padding-block: 2rem; border-bottom: 1px solid var(--line); }
+      .news-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.55rem; }
+      .news-list li { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 1rem; align-items: baseline; font-size: 0.97rem; }
+      .news-list time { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+      .news-title { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); margin: 0 0 0.8rem; }
+      @media (max-width: 600px) { .news-list li { grid-template-columns: 1fr; gap: 0; } }
 
-      /* Tablet and Desktop layout adjustments */
-      @media (min-width: 768px) {
-        .hero-grid {
-          justify-content: center;
-          gap: 2rem;
-        }
-        
-        .grid-item-format,
-        .grid-item-performance {
-          flex: 1;
-          max-width: 500px; /* Constrain width on larger screens */
-        }
-      }
-      
-      /* Mobile-specific layout adjustments */
-      @media (max-width: 767px) {
-        .hero-grid {
-          flex-direction: column;
-          align-items: center;
-          gap: 2rem;
-        }
-        
-        .grid-item-format,
-        .grid-item-performance {
-          width: 100%;
-          max-width: 450px; /* Slightly narrower on mobile */
-          margin-bottom: 0;
-        }
-        
-        .visual-card {
-          height: 280px; /* Taller on phones for better visibility */
-        }
-      }
+      /* ---------- Overview ---------- */
+      .overview { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+      .overview .lead { font-size: 1.2rem; line-height: 1.55; }
+      .points { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.4rem; }
+      .points li { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: 0.8rem; }
+      .points .cap { width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--board); display: grid; place-items: center; }
+      .points .cap i { width: 0.9rem; height: 0.9rem; border-radius: 3px; background: var(--cell); display: block; }
+      .points li:nth-child(2) .cap i { background: var(--amber); border-radius: 50%; }
+      .points li:nth-child(3) .cap i { background: var(--path); clip-path: polygon(50% 0, 100% 100%, 0 100%); border-radius: 0; }
+      .points h3 { margin-bottom: 0.3rem; }
+      .points p { margin: 0; color: var(--muted); font-size: 0.97rem; }
+      .figure-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 1.25rem; margin-top: 3rem; }
+      .figure-pair figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem; display: flex; flex-direction: column; gap: 0.6rem; min-width: 0; }
+      .figure-pair img { width: 100%; height: auto; max-height: 420px; object-fit: contain; border-radius: 6px; }
+      figcaption { font-size: 0.85rem; color: var(--muted); }
+      @media (max-width: 860px) { .overview, .figure-pair { grid-template-columns: 1fr; } }
+
+      /* ---------- Rules ---------- */
+      .rules { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2rem; align-items: start; }
+      .rules-container { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; }
+      .rule-item { appearance: none; border: 2px solid transparent; background: var(--surface); border-radius: var(--radius-sm); padding: 0.75rem 0.5rem 0.65rem; display: flex; flex-direction: column; align-items: center; gap: 0.45rem; cursor: pointer; font: 600 0.88rem var(--font-body); color: var(--ink); box-shadow: 0 1px 0 var(--line); transition: transform 0.2s, border-color 0.2s; }
+      .rule-item:hover { transform: translateY(-2px); }
+      .rule-item.is-active { border-color: var(--cell); }
+      .rule-icon { width: 64px; height: 64px; border-radius: 8px; overflow: hidden; background: #2d3b3b; }
+      .rule-icon img { width: 100%; height: 100%; display: block; }
+      .rule-details { background: var(--board); color: var(--path); border-radius: var(--radius); padding: 1.6rem; min-height: 100%; }
+      .rule-header { display: flex; align-items: center; gap: 1.1rem; margin-bottom: 1rem; }
+      .detail-icon { width: 92px; height: 92px; border-radius: 12px; overflow: hidden; flex: none; background: #2d3b3b; }
+      .detail-icon img { width: 100%; height: 100%; display: block; }
+      .detail-title { font-size: 1.3rem; }
+      .detail-subtitle { font-family: var(--font-mono); font-size: 0.8rem; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.3rem; }
+      .detail-description { color: var(--path-dim); margin: 0; }
+      .rules-note { margin-top: 1rem; font-size: 0.9rem; color: var(--muted); }
+      @media (max-width: 860px) { .rules { grid-template-columns: 1fr; } }
+      @media (max-width: 420px) { .rules-container { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+      /* ---------- Example puzzle ---------- */
+      .example-content { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: center; }
+      .puzzle-controls { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1.5rem 0; }
+      .puzzle-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin: 0; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); }
+      .stat-item { padding: 0.8rem 1rem; min-width: 0; }
+      .stat-item:nth-child(odd) { border-right: 1px solid var(--line); }
+      .stat-item:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .stat-item dt { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+      .stat-item dd { margin: 0.15rem 0 0; font-family: var(--font-mono); font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+      .puzzle-stage { background: var(--board); border-radius: calc(var(--radius) + 4px); padding: clamp(1rem, 3vw, 2rem); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+      .puzzle-frame { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 1 / 1; max-height: 520px; position: relative; }
+      #puzzle-container { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; max-width: 470px; max-height: 470px; }
+      #puzzle { width: 100%; height: 100%; filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.35)); }
+      #puzzle-interaction-hint { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8rem; background: rgba(11, 42, 63, 0.55); border-radius: 12px; backdrop-filter: blur(2px); color: var(--path); cursor: pointer; transition: opacity 0.3s; }
+      #puzzle-interaction-hint p { margin: 0; font-weight: 600; }
+      .pulse-circle { position: relative; width: 52px; height: 52px; }
+      .pulse-circle div:first-child { position: absolute; inset: 0; border-radius: 50%; border: 3px solid var(--path); animation: pulse-ring 1.8s ease-in-out infinite; }
+      .pulse-circle div:last-child { position: absolute; inset: 15px; border-radius: 50%; background: var(--path); }
+      @keyframes pulse-ring { 0%, 100% { transform: scale(0.8); opacity: 0.9; } 50% { transform: scale(1.15); opacity: 0.35; } }
+      @media (prefers-reduced-motion: reduce) { .pulse-circle div:first-child { animation: none; } }
+      .stage-note { font-size: 0.85rem; color: var(--path-dim); margin: 0; text-align: center; }
+      @media (max-width: 860px) { .example-content { grid-template-columns: 1fr; } }
+
+      /* ---------- Results band ---------- */
+      .band { background: var(--board); color: var(--path); }
+      .band .eyebrow { color: var(--amber); }
+      .band .section-head p { color: var(--path-dim); }
+      .band a { color: var(--amber); }
+      .band a:hover { color: var(--path); }
+      .lb-tabs { display: inline-flex; flex-wrap: wrap; gap: 0.3rem; padding: 0.3rem; border-radius: 999px; background: var(--board-2); margin-bottom: 1.25rem; }
+      .lb-tab { appearance: none; border: 0; background: transparent; color: var(--path-dim); font: 600 0.9rem var(--font-body); padding: 0.55rem 1rem; border-radius: 999px; cursor: pointer; }
+      .lb-tab:hover { color: var(--path); }
+      .lb-tab.active { background: var(--path); color: var(--board); }
+      .table-container { overflow-x: auto; border-radius: var(--radius); background: var(--board-2); border: 1px solid rgba(246, 240, 226, 0.08); }
+      .band table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+      .band th, .band td { padding: 0.72rem 0.7rem; text-align: left; border-bottom: 1px solid rgba(246, 240, 226, 0.08); white-space: nowrap; }
+      #lb-table td.lb-src { white-space: normal; min-width: 7.5rem; line-height: 1.3; }
+      .band tbody tr:last-child td { border-bottom: 0; }
+      .band th { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--path-dim); background: rgba(0, 0, 0, 0.12); position: sticky; top: 0; }
+      .band tbody tr:hover { background: rgba(246, 240, 226, 0.04); }
+      #lb-table th { cursor: pointer; user-select: none; }
+      #lb-table th:hover { color: var(--path); }
+      #lb-table th[aria-sort="descending"]::after { content: " \25BE"; color: var(--amber); }
+      #lb-table th[aria-sort="ascending"]::after { content: " \25B4"; color: var(--amber); }
+      .band td.num, .band th.num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+      #lb-table tr.human-row { background: rgba(31, 179, 133, 0.13); }
+      #lb-table tr.human-row td:first-child strong { color: var(--human); }
+      #lb-table td.lb-best { color: var(--amber); font-weight: 600; }
+      #lb-table .lb-logo { width: 20px; height: 20px; object-fit: contain; vertical-align: -5px; margin-right: 0.6rem; background: #fff; border-radius: 50%; padding: 2px; color: var(--board); }
+      #lb-table svg.lb-logo { background: var(--path); }
+      #lb-table .lb-src { font-size: 0.85rem; }
+      #lb-table .lb-src a { color: var(--path-dim); }
+      #lb-table .lb-src a:hover { color: var(--amber); }
+      #lb-table .lb-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 0.08rem 0.45rem; border-radius: 999px; border: 1px solid var(--amber); color: var(--amber); margin-left: 0.45rem; vertical-align: 1px; }
+      #lb-table .lb-subset { border-color: rgba(246, 240, 226, 0.35); color: var(--path-dim); }
+      .lb-note { font-size: 0.88rem; color: var(--path-dim); margin-top: 1rem; max-width: 80ch; }
+      .lb-note code { background: rgba(246, 240, 226, 0.1); color: var(--path); }
+      .findings { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; margin-top: 3rem; }
+      .findings figure { margin: 0; background: var(--path); color: var(--ink); border-radius: var(--radius); padding: 1.1rem; display: flex; flex-direction: column; gap: 0.7rem; min-width: 0; }
+      .findings h3 { font-size: 1rem; }
+      .findings img { width: 100%; height: auto; border-radius: 8px; background: #fff; }
+      .findings figcaption { color: var(--muted); }
+      @media (max-width: 860px) { .findings { grid-template-columns: 1fr; } }
+
+      /* ---------- Evaluate ---------- */
+      .eval-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+      .eval-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.4rem; display: flex; flex-direction: column; gap: 0.7rem; min-width: 0; }
+      .eval-card p { margin: 0; font-size: 0.95rem; color: var(--muted); }
+      .eval-link { margin-top: auto; font-weight: 600; font-size: 0.93rem; }
+      .eval-note { margin-top: 1.5rem; color: var(--muted); }
+      .code-wrap { position: relative; min-width: 0; }
+      .code-block { margin: 0; background: var(--board); color: var(--path); font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.65; padding: 2.4rem 1.1rem 1.1rem; border-radius: var(--radius-sm); overflow-x: auto; white-space: pre; tab-size: 2; }
+      .code-block::before { content: "$"; position: absolute; top: 0.75rem; left: 1.1rem; color: var(--amber); font-family: var(--font-mono); font-size: 0.8rem; }
+      .code-block.py::before { content: "python"; }
+      .copy-btn { position: absolute; top: 0.55rem; right: 0.55rem; z-index: 1; font: 600 0.75rem var(--font-body); padding: 0.25rem 0.65rem; border-radius: 999px; border: 1px solid rgba(246, 240, 226, 0.35); background: transparent; color: var(--path); cursor: pointer; }
+      .copy-btn:hover { background: var(--path); color: var(--board); }
+      @media (max-width: 760px) { .eval-grid { grid-template-columns: 1fr; } }
+
+      /* ---------- Tools ---------- */
+      .tool-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+      .tool-list li { display: grid; grid-template-columns: minmax(0, 14rem) minmax(0, 1fr) auto; gap: 1.5rem; align-items: center; padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
+      .tool-list h3 { font-size: 1.05rem; }
+      .tool-list .kind { display: block; font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--teal); margin-top: 0.3rem; }
+      .tool-list p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+      @media (max-width: 760px) { .tool-list li { grid-template-columns: 1fr; gap: 0.6rem; } .tool-list .btn { justify-self: start; } }
+
+      /* ---------- Dataset ---------- */
+      .dataset { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 2rem; align-items: start; }
+      .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin: 1.5rem 0; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); }
+      .facts div { padding: 0.85rem 1rem; }
+      .facts div:nth-child(odd) { border-right: 1px solid var(--line); }
+      .facts div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .facts dt { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+      .facts dd { margin: 0.15rem 0 0; font-weight: 600; }
+      @media (max-width: 860px) { .dataset { grid-template-columns: 1fr; } }
+
+      /* ---------- Citation ---------- */
+      .cite-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr); gap: 2rem; align-items: start; }
+      .cite-blocks { display: grid; gap: 1rem; min-width: 0; }
+      .citation-block { margin: 0; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--cell); border-radius: var(--radius-sm); padding: 2.4rem 1.1rem 1.1rem; font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.6; white-space: pre; overflow-x: auto; }
+      #citation .copy-btn { border-color: var(--line); color: var(--ink); background: var(--surface); }
+      #citation .copy-btn:hover { background: var(--ink); color: var(--paper); }
+      .related-title { font-size: 1rem; margin-bottom: 0.9rem; }
+      .related-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
+      .related-list li { display: grid; gap: 0.15rem; padding-left: 1rem; border-left: 2px solid var(--line); }
+      .related-list a { font-weight: 600; text-decoration: none; color: var(--ink); line-height: 1.35; }
+      .related-list a:hover { color: var(--teal); text-decoration: underline; }
+      .related-list span { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+      @media (max-width: 860px) { .cite-grid { grid-template-columns: 1fr; } }
+
+      /* ---------- Footer ---------- */
+      .site-footer { background: var(--board); color: var(--path-dim); padding-block: 3.5rem 2.5rem; }
+      .site-footer .wrap { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 2rem; align-items: end; }
+      .site-footer h2 { color: var(--path); font-size: clamp(1.4rem, 3vw, 1.9rem); margin-bottom: 0.6rem; }
+      .site-footer .mail { font-family: var(--font-mono); color: var(--path); font-size: 1rem; user-select: all; white-space: nowrap; }
+      .site-footer a { color: var(--path); }
+      .site-footer a:hover { color: var(--amber); }
+      .foot-links { display: flex; flex-wrap: wrap; gap: 1.2rem; justify-content: flex-end; }
+      .fine { grid-column: 1 / -1; font-size: 0.85rem; border-top: 1px solid rgba(246, 240, 226, 0.12); padding-top: 1.4rem; margin-top: 0.5rem; }
+      @media (max-width: 760px) { .site-footer .wrap { grid-template-columns: 1fr; } .foot-links { justify-content: flex-start; } }
     </style>
   </head>
   <body>
-    <!-- Header -->
-    <header class="site-header">
-      <div class="particle-container">
-        <div class="particle particle-1"></div>
-        <div class="particle particle-2"></div>
-        <div class="particle particle-3"></div>
-      </div>
-      <div class="container">
-        <div class="header-content">
-          <h1 class="header-title" style="font-size: 4.5rem; margin-bottom: 0.5rem; position: relative; display: inline-block; background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #ffffff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; letter-spacing: -0.02em;">
-            SPaRC
-          </h1>
-          <p class="tagline" style="font-size: 1.2rem; max-width: 700px; margin: 0 auto 1.5rem; line-height: 1.5; color: rgba(255, 255, 255, 0.95); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); font-weight: 400;">
-            A Spatial Pathfinding Reasoning Challenge for grounding language models in spatial cognition
-          </p>
-          
-          <div class="header-meta" style="display: flex; justify-content: center; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; padding: 1.2rem 1.5rem; background: rgba(255, 255, 255, 0.12); border-radius: var(--radius); backdrop-filter: blur(10px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.1);">
-            <div class="header-stats" style="display: flex; gap: 1.5rem;">
-              <div class="header-stat" style="text-align: center; position: relative;">
-                <div class="stat-number" style="font-size: 2.2rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">1,000</div>
-                <div class="stat-label" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; opacity: 0.9;">Puzzles</div>
-              </div>
-              <div class="header-stat" style="text-align: center; position: relative;">
-                <div class="stat-number" style="font-size: 2.2rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">98%</div>
-                <div class="stat-label" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; opacity: 0.9;">Human Success</div>
-              </div>
-              <div class="header-stat" style="text-align: center; position: relative;">
-                <div class="stat-number" style="font-size: 2.2rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;">15.8%</div>
-                <div class="stat-label" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; opacity: 0.9;">Best AI (paper)</div>
-              </div>
-            </div>
-            
-            <div class="authors" style="text-align: left; padding-left: 1.5rem; line-height: 1.6; font-size: 0.9rem;">
-              <div style="font-weight: 500; margin-bottom: 0.2rem; color: rgba(255, 255, 255, 0.95);">
-                Lars&nbsp;Benedikt&nbsp;Kaesberg,
-                Jan&nbsp;Philip&nbsp;Wahle,
-                Terry&nbsp;Ruas,
-                Bela&nbsp;Gipp
-              </div>
-              <div style="font-size: 0.85rem; opacity: 0.8;">University of Göttingen, Germany</div>
-            </div>
-          </div>
-          
-          <div class="header-buttons" style="display: flex; gap: 1rem; justify-content: center; position: relative; z-index: 5; margin-bottom: 1rem;">
-            <a href="https://aclanthology.org/2025.emnlp-main.526" target="_blank" class="header-btn header-btn-primary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.5rem; font-weight: 600; font-size: 0.95rem; border-radius: 30px; transition: all 0.3s ease; background: #ffffff; color: var(--color-primary); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-              Read Paper
-            </a>
-            <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" target="_blank" class="header-btn header-btn-primary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.5rem; font-weight: 600; font-size: 0.95rem; border-radius: 30px; transition: all 0.3s ease; background: #ffffff; color: var(--color-primary); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              Get the Dataset
-            </a>
-            <a href="/annotate.html?url=https://huggingface.co/datasets/lkaesberg/SPaRC/raw/main/puzzle_all_test.jsonl" target="_blank" class="header-btn header-btn-secondary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.5rem; font-weight: 600; font-size: 0.95rem; border-radius: 30px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.15); color: white; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.2);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
-              Try Online
-            </a>
-            <a href="https://github.com/lkaesberg/SPaRC" target="_blank" class="header-btn header-btn-secondary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.5rem; font-weight: 600; font-size: 0.95rem; border-radius: 30px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.15); color: white; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.2);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-              View on GitHub
-            </a>
-            <a href="#citation" class="header-btn header-btn-secondary" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.5rem; font-weight: 600; font-size: 0.95rem; border-radius: 30px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.15); color: white; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.2);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
-              Cite SPaRC
-            </a>
+    <header class="hero" id="top">
+      <div class="wrap hero-main">
+        <div class="hero-text">
+          <div class="venue"><span>EMNLP 2025 · Main</span> Suzhou, China</div>
+          <h1 class="wordmark">SPa<span class="lo">R</span>C</h1>
+          <p class="paper-title">A Spatial Pathfinding Reasoning Challenge for grounding language models in spatial cognition</p>
+          <p class="authors"><strong>Lars Benedikt Kaesberg</strong>, <strong>Jan Philip Wahle</strong>, <strong>Terry Ruas</strong>, <strong>Bela Gipp</strong><br>University of Göttingen, Germany</p>
+          <div class="hero-actions">
+            <a href="https://aclanthology.org/2025.emnlp-main.526" target="_blank" rel="noopener" class="btn btn-accent">Read the paper</a>
+            <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" target="_blank" rel="noopener" class="btn">Dataset</a>
+            <a href="/annotate.html?url=https://huggingface.co/datasets/lkaesberg/SPaRC/raw/main/puzzle_all_test.jsonl" target="_blank" rel="noopener" class="btn">Solve puzzles</a>
+            <a href="https://github.com/lkaesberg/SPaRC" target="_blank" rel="noopener" class="btn">Code</a>
+            <a href="#citation" class="btn">Cite</a>
           </div>
         </div>
-      </div>
-      
-      <div style="position: absolute; bottom: -2px; left: 0; width: 100%; z-index: 1; pointer-events: none;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" fill="#ffffff" preserveAspectRatio="none" style="display: block; width: 100%; height: 70px;">
-          <path d="M0,32L80,42.7C160,53,320,75,480,75C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,100L1360,100C1280,100,1120,100,960,100C800,100,640,100,480,100C320,100,160,100,80,100L0,100Z"></path>
+        <svg class="board-art" viewBox="0 0 560 450" role="img" aria-label="A small SPaRC puzzle: a line runs from the start circle through a dot to the exit, splitting the grid so that the two stars share a region and the cell with two triangles touches the line on two edges">
+          <rect x="6" y="6" width="548" height="438" rx="26" fill="#123f55"/>
+          <rect x="6" y="6" width="548" height="438" rx="26" fill="none" stroke="#1b5268" stroke-width="2"/>
+          <!-- cells -->
+          <g fill="#0e9a7f">
+            <rect x="85" y="85" width="75" height="75" rx="4"/><rect x="190" y="85" width="75" height="75" rx="4"/><rect x="295" y="85" width="75" height="75" rx="4"/><rect x="400" y="85" width="75" height="75" rx="4"/>
+            <rect x="85" y="190" width="75" height="75" rx="4"/><rect x="190" y="190" width="75" height="75" rx="4"/><rect x="295" y="190" width="75" height="75" rx="4"/><rect x="400" y="190" width="75" height="75" rx="4"/>
+            <rect x="85" y="295" width="75" height="75" rx="4"/><rect x="190" y="295" width="75" height="75" rx="4"/><rect x="295" y="295" width="75" height="75" rx="4"/><rect x="400" y="295" width="75" height="75" rx="4"/>
+          </g>
+          <!-- tracks -->
+          <g stroke="#2a6378" stroke-width="22" stroke-linecap="round" fill="none">
+            <path d="M70 70 H490 M70 175 H490 M70 280 H490 M70 385 H490"/>
+            <path d="M70 70 V385 M175 70 V385 M280 70 V385 M385 70 V385 M490 70 V385"/>
+            <path d="M490 70 V30"/>
+          </g>
+          <!-- rule symbols -->
+          <g fill="#f2b33d">
+            <polygon points="437.5,102 442,115 455,113 446,123 455,133 442,131 437.5,144 433,131 420,133 429,123 420,113 433,115"/>
+            <polygon points="437.5,207 442,220 455,218 446,228 455,238 442,236 437.5,249 433,236 420,238 429,228 420,218 433,220"/>
+          </g>
+          <g fill="#f6f0e2">
+            <polygon points="104,134 113,116 122,134"/><polygon points="124,134 133,116 142,134"/>
+          </g>
+          <!-- the solution line -->
+          <path class="glow" pathLength="1" d="M70 385 V175 H175 V70 H385 V280 H490 V30" fill="none" stroke="#f6f0e2" stroke-opacity="0.25" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+          <path class="trace" pathLength="1" d="M70 385 V175 H175 V70 H385 V280 H490 V30" fill="none" stroke="#f6f0e2" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle class="start" cx="70" cy="385" r="27" fill="#f6f0e2"/>
+          <polygon points="280,61 288,65.5 288,74.5 280,79 272,74.5 272,65.5" fill="#0b2a3f"/>
         </svg>
       </div>
-      
-      <style>
-        /* Adjust wave position on mobile */
-        @media (max-width: 680px) {
-          .site-header > div:last-child {
-            bottom: -1px;
-          }
-          .site-header > div:last-child svg {
-            height: 50px; /* Smaller wave on mobile */
-          }
-        }
-      </style>
+      <div class="wrap">
+        <div class="stats">
+          <div class="stat"><b>1,000</b><span>grid puzzles, 500 in the test set</span></div>
+          <div class="stat"><b>98.0%</b><span>solved by humans (94.5% of the hardest)</span></div>
+          <div class="stat"><b>15.8%</b><span>best model in the paper (o4-mini)</span></div>
+          <div class="stat hl"><b>83.6%</b><span>best model now, but 49.4% on the hardest</span></div>
+        </div>
+      </div>
     </header>
 
-    <!-- Navigation -->
-    <div class="nav-container" style="border-bottom: 1px solid rgba(226, 232, 240, 0.8); position: sticky !important; top: 0 !important; z-index: 1000; background: white; width: 100%; will-change: transform;">
-      <div class="container">
-        <nav class="main-nav">
-          <ul class="nav-list" style="display: flex; flex-wrap: nowrap; gap: 0.2rem; margin: 0; padding: 0.5rem 0; list-style: none; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch;">
-            <li class="nav-item"><a href="#overview" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Overview</a></li>
-            <li class="nav-item"><a href="#key-features" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Features</a></li>
-            <li class="nav-item"><a href="#puzzle-rules" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Rules</a></li>
-            <li class="nav-item"><a href="#example" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Example</a></li>
-            <li class="nav-item"><a href="#leaderboard" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Results</a></li>
-            <li class="nav-item"><a href="#evaluate" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Evaluate</a></li>
-            <li class="nav-item"><a href="#tools" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Tools</a></li>
-            <li class="nav-item"><a href="#dataset" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Dataset</a></li>
-            <li class="nav-item"><a href="#citation" class="nav-link" style="display: block; padding: 0.7rem 0.8rem; color: var(--color-text); font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s ease; font-size: 0.95rem; white-space: nowrap; min-width: 44px; text-align: center;">Citation</a></li>
-          </ul>
-        </nav>
+    <nav class="main-nav" aria-label="Sections">
+      <div class="wrap">
+        <a class="nav-brand" href="#top"><img src="favicon/favicon.svg" alt="" width="26" height="26"><span>SPaRC</span></a>
+        <ul class="nav-list">
+          <li><a href="#overview" class="nav-link">Overview</a></li>
+          <li><a href="#puzzle-rules" class="nav-link">Rules</a></li>
+          <li><a href="#example" class="nav-link">Try it</a></li>
+          <li><a href="#leaderboard" class="nav-link">Results</a></li>
+          <li><a href="#evaluate" class="nav-link">Evaluate</a></li>
+          <li><a href="#tools" class="nav-link">Tools</a></li>
+          <li><a href="#dataset" class="nav-link">Dataset</a></li>
+          <li><a href="#citation" class="nav-link">Cite</a></li>
+        </ul>
       </div>
-      <style>
-        /* Hide scrollbar but keep functionality */
-        .nav-list::-webkit-scrollbar {
-          display: none;
-        }
-        
-        /* Add fading edges to indicate scrollable content */
-        @media (max-width: 768px) {
-          .nav-container::before,
-          .nav-container::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 30px;
-            z-index: 2;
-            pointer-events: none;
-          }
-          
-          .nav-container::before {
-            left: 0;
-            background: linear-gradient(to right, white, rgba(255, 255, 255, 0));
-          }
-          
-          .nav-container::after {
-            right: 0;
-            background: linear-gradient(to left, white, rgba(255, 255, 255, 0));
-          }
-          
-          /* Larger touch targets for mobile */
-          .nav-link {
-            padding: 0.8rem 0.9rem !important; 
-            font-size: 0.9rem !important;
-          }
-          
-          /* More compact spacing for small screens */
-          .nav-list {
-            padding: 0.3rem 0 !important;
-            justify-content: flex-start !important;
-            padding-left: 0.5rem !important;
-            scroll-behavior: smooth; /* Add smooth scrolling */
-          }
-          
-          /* Add smooth transition for active state */
-          .nav-link.active {
-            transition: all 0.3s ease;
-          }
-        }
-        
-        /* Additional fixes for mobile layout */
-        @media (max-width: 768px) {
-          /* Fix potential overflow issues */
-          .container {
-            padding-left: 1rem;
-            padding-right: 1rem;
-            max-width: 100%;
-          }
-          
-          /* Ensure all grids are responsive */
-          [class*="grid"] {
-            width: 100%;
-            margin-left: 0;
-            margin-right: 0;
-          }
-          
-          /* Rules container fix */
-          .rules-container {
-            margin-left: -0.5rem;
-            margin-right: -0.5rem;
-            width: calc(100% + 1rem);
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-          }
-        }
-      </style>
-      </div>
+      <div class="nav-progress" aria-hidden="true"></div>
+    </nav>
 
-    <!-- Main Content -->
-    <main class="main-content" style="width: 100%; overflow-x: hidden; max-width: 100vw; position: relative; z-index: 1;">
-      <div class="container">
-        <!-- News -->
-        <section class="news" aria-labelledby="news-title">
+    <main>
+      <section class="news" aria-labelledby="news-title">
+        <div class="wrap">
           <h2 class="news-title" id="news-title">News</h2>
           <ul class="news-list">
-            <li><time datetime="2026-10-13">Oct 2026</time><span>Leaderboard update with newer models. GPT-6.1 Sol solves 83.6% of the test puzzles but only 49.4% of the hardest ones; humans solve 94.5% of those. <a href="#leaderboard">See the leaderboard</a>.</span></li>
+            <li><time datetime="2026-10-13">Oct 2026</time><span>Leaderboard update with newer models. GPT-6.1 Sol solves 83.6% of the test puzzles but only 49.4% of the hardest ones; humans solve 94.5% of those. <a href="#leaderboard">See the results</a>.</span></li>
             <li><time datetime="2026-10-13">Oct 2026</time><span>SPaRC now runs in Inspect AI, lm-evaluation-harness and Prime Intellect verifiers. <a href="#evaluate">Evaluate a model</a>.</span></li>
             <li><time datetime="2026-08-21">Aug 2026</time><span><a href="https://arxiv.org/abs/2608.21170" target="_blank" rel="noopener">Is Visual Prompting All You Need?</a> studies vision-language models on SPaRC with visual scaffolds.</span></li>
             <li><time datetime="2026-04-10">Apr 2026</time><span><a href="https://arxiv.org/abs/2604.09338" target="_blank" rel="noopener">Spatial-Gym</a> turns SPaRC into a step-by-step environment for agents.</span></li>
             <li><time datetime="2025-11">Nov 2025</time><span>SPaRC was presented at <a href="https://aclanthology.org/2025.emnlp-main.526/" target="_blank" rel="noopener">EMNLP 2025</a> in Suzhou.</span></li>
           </ul>
-        </section>
-        <style>
-          .news { background: var(--color-card); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 1.25rem 1.5rem; margin-bottom: 2.5rem; }
-          .news-title { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-primary); margin: 0 0 0.75rem; }
-          .news-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
-          .news-list li { display: grid; grid-template-columns: 5.5rem 1fr; gap: 1rem; align-items: baseline; font-size: 0.95rem; line-height: 1.5; }
-          .news-list time { font-size: 0.8rem; font-weight: 600; color: var(--color-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
-          .news-list span { min-width: 0; }
-          .news-list a { color: var(--color-primary); }
-          @media (max-width: 600px) { .news-list li { grid-template-columns: 1fr; gap: 0.1rem; } }
-        </style>
-        <!-- Hero Grid -->
-        <div class="hero-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-bottom: 3rem; width: 100%; max-width: 100%; overflow: hidden;">
-          <!-- Main visualization - keep this important image -->
-          <div class="grid-item-format" style="flex: 1; max-width: 500px; min-width: 300px; display: flex; flex-direction: column; box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden;">
-            <div class="visual-card" style="height: 360px; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; position: relative;">
-              <img src="graphics/images/teaser.png" alt="SPaRC Grid Visualization" style="width: 100%; height: 100%; object-fit: contain; background-color: #ffffff; padding: 1rem;" />
-            </div>
-            <div style="padding: 0.75rem; background: rgba(99, 102, 241, 0.95); color: white; font-weight: 500; text-align: center; border-radius: 0 0 var(--radius) var(--radius);">
-              Grid Format
-            </div>
-          </div>
-          
-          <!-- Performance chart - keep this key visualization -->
-          <div class="grid-item-performance" style="grid-column: span 7; display: flex; flex-direction: column; box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden;">
-            <div class="visual-card" style="height: 360px; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; position: relative;">
-              <img src="graphics/figure2_solve_rates.png" alt="Model Performance Comparison" style="width: 100%; height: 100%; object-fit: contain; background-color: #ffffff; padding: 0.5rem;" />
-            </div>
-            <div style="padding: 0.75rem; background: rgba(16, 185, 129, 0.95); color: white; font-weight: 500; text-align: center; border-radius: 0 0 var(--radius) var(--radius);">
-              Performance
-            </div>
-          </div>
-          </div>
-          
-        <style>
-          /* Mobile-specific grid layout to stack items vertically */
-          @media (max-width: 767px) {
-            .hero-grid {
-              grid-template-columns: 1fr !important;
-              gap: 2rem !important;
-            }
-            
-            .grid-item-format,
-            .grid-item-performance {
-              grid-column: span 12 !important;
-              margin-bottom: 0 !important;
-            }
-            
-            .visual-card {
-              height: 280px !important; /* Taller on phones for better visibility */
-            }
-          }
-        </style>
+        </div>
+      </section>
 
-        <!-- Key Stats -->
-        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin: 1rem 0 4rem; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 2rem; border-radius: var(--radius-lg);">
-          <div class="stat-card" style="text-align: center; background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: var(--transition); padding: 2rem; border-top: 4px solid var(--color-primary);">
-            <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-primary); line-height: 1; margin-bottom: 0.5rem;">1,000</div>
-            <div style="color: var(--color-text); font-weight: 500; font-size: 1.1rem;">Unique Puzzles</div>
+      <section id="overview" class="section">
+        <div class="wrap">
+          <div class="overview">
+            <div>
+              <div class="eyebrow">The benchmark</div>
+              <h2>Draw one line from start to exit</h2>
+              <div style="height:1.2rem"></div>
+              <p class="lead">Many reasoning benchmarks mix spatial thinking with surface-level language patterns. SPaRC tests spatial reasoning on its own: 1,000 two-dimensional grid puzzles in the style of the game <em>The Witness</em>.</p>
+              <p>Each puzzle asks for one path from the start node to the exit that satisfies every rule on the board at once. Solving one takes path planning, rule checking and counting. Humans solve 98% of the puzzles. Their median time per puzzle ranges from 7.1 seconds at level 1 to 85.6 seconds at level 5. The models in the paper solve only 0.4% to 15.8%. Newer models do much better, but they still fail on most of the hardest puzzles.</p>
+            </div>
+            <ul class="points" id="key-features">
+              <li><div class="cap"><i></i></div><div><h3>Many rules at once</h3><p>One path has to satisfy dots, gaps, stones, stars, triangles and shapes together. A single wrong turn early on can make the puzzle unsolvable, so solvers must plan and revise.</p></div></li>
+              <li><div class="cap"><i></i></div><div><h3>Planning, not pattern matching</h3><p>The answer is a full list of coordinates. A model has to track where it is, which cells it has used and which regions its line creates.</p></div></li>
+              <li><div class="cap"><i></i></div><div><h3>A clear gap to humans</h3><p>Humans solve 94.5% of the hardest (level 5) puzzles. In the paper, o4-mini solved 1.1% of them, and the best model today solves 49.4%.</p></div></li>
+            </ul>
           </div>
-          <div class="stat-card" style="text-align: center; background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: var(--transition); padding: 2rem; border-top: 4px solid #10b981;">
-            <div style="font-size: 2.5rem; font-weight: 700; color: #10b981; line-height: 1; margin-bottom: 0.5rem;">98%</div>
-            <div style="color: var(--color-text); font-weight: 500; font-size: 1.1rem;">Human Success Rate</div>
-          </div>
-          <div class="stat-card" style="text-align: center; background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: var(--transition); padding: 2rem; border-top: 4px solid var(--color-accent);">
-            <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-accent); line-height: 1; margin-bottom: 0.5rem;">15.8%</div>
-            <div style="color: var(--color-text); font-weight: 500; font-size: 1.1rem;">Best AI in the paper</div>
-          </div>
-          <div class="stat-card" style="text-align: center; background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: var(--transition); padding: 2rem; border-top: 4px solid #7c3aed;">
-            <div style="font-size: 2.5rem; font-weight: 700; color: #7c3aed; line-height: 1; margin-bottom: 0.5rem;">15+</div>
-            <div style="color: var(--color-text); font-weight: 500; font-size: 1.1rem;">Steps Per Solution</div>
+          <div class="figure-pair">
+            <figure>
+              <img src="graphics/images/teaser.png" alt="Three SPaRC puzzles and their solutions: dots, triangles and stars" loading="lazy" width="1560" height="1624">
+              <figcaption>Three puzzles (left) and their solutions (right).</figcaption>
+            </figure>
+            <figure>
+              <img src="graphics/figure2_solve_rates.png" alt="Bar chart of solve rates for humans and the models in the paper" loading="lazy" width="3060" height="1559">
+              <figcaption>Solve rates in the paper: humans 98.0%, o4-mini 15.8%, and below 10% for the other models.</figcaption>
+            </figure>
           </div>
         </div>
-
-        <!-- Overview Section -->
-        <section id="overview" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Overview</h2>
-          </div>
-        <p>
-          Existing multi‑step reasoning benchmarks often conflate symbolic tasks
-          with surface‑level linguistic pattern matching, leaving fundamental
-          spatial reasoning abilities under‑explored. We introduce <strong>SPaRC</strong>, a
-          dataset of 1,000 two‑dimensional grid puzzles that require joint
-          <em>path‑planning</em>, <em>rule satisfaction</em>, and <em>numeric‑geometric
-            arithmetic</em>. Humans solve 98% of the puzzles. Their median time per puzzle ranges from
-          7.1 seconds at level 1 to 85.6 seconds at level 5. The models in the paper solve only
-          0.4% to 15.8%. Newer models do much better, but they still fail on most of the hardest
-          puzzles (see the <a href="#leaderboard">leaderboard</a>).
-        </p>
       </section>
 
-        <!-- Key Features Section -->
-        <section id="key-features" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Key Features</h2>
+      <section id="puzzle-rules" class="section">
+        <div class="wrap">
+          <div class="section-head">
+            <div class="eyebrow">Rules</div>
+            <h2>Seven kinds of rules</h2>
+            <p>Every symbol on the board adds a constraint to the path. Choose a symbol to see what it asks for.</p>
           </div>
-          <div class="features-grid">
-            <div class="feature-card">
-              <h3>Multi‑Constraint Problem Solving</h3>
-              <p>Puzzles require simultaneously satisfying multiple spatial constraints, forcing models to integrate various rules (counting, segregation, shape logic) while planning a single path. Wrong steps can lead to irreversible errors, requiring careful hypothesis revision and deep abstract reasoning.</p>
-            </div>
-            <div class="feature-card">
-              <h3>Joint Planning and Pathfinding</h3>
-              <p>Tasks demand step-by-step planning combined with pathfinding and logic skills. Solvers must understand rule interactions, perform long-term planning, and navigate through spatial constraints—a core human ability that modern AI systems struggle with.</p>
-            </div>
-            <div class="feature-card">
-              <h3>Significant Human-AI Performance Gap</h3>
-              <p>Humans solve 98% of puzzles easily (including 94.5% of the hardest level 5 puzzles), while state-of-the-art reasoning models achieve only 15.8% accuracy overall and just 1.1% on difficult puzzles—revealing fundamental limitations in current AI spatial reasoning.</p>
-            </div>
-            </div>
-      </section>
-
-        <!-- Puzzle Rules Section -->
-        <section id="puzzle-rules" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Puzzle Rules</h2>
-            </div>
-          
-          <div class="rules-container" style="display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 1rem; padding-bottom: 1rem; -webkit-overflow-scrolling: touch; margin-bottom: 2rem; justify-content: flex-start; width: 100%; max-width: 100vw; margin-left: 0; margin-right: 0;">
-            <!-- Rule 1: Dots -->
-            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(0)">
-              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
-                <img src="graphics/images/rules/dot.png" alt="Dots Rule" style="width: 145%; height: 145%; object-fit: cover;">
-            </div>
-              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Dots</div>
-          </div>
-            
-            <!-- Rule 2: Gaps -->
-            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(1)">
-              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
-                <img src="graphics/images/rules/gap.png" alt="Gaps Rule" style="width: 145%; height: 145%; object-fit: cover;">
+          <div class="rules">
+            <div>
+              <div class="rules-container">
+                <button type="button" class="rule-item" onclick="showRule(0)" aria-pressed="true"><span class="rule-icon"><img src="graphics/images/rules/dot.png" alt=""></span>Dots</button>
+                <button type="button" class="rule-item" onclick="showRule(1)" aria-pressed="false"><span class="rule-icon"><img src="graphics/images/rules/gap.png" alt=""></span>Gaps</button>
+                <button type="button" class="rule-item" onclick="showRule(2)" aria-pressed="false"><span class="rule-icon"><img src="graphics/images/rules/stone.png" alt=""></span>Stones</button>
+                <button type="button" class="rule-item" onclick="showRule(3)" aria-pressed="false"><span class="rule-icon"><img src="graphics/images/rules/star.png" alt=""></span>Stars</button>
+                <button type="button" class="rule-item" onclick="showRule(4)" aria-pressed="false"><span class="rule-icon"><img src="graphics/images/rules/triangle.png" alt=""></span>Triangles</button>
+                <button type="button" class="rule-item" onclick="showRule(5)" aria-pressed="false"><span class="rule-icon"><img src="graphics/images/rules/poly.png" alt=""></span>Polyominoes</button>
+                <button type="button" class="rule-item" onclick="showRule(6)" aria-pressed="false"><span class="rule-icon"><img src="graphics/images/rules/ylop.png" alt=""></span>Ylop</button>
               </div>
-              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Gaps</div>
+              <p class="rules-note">On top of the symbols, the path always starts at the start node, ends at the exit, and never visits a node twice.</p>
             </div>
-            
-            <!-- Rule 3: Stones -->
-            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(2)">
-              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
-                <img src="graphics/images/rules/stone.png" alt="Stones Rule" style="width: 145%; height: 145%; object-fit: cover;">
-              </div>
-              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Stones</div>
-            </div>
-            
-            <!-- Rule 4: Stars -->
-            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(3)">
-              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
-                <img src="graphics/images/rules/star.png" alt="Stars Rule" style="width: 145%; height: 145%; object-fit: cover;">
-              </div>
-              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Stars</div>
-            </div>
-            
-            <!-- Rule 5: Triangles -->
-            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(4)">
-              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
-                <img src="graphics/images/rules/triangle.png" alt="Triangles Rule" style="width: 145%; height: 145%; object-fit: cover;">
-              </div>
-              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Triangles</div>
-            </div>
-            
-            <!-- Rule 6: Polyominoes -->
-            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(5)">
-              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
-                <img src="graphics/images/rules/poly.png" alt="Polyominoes Rule" style="width: 145%; height: 145%; object-fit: cover;">
-              </div>
-              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Polyominoes</div>
-            </div>
-            
-            <!-- Rule 7: Ylop -->
-            <div class="rule-item" style="flex: 1; min-width: 100px; text-align: center; cursor: pointer; background: white; padding: 1rem 0.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: all 0.2s ease;" onclick="showRule(6)">
-              <div class="rule-icon" style="margin-bottom: 0.5rem; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; background: white; overflow: hidden;">
-                <img src="graphics/images/rules/ylop.png" alt="Ylop Rule" style="width: 145%; height: 145%; object-fit: cover;">
-              </div>
-              <div class="rule-title" style="font-weight: 600; font-size: 0.85rem; line-height: 1.2;">Ylop</div>
-            </div>
-          </div>
-          
-          <!-- Rule Details Container -->
-          <div id="ruleDetails" class="rule-details" style="background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 2rem; margin-bottom: 2rem; display: block;">
-            <div class="rule-header" style="display: flex; align-items: center; margin-bottom: 1.5rem;">
-              <div id="detailIcon" class="detail-icon" style="background: rgba(99, 102, 241, 0.1); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; overflow: hidden;">
-                <img src="graphics/images/rules/dot.png" alt="Dots Rule" style="width: 145%; height: 145%; object-fit: cover;">
-              </div>
-              <div>
-                <h3 id="detailTitle" class="detail-title" style="margin: 0 0 0.25rem; font-size: 1.5rem; color: var(--color-primary);">
-                  Item Collection
-                </h3>
-                <div id="detailSubtitle" class="detail-subtitle" style="font-size: 1rem; color: var(--color-muted); font-weight: 400;">
-                  Dots
+            <div id="ruleDetails" class="rule-details" aria-live="polite">
+              <div class="rule-header">
+                <div id="detailIcon" class="detail-icon"><img src="graphics/images/rules/dot.png" alt=""></div>
+                <div>
+                  <h3 id="detailTitle" class="detail-title">Item Collection</h3>
+                  <div id="detailSubtitle" class="detail-subtitle">Dots</div>
                 </div>
               </div>
+              <p id="detailDescription" class="detail-description">The solution path needs to pass through every dot.</p>
             </div>
-            <p id="detailDescription" class="detail-description" style="font-size: 1.1rem; line-height: 1.6; margin: 0;">
-              The solution path needs to pass through every dot.
-            </p>
           </div>
-          
-          <script>
+        </div>
+        <script>
             // Rule definitions
             const rules = [
               {
@@ -1503,207 +530,64 @@
                 description: 'A ylop must be enclosed in the same region as one or more polys. Its shape and area subtract from the total required by the polys. If a ylop cancels out a poly exactly, that pair imposes no constraint.'
               }
             ];
-            
-            // Function to show rule details
+
             function showRule(index) {
-              // Get the rule details
               const rule = rules[index];
-              
-              // Update the details
-              document.getElementById('detailIcon').innerHTML = `<img src="${rule.image}" alt="${rule.subtitle} Rule" style="width: 145%; height: 145%; object-fit: cover;">`;
+              document.getElementById('detailIcon').innerHTML = '<img src="' + rule.image + '" alt="">';
               document.getElementById('detailTitle').textContent = rule.title;
               document.getElementById('detailSubtitle').textContent = rule.subtitle;
               document.getElementById('detailDescription').textContent = rule.description;
-              
-              // Update highlighted item state
-              const items = document.querySelectorAll('.rule-item');
-              items.forEach((item, i) => {
-                if (i === index) {
-                  item.style.transform = 'translateY(-5px)';
-                  item.style.boxShadow = 'var(--shadow)';
-                  item.style.background = 'rgba(99, 102, 241, 0.05)';
-                } else {
-                  item.style.transform = '';
-                  item.style.boxShadow = 'var(--shadow-sm)';
-                  item.style.background = 'white';
-                }
+              document.querySelectorAll('.rule-item').forEach(function (item, i) {
+                item.classList.toggle('is-active', i === index);
+                item.setAttribute('aria-pressed', i === index ? 'true' : 'false');
               });
             }
-            
-            // Initialize with first rule
-            document.addEventListener('DOMContentLoaded', function() {
-              const firstItem = document.querySelector('.rule-item');
-              if (firstItem) {
-                firstItem.style.transform = 'translateY(-5px)';
-                firstItem.style.boxShadow = 'var(--shadow)';
-                firstItem.style.background = 'rgba(99, 102, 241, 0.05)';
-              }
-            });
-          </script>
+            document.addEventListener('DOMContentLoaded', function () { showRule(0); });
+        </script>
       </section>
 
-        <!-- Example Section -->
-        <section id="example" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Example Puzzle</h2>
-          </div>
-          <div class="card" style="background: linear-gradient(to bottom, #ffffff, #f8fafc); overflow: hidden; border: none; box-shadow: var(--shadow);">
-            <div class="example-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-              <div>
-                <h3 style="margin-top: 0; color: var(--color-primary);">Puzzle Description</h3>
-                <p style="font-style: italic; color: var(--color-text); margin-bottom: 2rem;">
-                  "Start at the marked position. Navigate through the grid while adhering to the rules defined by the colored elements. Find a valid path to the exit point while satisfying all constraints."
-                </p>
-                
-                <div style="margin-bottom: 2rem;">
-                  <div class="puzzle-controls" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                    <button id="show-solution-btn" class="btn btn-accent" style="display: flex; align-items: center; gap: 0.5rem;">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
-                      Show Solution
-                    </button>
-                    <button id="randomize-puzzle-btn" class="btn" style="display: flex; align-items: center; gap: 0.5rem;">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"></path></svg>
-                      Random Puzzle
-                    </button>
-                  </div>
-                </div>
-                
-                <div class="puzzle-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; background: #f1f5f9; padding: 1.5rem; border-radius: var(--radius-sm);">
-                  <div class="stat-item">
-                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); margin-bottom: 0.25rem;">Puzzle ID</div>
-                    <div id="puzzle-id" style="font-size: 1rem; font-weight: 600; font-family: 'SF Mono', monospace;"></div>
-                  </div>
-                  <div class="stat-item">
-                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); margin-bottom: 0.25rem;">Difficulty</div>
-                    <div id="puzzle-difficulty" style="font-size: 1rem; font-weight: 600;"></div>
-                  </div>
-                  <div class="stat-item">
-                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); margin-bottom: 0.25rem;">Grid Size</div>
-                    <div id="puzzle-grid-size" style="font-size: 1rem; font-weight: 600;"></div>
-                  </div>
-                  <div class="stat-item">
-                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); margin-bottom: 0.25rem;">Solution Length</div>
-                    <div id="puzzle-path-length" style="font-size: 1rem; font-weight: 600;"></div>
+      <section id="example" class="section">
+        <div class="wrap">
+          <div class="example-content">
+            <div>
+              <div class="eyebrow">Try it</div>
+              <h2>Solve a test puzzle</h2>
+              <div style="height:1rem"></div>
+              <p>This is a real puzzle from the test set. Click the board, then trace a line from the start circle to the exit. You can also show the stored solution or load another puzzle.</p>
+              <div class="puzzle-controls">
+                <button id="show-solution-btn" class="btn btn-accent"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg> Show Solution</button>
+                <button id="randomize-puzzle-btn" class="btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg> Random Puzzle</button>
+              </div>
+              <dl class="puzzle-stats">
+                <div class="stat-item"><dt>Puzzle ID</dt><dd id="puzzle-id"></dd></div>
+                <div class="stat-item"><dt>Difficulty</dt><dd id="puzzle-difficulty"></dd></div>
+                <div class="stat-item"><dt>Grid size</dt><dd id="puzzle-grid-size"></dd></div>
+                <div class="stat-item"><dt>Solution length</dt><dd id="puzzle-path-length"></dd></div>
+              </dl>
+            </div>
+            <div class="puzzle-stage">
+              <div class="puzzle-frame">
+                <div id="puzzle-container">
+                  <svg id="puzzle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"></svg>
+                  <div id="puzzle-interaction-hint">
+                    <div class="pulse-circle"><div></div><div></div></div>
+                    <p>Click to start drawing</p>
                   </div>
                 </div>
               </div>
-              
-              <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 10px 25px -5px rgba(17, 24, 39, 0.5); height: 100%;">
-                <!-- Glow effects -->
-                <div style="position: absolute; width: 300px; height: 300px; background: rgba(16, 185, 129, 0.05); border-radius: 50%; filter: blur(40px);"></div>
-                <div style="position: absolute; width: 250px; height: 250px; background: rgba(99, 102, 241, 0.05); border-radius: 50%; filter: blur(40px);"></div>
-                
-                <!-- Puzzle container with adaptive dimensions -->
-                <div style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 280px; flex-grow: 1; max-height: 80vh; overflow: visible; position: relative;">
-                  <div id="puzzle-container" style="width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; max-width: 450px; max-height: 450px;">
-                    <svg id="puzzle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" style="width: 100%; height: 100%; filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));"></svg>
-                    
-                    <!-- Interactive overlay indicator -->
-                    <div id="puzzle-interaction-hint" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.5); border-radius: var(--radius); backdrop-filter: blur(2px); cursor: pointer; z-index: 10; transition: opacity 0.3s ease-in-out;">
-                      <div class="pulse-circle" style="position: relative; width: 80px; height: 80px; margin-bottom: 20px;">
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.2); animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;"></div>
-                        <div style="position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; animation: pulse-dot 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;">
-                        </div>
-                      </div>
-                      <p style="color: white; font-weight: 500; text-align: center; margin: 0; padding: 0 20px; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-                        Click to interact
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Information text -->
-                <div style="margin-top: 1.5rem; text-align: center; color: white; font-size: 0.9rem; width: 100%;">
-                  <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.1); padding: 0.5rem 1rem; border-radius: 20px; backdrop-filter: blur(5px);">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
-                    <span>Click "Show Solution" to visualize the optimal path</span>
-                  </div>
-                </div>
-              </div>
+              <p class="stage-note">"Show Solution" draws the stored solution path.</p>
             </div>
           </div>
-          <style>
-            /* Responsive layout for the example section */
-            @media (max-width: 768px) {
-              .example-content {
-                grid-template-columns: 1fr !important;
-              }
-              
-              .puzzle-controls {
-                flex-wrap: wrap;
-                justify-content: center;
-              }
-              
-              .puzzle-controls button {
-                width: 100%;
-              }
-              
-              #puzzle-container {
-                min-height: 280px;
-                max-height: 400px;
-                margin: 1rem auto;
-              }
-            }
-            
-            /* Finer adjustments for smaller screens */
-            @media (max-width: 680px) {
-              .puzzle-stats {
-                grid-template-columns: 1fr !important;
-                padding: 1rem !important;
-              }
-              
-              #puzzle-container {
-                min-height: 250px;
-                max-height: 350px;
-              }
-              
-              .card {
-                padding: 1rem !important;
-              }
-            }
-            
-            /* Animation for the interaction hint */
-            @keyframes pulse-ring {
-              0% {
-                transform: scale(0.8);
-                opacity: 0.8;
-              }
-              50% {
-                transform: scale(1.2);
-                opacity: 0.3;
-              }
-              100% {
-                transform: scale(0.8);
-                opacity: 0.8;
-              }
-            }
-            
-            @keyframes pulse-dot {
-              0% {
-                transform: scale(0.9);
-              }
-              50% {
-                transform: scale(1);
-              }
-              100% {
-                transform: scale(0.9);
-              }
-            }
-          </style>
+        </div>
       </section>
 
- 
-
-        <!-- Leaderboard Section -->
-        <section id="leaderboard" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Leaderboard</h2>
+      <section id="leaderboard" class="section band">
+        <div class="wrap">
+          <div class="section-head">
+            <div class="eyebrow">Results</div>
+            <h2>Leaderboard</h2>
+            <p>Accuracy on the 500 SPaRC test puzzles. "Hard" is difficulty level 5. "Invalid path" is the share of answers that are not a valid line from start to end (Table 7 in the paper). Click a column to sort. The best value in each column is highlighted, counting only runs on (nearly) all 500 puzzles. Last updated: 13 October 2026.</p>
           </div>
-          <p>
-            Accuracy on the 500 SPaRC test puzzles. "Hard" is difficulty level 5. "Invalid path" is the share of
-            answers that are not a valid line from start to end (Table 7 in the paper). Click a column to sort.
-            Bold marks the best model in each column among runs on (nearly) all 500 puzzles. Last updated: 13 October 2026.
-          </p>
           <div class="lb-tabs" role="tablist" aria-label="Evaluation setting">
             <button type="button" class="lb-tab active" data-setting="single-shot">Single-shot</button>
             <button type="button" class="lb-tab" data-setting="step-by-step">Step-by-step</button>
@@ -1723,24 +607,21 @@
             rows are not meaningful. The column n is the number of puzzles a row is based on. The human row uses
             100 puzzles with three annotators each (majority vote).
           </p>
-          <style>
-            .lb-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0 0; }
-            .lb-tab { border: 1px solid #e2e8f0; background: white; border-radius: var(--radius-sm); padding: 0.45rem 0.9rem; font: inherit; font-size: 0.9rem; cursor: pointer; color: var(--color-text); }
-            .lb-tab.active { background: var(--color-primary); border-color: var(--color-primary); color: white; }
-            #lb-table th { cursor: pointer; white-space: nowrap; user-select: none; }
-            #lb-table th[aria-sort="descending"]::after { content: " \25BE"; }
-            #lb-table th[aria-sort="ascending"]::after { content: " \25B4"; }
-            #lb-table td:first-child, #lb-table td.lb-src { white-space: nowrap; }
-            #lb-table td.num, #lb-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
-            #lb-table tr.human-row { background-color: rgba(16, 185, 129, 0.1); }
-            #lb-table .lb-src { font-size: 0.85rem; color: var(--color-muted); }
-            #lb-table .lb-logo { width: 18px; height: 18px; object-fit: contain; vertical-align: -3px; margin-right: 0.5rem; color: var(--color-muted); }
-            #lb-table td.lb-best { font-weight: 700; color: var(--color-text); }
-            #lb-table .lb-subset { background: rgba(148, 163, 184, 0.18); color: #475569; }
-            #lb-table .lb-badge { display: inline-block; font-size: 0.72rem; padding: 0.05rem 0.4rem; border-radius: 999px; background: rgba(99, 102, 241, 0.12); color: var(--color-primary); margin-left: 0.4rem; vertical-align: middle; }
-            .lb-note { font-size: 0.9rem; color: var(--color-muted); }
-            @media (max-width: 600px) { #lb-table th, #lb-table td { padding: 0.6rem 0.5rem; font-size: 0.85rem; } }
-          </style>
+          <div class="table-container" id="lb-static">
+            <table>
+              <thead><tr><th>Model</th><th class="num">All</th><th class="num">L1</th><th class="num">L2</th><th class="num">L3</th><th class="num">L4</th><th class="num">L5</th></tr></thead>
+              <tbody>
+                <tr class="human-row"><td><img class="lb-logo" src="graphics/images/logos/models/human.svg" alt="" width="20" height="20"><strong>Human</strong></td><td class="num">98.0%</td><td class="num">100.0%</td><td class="num">100.0%</td><td class="num">100.0%</td><td class="num">94.4%</td><td class="num">94.5%</td></tr>
+                <tr><td><img class="lb-logo" src="graphics/images/logos/models/openai.png" alt="" width="20" height="20">o4-mini</td><td class="num">15.8%</td><td class="num">47.7%</td><td class="num">19.5%</td><td class="num">10.7%</td><td class="num">1.2%</td><td class="num">1.1%</td></tr>
+                <tr><td><img class="lb-logo" src="graphics/images/logos/models/openai.png" alt="" width="20" height="20">o3-mini</td><td class="num">8.2%</td><td class="num">29.1%</td><td class="num">10.2%</td><td class="num">2.5%</td><td class="num">1.2%</td><td class="num">0.0%</td></tr>
+                <tr><td><img class="lb-logo" src="graphics/images/logos/models/qwen.svg" alt="" width="20" height="20">QwQ 32B</td><td class="num">5.8%</td><td class="num">20.9%</td><td class="num">5.9%</td><td class="num">2.5%</td><td class="num">1.2%</td><td class="num">0.0%</td></tr>
+                <tr><td><img class="lb-logo" src="graphics/images/logos/models/deepseek.svg" alt="" width="20" height="20">R1 70B</td><td class="num">4.0%</td><td class="num">17.4%</td><td class="num">2.5%</td><td class="num">1.7%</td><td class="num">0.0%</td><td class="num">0.0%</td></tr>
+                <tr><td><img class="lb-logo" src="graphics/images/logos/models/openai.png" alt="" width="20" height="20">GPT-4.1</td><td class="num">1.6%</td><td class="num">7.0%</td><td class="num">0.8%</td><td class="num">0.8%</td><td class="num">0.0%</td><td class="num">0.0%</td></tr>
+                <tr><td><img class="lb-logo" src="graphics/images/logos/models/gemma.svg" alt="" width="20" height="20">Gemma-3 27B</td><td class="num">1.2%</td><td class="num">3.5%</td><td class="num">0.8%</td><td class="num">0.8%</td><td class="num">0.0%</td><td class="num">1.1%</td></tr>
+                <tr><td><img class="lb-logo" src="graphics/images/logos/models/qwen.svg" alt="" width="20" height="20">Qwen 2.5 72B</td><td class="num">0.4%</td><td class="num">0.0%</td><td class="num">1.7%</td><td class="num">0.0%</td><td class="num">0.0%</td><td class="num">0.0%</td></tr>
+              </tbody>
+            </table>
+          </div>
           <script>
             (function () {
               var SOURCES = [
@@ -1934,181 +815,28 @@
               }
             });
           </script>
-          <div class="table-container" id="lb-static">
-            <table>
-              <thead>
-                <tr>
-                  <th>Model</th>
-                  <th>All</th>
-                  <th>Level 1</th>
-                  <th>Level 2</th>
-                  <th>Level 3</th>
-                  <th>Level 4</th>
-                  <th>Level 5</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="human-row" style="background-color: rgba(16, 185, 129, 0.1);">
-                  <td><strong>Human</strong></td>
-                  <td>98.0%</td>
-                  <td>100.0%</td>
-                  <td>100.0%</td>
-                  <td>100.0%</td>
-                  <td>94.4%</td>
-                  <td>94.5%</td>
-                </tr>
-                <tr style="background-color: #f8fafc;">
-                  <td colspan="7"><strong>Reasoning Models</strong></td>
-                </tr>
-                <tr>
-                  <td><img src="graphics/images/logos/openai.png" alt="OpenAI" width="16px" style="vertical-align: middle; margin-right: 6px;"> o4-mini</td>
-                  <td><strong>15.8%</strong></td>
-                  <td><strong>47.7%</strong></td>
-                  <td><strong>19.5%</strong></td>
-                  <td><strong>10.7%</strong></td>
-                  <td><strong>1.2%</strong></td>
-                  <td><strong>1.1%</strong></td>
-                </tr>
-                <tr>
-                  <td><img src="graphics/images/logos/openai.png" alt="OpenAI" width="16px" style="vertical-align: middle; margin-right: 6px;"> o3-mini</td>
-                  <td>8.2%</td>
-                  <td>29.1%</td>
-                  <td>10.2%</td>
-                  <td>2.5%</td>
-                  <td><strong>1.2%</strong></td>
-                  <td>0.0%</td>
-                </tr>
-                <tr>
-                  <td><img src="graphics/images/logos/qwen.png" alt="Qwen" width="16px" style="vertical-align: middle; margin-right: 6px;"> QwQ 32B</td>
-                  <td>5.8%</td>
-                  <td>20.9%</td>
-                  <td>5.9%</td>
-                  <td>2.5%</td>
-                  <td><strong>1.2%</strong></td>
-                  <td>0.0%</td>
-                </tr>
-                <tr>
-                  <td><img src="graphics/images/logos/deepseek.png" alt="DeepSeek" width="16px" style="vertical-align: middle; margin-right: 6px;"> R1 70B</td>
-                  <td>4.0%</td>
-                  <td>17.4%</td>
-                  <td>2.5%</td>
-                  <td>1.7%</td>
-                  <td>0.0%</td>
-                  <td>0.0%</td>
-                </tr>
-                <tr style="background-color: #f8fafc;">
-                  <td colspan="7"><strong>Instruction Models</strong></td>
-                </tr>
-                <tr>
-                  <td><img src="graphics/images/logos/openai.png" alt="OpenAI" width="16px" style="vertical-align: middle; margin-right: 6px;"> GPT-4.1</td>
-                  <td>1.6%</td>
-                  <td>7.0%</td>
-                  <td>0.8%</td>
-                  <td>0.8%</td>
-                  <td>0.0%</td>
-                  <td>0.0%</td>
-                </tr>
-                <tr>
-                  <td><img src="graphics/images/logos/google.png" alt="Google" width="16px" style="vertical-align: middle; margin-right: 6px;"> Gemma-3 27B</td>
-                  <td>1.2%</td>
-                  <td>3.5%</td>
-                  <td>0.8%</td>
-                  <td>0.8%</td>
-                  <td>0.0%</td>
-                  <td><strong>1.1%</strong></td>
-                </tr>
-                <tr>
-                  <td><img src="graphics/images/logos/qwen.png" alt="Qwen" width="16px" style="vertical-align: middle; margin-right: 6px;"> Qwen 2.5 72B</td>
-                  <td>0.4%</td>
-                  <td>0.0%</td>
-                  <td>1.7%</td>
-                  <td>0.0%</td>
-                  <td>0.0%</td>
-                  <td>0.0%</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="findings">
+            <figure>
+              <h3>Where models go wrong</h3>
+              <img src="graphics/figure_radar_error_types_seaborn.png" alt="Radar chart of error types for reasoning and instruction models" loading="lazy">
+              <figcaption>Error types by model type. Reasoning models handle basic path rules better but still struggle when several rules interact.</figcaption>
+            </figure>
+            <figure>
+              <h3>A reasoning failure up close</h3>
+              <img src="graphics/reasoning.png" alt="Annotated reasoning trace of a failed attempt on puzzle 80a59619e323acba" loading="lazy">
+              <figcaption>Puzzle 80a59619e323acba, attempted by DeepSeek R1 Llama 70B. The model commits to a chain of steps without checking each one, which leads to careless mistakes.</figcaption>
+            </figure>
           </div>
-
-          <!-- Keep just this one key visualization image -->
-          <div style="text-align: center; margin: 2rem 0; display: none;">
-            <img src="graphics/figure_radar_error_types_selected.png" alt="Model Performance Comparison" style="max-width: 700px; width: 100%; border-radius: var(--radius); box-shadow: var(--shadow-sm);" />
-            <p class="caption" style="margin-top: 0.5rem; color: var(--color-muted); font-size: 0.9rem;">
-              Figure: Error analysis by model type and reasoning category
-            </p>
-          </div>
-
-          <!-- Error Analysis Figure - Dedicated section with improved styling -->
-          <div style="margin: 3rem 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; width: 100%; max-width: 100%; overflow-x: hidden;">
-            <!-- Radar Plot Container -->
-            <div style="background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; height: 100%; max-width: 100%;">
-            <div style="background: linear-gradient(to right, rgba(99, 102, 241, 0.08), rgba(16, 185, 129, 0.08)); padding: 1.5rem; border-bottom: 1px solid #f1f5f9;">
-                <h3 style="margin: 0; color: var(--color-text); font-size: 1.4rem;">Error Patterns by Model Type</h3>
-                <p style="margin: 0.5rem 0 0; color: var(--color-muted); font-size: 1rem;">Radar chart showing different failure modes</p>
-            </div>
-            
-              <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 100%;">
-                <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 100%;">
-                  <img src="graphics/figure_radar_error_types_seaborn.png" alt="Error Analysis by Model Type" style="max-width: 100%; height: auto; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);" />
-                </div>
-                <p style="margin-top: 1.5rem; color: var(--color-muted); font-size: 0.9rem; text-align: center;">
-                  Error patterns differ across model types, with reasoning models showing better performance on baseline spatial tasks but struggling with complex rule interactions.
-                </p>
-              </div>
-            </div>
-            
-            <!-- Reasoning Example Container -->
-            <div style="background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; height: 100%; max-width: 100%;">
-              <div style="background: linear-gradient(to right, rgba(244, 63, 94, 0.08), rgba(99, 102, 241, 0.08)); padding: 1.5rem; border-bottom: 1px solid #f1f5f9;">
-                <h3 style="margin: 0; color: var(--color-text); font-size: 1.4rem;">Reasoning Analysis Example</h3>
-                <p style="margin: 0.5rem 0 0; color: var(--color-muted); font-size: 1rem;">Case study of model reasoning failure</p>
-            </div>
-              
-              <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 100%;">
-                <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 100%;">
-                  <img src="graphics/reasoning.png" alt="Reasoning Analysis Example" style="max-width: 100%; height: auto; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);" />
-          </div>
-                <p style="margin-top: 1.5rem; color: var(--color-muted); font-size: 0.9rem; text-align: center;">
-                  Analysis of puzzle 80a59619e323acba with an incorrect solution attempt by DeepSeek R1 Llama 70B. The model tends to commit to a sequence of reasoning steps without thoroughly validating each one, leading to careless mistakes.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <style>
-            @media (max-width: 850px) {
-              [style*="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr))"] {
-                grid-template-columns: 1fr !important;
-              }
-            }
-            
-            @media (max-width: 600px) {
-              [style*="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr))"] {
-                grid-template-columns: 1fr !important;
-              }
-              
-              [style*="minmax(400px, 1fr)"] > div {
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 1rem !important;
-              }
-              
-              [style*="minmax(400px, 1fr)"] h3 {
-                font-size: 1.2rem !important;
-              }
-            }
-          </style>
+        </div>
       </section>
 
-        <!-- Evaluate Section -->
-        <section id="evaluate" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Evaluate a Model</h2>
+      <section id="evaluate" class="section">
+        <div class="wrap">
+          <div class="section-head">
+            <div class="eyebrow">Use it</div>
+            <h2>Evaluate a model</h2>
+            <p>SPaRC runs in the evaluation tools that many groups already use. All of them use the paper's prompt and count a path as correct only if it matches one of the puzzle's stored solutions.</p>
           </div>
-          <p>
-            SPaRC runs in the evaluation tools that many groups already use. All of them use the paper's prompt and
-            count a path as correct only if it matches one of the puzzle's stored solutions.
-          </p>
           <div class="eval-grid">
             <div class="eval-card">
               <h3>Inspect AI</h3>
@@ -2143,152 +871,62 @@ sparc --api-key "$OPENAI_API_KEY" --model gpt-4.1</pre></div>
               <a class="eval-link" href="https://github.com/lkaesberg/SPaRC#cli-reference" target="_blank" rel="noopener">CLI reference</a>
             </div>
           </div>
-          <p class="eval-note">
-            To add a model to the leaderboard, run <code>python leaderboard/run.py --model &lt;inspect-model-id&gt;</code> in the
-            <a href="https://github.com/lkaesberg/SPaRC" target="_blank" rel="noopener">SPaRC repository</a> and open a pull request with the new row.
-          </p>
-          <style>
-            .eval-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin: 1.5rem 0; }
-            @media (max-width: 760px) { .eval-grid { grid-template-columns: 1fr; } }
-            .eval-card { background: var(--color-card); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 1.25rem 1.25rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
-            .eval-card h3 { margin: 0; font-size: 1.15rem; }
-            .eval-card p { margin: 0; font-size: 0.92rem; line-height: 1.5; }
-            .eval-card code, .eval-note code { font-family: 'SF Mono', 'Consolas', monospace; font-size: 0.85em; background: #f1f5f9; padding: 0.05rem 0.3rem; border-radius: 4px; }
-            .eval-card .code-block { margin: 0.25rem 0 0; font-size: 0.8rem; padding: 2.1rem 1rem 1rem; }
-            .eval-link { margin-top: auto; font-size: 0.9rem; color: var(--color-primary); font-weight: 500; }
-            .eval-note { font-size: 0.92rem; color: var(--color-text); }
-            .code-wrap { position: relative; min-width: 0; }
-            .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 1; font: inherit; font-size: 0.75rem; padding: 0.2rem 0.55rem; border-radius: 6px; border: 1px solid rgba(148, 163, 184, 0.5); background: rgba(255, 255, 255, 0.92); color: #334155; cursor: pointer; }
-            .copy-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
-          </style>
-        </section>
-
-        <!-- Tools Section -->
-        <section id="tools" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Tools &amp; Resources</h2>
-          </div>
-          <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
-            <!-- Puzzle Visualizer -->
-            <div class="feature-card" style="background: white; border-radius: var(--radius); padding: 1.5rem; overflow: hidden; box-shadow: var(--shadow); border: none; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column;">
-              <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(99, 102, 241, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                </div>
-                <div>
-                  <h3 style="margin: 0; font-size: 1.25rem; color: var(--color-text);">Puzzle Visualizer</h3>
-                  <div style="font-size: 0.85rem; color: var(--color-primary); font-weight: 500;">Interactive Tool</div>
-                </div>
-              </div>
-              
-              <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid var(--color-primary); font-size: 0.9rem; color: var(--color-text); opacity: 0.9; flex-grow: 1;">
-                <p>Solve any puzzle with our interactive visualization tool. Allows examining solutions, rules, and constraints.</p>
-              </div>
-              
-              <a href="/visualizer.html" class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
-                Open Visualizer
-              </a>
-            </div>
-            
-            <!-- Annotation Interface -->
-            <div class="feature-card" style="background: white; border-radius: var(--radius); padding: 1.5rem; overflow: hidden; box-shadow: var(--shadow); border: none; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column;">
-              <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(244, 63, 94, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                </div>
-                <div>
-                  <h3 style="margin: 0; font-size: 1.25rem; color: var(--color-text);">Annotation Interface</h3>
-                  <div style="font-size: 0.85rem; color: var(--color-accent); font-weight: 500;">Research Tool</div>
-                </div>
-              </div>
-              
-              <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid var(--color-accent); font-size: 0.9rem; color: var(--color-text); opacity: 0.9; flex-grow: 1;">
-                <p>Use our annotation interface to label puzzle samples and analyze human capabilities compared to AI models.</p>
-              </div>
-              
-              <a href="/annotate.html" class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                Start Annotating
-              </a>
-            </div>
-            
-            <!-- Result Analyser -->
-            <div class="feature-card" style="background: white; border-radius: var(--radius); padding: 1.5rem; overflow: hidden; box-shadow: var(--shadow); border: none; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column;">
-              <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M9 17h6"></path><path d="M10 20H3a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2h7M14 20h7a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-7"></path><path d="M21 14H3"></path><path d="M21 6H3"></path></svg>
-                </div>
-                <div>
-                  <h3 style="margin: 0; font-size: 1.25rem; color: var(--color-text);">Result Analyser</h3>
-                  <div style="font-size: 0.85rem; color: #10b981; font-weight: 500;">Analysis Tool</div>
-                </div>
-              </div>
-              
-              <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #10b981; font-size: 0.9rem; color: var(--color-text); opacity: 0.9; flex-grow: 1;">
-                <p>Analyze model performance patterns and compare reasoning strategies across different AI systems to identify key areas for improvement.</p>
-              </div>
-              
-              <a href="/annotate-reason.html" class="btn" style="width: 100%; padding: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
-                Open Result Analyzer
-              </a>
-            </div>
-          </div>
+          <p class="eval-note">To add a model to the leaderboard, run <code>python leaderboard/run.py --model &lt;inspect-model-id&gt;</code> in the <a href="https://github.com/lkaesberg/SPaRC" target="_blank" rel="noopener">SPaRC repository</a> and open a pull request with the new row.</p>
+        </div>
       </section>
 
-             <!-- Dataset Section -->
-             <section id="dataset" class="section">
-              <div class="section-header">
-                <h2 class="section-title">Dataset</h2>
-              </div>
-              <div style="display: flex; align-items: center; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.03) 100%); padding: 1.5rem; border-radius: var(--radius);">
-                <div style="flex: 1;">
-                  <p style="font-size: 1.1rem; line-height: 1.5; margin: 0;">
-                    The SPaRC dataset contains 1,000 spatial reasoning puzzles with the complete "all" set 
-                    available on <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" style="font-weight: 500; text-decoration: underline;" target="_blank">HuggingFace</a>.
-                  </p>
-                </div>
-                <div style="margin-left: 2rem;">
-                  <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" target="_blank" style="display: inline-flex; align-items: center; text-decoration: none; color: var(--color-primary); font-weight: 500;">
-                    <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg" alt="HuggingFace" style="height: 32px; margin-right: 0.75rem;">
-                    <span>Browse on HuggingFace</span>
-              </a>
-            </div>
+      <section id="tools" class="section">
+        <div class="wrap">
+          <div class="section-head">
+            <div class="eyebrow">Tools</div>
+            <h2>Look inside the puzzles</h2>
           </div>
-              
-              <div class="card" style="background: #1e293b; color: #e2e8f0; box-shadow: var(--shadow); overflow: hidden; padding: 0;">
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
-                  <div style="display: flex; align-items: center;">
-                    <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg" alt="HuggingFace" style="height: 24px; margin-right: 0.75rem;">
-                    <h4 style="margin: 0; color: white; font-size: 1.1rem;">HuggingFace Usage</h4>
-                  </div>
-                  <div>
-                    <span style="font-size: 0.8rem; opacity: 0.7;">Python</span>
-                  </div>
-                </div>
-                <div class="code-block" style="margin: 0; border-radius: 0; padding: 1.5rem; background: transparent;"># Install and import
-pip install datasets
-from datasets import load_dataset
+          <ul class="tool-list">
+            <li><div><h3>Puzzle Visualizer</h3><span class="kind">Interactive tool</span></div><p>Open any puzzle, draw paths, and inspect its solutions, rules and constraints.</p><a href="/visualizer.html" class="btn">Open visualizer</a></li>
+            <li><div><h3>Annotation Interface</h3><span class="kind">Research tool</span></div><p>Label puzzle samples and compare human solving with model answers.</p><a href="/annotate.html" class="btn">Start annotating</a></li>
+            <li><div><h3>Result Analyser</h3><span class="kind">Analysis tool</span></div><p>Compare model answers and reasoning across systems to find where they fail.</p><a href="/annotate-reason.html" class="btn">Open analyser</a></li>
+          </ul>
+        </div>
+      </section>
 
-# Login using e.g. `huggingface-cli login` to access this dataset
+      <section id="dataset" class="section">
+        <div class="wrap">
+          <div class="dataset">
+            <div>
+              <div class="eyebrow">Data</div>
+              <h2>The dataset</h2>
+              <div style="height:1rem"></div>
+              <p>The full set is on Hugging Face. Each puzzle comes with its grid, its rules, a difficulty level and every valid solution.</p>
+              <dl class="facts">
+                <div><dt>Puzzles</dt><dd>1,000</dd></div>
+                <div><dt>Splits</dt><dd>500 train, 500 test</dd></div>
+                <div><dt>Difficulty</dt><dd>Levels 1 to 5</dd></div>
+                <div><dt>Config</dt><dd><code>all</code> (plus 10 rule subsets)</dd></div>
+              </dl>
+              <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" target="_blank" rel="noopener" class="btn btn-accent">Browse on Hugging Face</a>
+            </div>
+            <div class="code-wrap"><button type="button" class="copy-btn" aria-label="Copy Python example">Copy</button><pre class="code-block py">from datasets import load_dataset
+
 ds = load_dataset("lkaesberg/SPaRC", "all", split="test")
-
-# Access puzzle data
 puzzle = ds[0]
-print(puzzle["id"])                # Puzzle identifier
-print(puzzle["difficulty_level"])  # Difficulty (1-5)
-print(puzzle["grid_size"])         # Grid dimensions</div>
+print(puzzle["id"])                # puzzle identifier
+print(puzzle["difficulty_level"])  # difficulty (1-5)
+print(puzzle["grid_size"])         # grid dimensions
+print(len(puzzle["solutions"]))    # number of valid solutions</pre></div>
           </div>
+        </div>
       </section>
 
-        <!-- Citation Section -->
-        <section id="citation" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Citation</h2>
+      <section id="citation" class="section">
+        <div class="wrap">
+          <div class="section-head">
+            <div class="eyebrow">Cite</div>
+            <h2>Citation</h2>
+            <p>If you use SPaRC, please cite the EMNLP 2025 paper. If you use the step-by-step environment, please also cite Spatial-Gym.</p>
           </div>
-          <p>If you use SPaRC, please cite the EMNLP 2025 paper. If you use the step-by-step environment, please also cite Spatial-Gym.</p>
-          <div class="code-wrap"><button type="button" class="copy-btn" aria-label="Copy SPaRC BibTeX">Copy</button><div class="citation-block">@inproceedings{kaesberg-etal-2025-sparc,
+          <div class="cite-grid">
+            <div class="cite-blocks">
+              <div class="code-wrap"><button type="button" class="copy-btn" aria-label="Copy SPaRC BibTeX">Copy</button><div class="citation-block">@inproceedings{kaesberg-etal-2025-sparc,
   title     = "{SP}a{RC}: A Spatial Pathfinding Reasoning Challenge",
   author    = "Kaesberg, Lars Benedikt and Wahle, Jan Philip and Ruas, Terry and Gipp, Bela",
   booktitle = "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing",
@@ -2309,52 +947,37 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
   archivePrefix = {arXiv}
 }
 </div></div>
-          <h3 class="related-title">Related work from our group</h3>
-          <ul class="related-list">
-            <li><a href="https://aclanthology.org/2025.emnlp-main.526/" target="_blank" rel="noopener">SPaRC: A Spatial Pathfinding Reasoning Challenge</a> <span>EMNLP 2025 (Main)</span></li>
-            <li><a href="https://arxiv.org/abs/2604.09338" target="_blank" rel="noopener">Mind the Gap Between Spatial Reasoning and Acting! Step-by-Step Evaluation of Agents With Spatial-Gym</a> <span>arXiv preprint, 2026</span></li>
-            <li><a href="https://arxiv.org/abs/2608.21170" target="_blank" rel="noopener">Is Visual Prompting All You Need? Studying VLM Spatial Reasoning under Progressive Visual Scaffolds</a> <span>arXiv preprint, 2026</span></li>
-            <li><a href="https://aclanthology.org/2025.findings-acl.606/" target="_blank" rel="noopener">Voting or Consensus? Decision-Making in Multi-Agent Debate</a> <span>Findings of ACL 2025</span></li>
-          </ul>
-          <style>
-            #citation .citation-block { margin: 0 0 1.25rem; padding-top: 2.4rem; }
-            .related-title { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
-            .related-list { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.5rem; }
-            .related-list a { color: var(--color-primary); }
-            .related-list span { color: var(--color-muted); font-size: 0.9rem; white-space: nowrap; }
-          </style>
-      </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="section">
-          <div class="section-header">
-            <h2 class="section-title">Contact</h2>
-          </div>
-          <div class="card" style="text-align: center;">
-            <p>For questions, feedback, or collaboration opportunities:</p>
-            <p><a href="mailto:l.kaesberg@uni-goettingen.de">l.kaesberg@uni-goettingen.de</a></p>
-          </div>
-      </section>
-      </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="site-footer">
-      <div class="container">
-        <div class="footer-content">
-          <p>Dataset Released under <a href="https://creativecommons.org/licenses/by/4.0/">CC‑BY‑4.0</a> · © 2025 SPaRC Authors</p>
-          <div class="footer-links">
-            <a href="https://github.com/lkaesberg/SPaRC">GitHub</a>
-            <a href="https://huggingface.co/datasets/lkaesberg/SPaRC">HuggingFace</a>
+            </div>
+            <div>
+              <h3 class="related-title">Related work from our group</h3>
+              <ul class="related-list">
+                <li><a href="https://aclanthology.org/2025.emnlp-main.526/" target="_blank" rel="noopener">SPaRC: A Spatial Pathfinding Reasoning Challenge</a><span>EMNLP 2025 (Main)</span></li>
+                <li><a href="https://arxiv.org/abs/2604.09338" target="_blank" rel="noopener">Mind the Gap Between Spatial Reasoning and Acting! Step-by-Step Evaluation of Agents With Spatial-Gym</a><span>arXiv preprint, 2026</span></li>
+                <li><a href="https://arxiv.org/abs/2608.21170" target="_blank" rel="noopener">Is Visual Prompting All You Need? Studying VLM Spatial Reasoning under Progressive Visual Scaffolds</a><span>arXiv preprint, 2026</span></li>
+                <li><a href="https://aclanthology.org/2025.findings-acl.606/" target="_blank" rel="noopener">Voting or Consensus? Decision-Making in Multi-Agent Debate</a><span>Findings of ACL 2025</span></li>
+              </ul>
+            </div>
           </div>
         </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="contact">
+      <div class="wrap">
+        <div>
+          <h2>Questions or ideas?</h2>
+          <p>For questions, feedback or collaboration, write to <span class="mail">l.kaesberg@uni-goettingen.de</span>.</p>
+        </div>
+        <div class="foot-links">
+          <a href="https://github.com/lkaesberg/SPaRC" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://huggingface.co/datasets/lkaesberg/SPaRC" target="_blank" rel="noopener">Hugging Face</a>
+          <a href="https://aclanthology.org/2025.emnlp-main.526/" target="_blank" rel="noopener">Paper</a>
+          <a href="https://github.com/lkaesberg/Spatial-Gym" target="_blank" rel="noopener">Spatial-Gym</a>
+        </div>
+        <p class="fine">Dataset released under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC-BY-4.0</a> · © 2025 SPaRC Authors · University of Göttingen</p>
       </div>
     </footer>
 
-    <!-- Hidden elements required by the puzzle engine -->
-    <input type="hidden" id="sens" value="1.0">
-
-    <!-- Add necessary scripts for puzzle visualization -->
     <script type="text/javascript" src="visualizer/engine/utilities.js"></script>
     <script type="text/javascript" src="visualizer/engine/svg.js"></script>
     <script type="text/javascript" src="visualizer/engine/polyominos.js"></script>
@@ -2371,141 +994,6 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
     <script>
       // Define fallbackPuzzle globally to avoid duplication
       const fallbackPuzzle = {"difficulty_level":5,"difficulty_score":5.8,"grid_size":{"height":2,"width":3},"id":"176d1e37ebbacac0","polyshapes":{"16":"·█··\n····\n····\n····"},"puzzle_array":[["+","+","+","+","+",".","+"],["S","N","+","P-R-16","+","o-B","+"],["+","+","+","+","+","+","+"],["+","N","+","N","+","o-B","+"],["+","+","E","+","+","+","+"]],"solution_count":1,"solutions":[{"index":0,"path":[{"x":0,"y":1},{"x":0,"y":0},{"x":1,"y":0},{"x":2,"y":0},{"x":2,"y":1},{"x":2,"y":2},{"x":3,"y":2},{"x":4,"y":2},{"x":4,"y":1},{"x":4,"y":0},{"x":5,"y":0},{"x":6,"y":0},{"x":6,"y":1},{"x":6,"y":2},{"x":6,"y":3},{"x":6,"y":4},{"x":5,"y":4},{"x":4,"y":4},{"x":3,"y":4},{"x":2,"y":4}],"pathLength":20}],"text_visualization":"puzzle:\n  dimensions:\n    width: 3\n    height: 2\n  start:\n    x: 0\n    y: 1\n  end:\n    x: 2\n    y: 4\n  cells:\n    - position:\n        x: 3\n        y: 1\n      properties:\n        type: \"poly\"\n        polyshape: 16\n        color: \"red\"\n    - position:\n        x: 5\n        y: 0\n      properties:\n        dot: 1\n        color: \"black\"\n    - position:\n        x: 5\n        y: 1\n      properties:\n        type: \"square\"\n        color: \"blue\"\n    - position:\n        x: 5\n        y: 3\n      properties:\n        type: \"square\"\n        color: \"blue\"\n"};
-    </script>
-
-    <script>
-      // Add active state to navigation links based on scroll position
-      document.addEventListener('DOMContentLoaded', function() {
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section[id]');
-        
-        function setActiveLink() {
-          let scrollPos = window.scrollY + 100;
-          
-          // Find the current section
-          sections.forEach((section, i) => {
-            if (section.offsetTop <= scrollPos && 
-                (section.offsetTop + section.offsetHeight > scrollPos || i === sections.length - 1)) {
-              
-              // Remove active class from all links
-              navLinks.forEach(link => {
-                link.classList.remove('active');
-                link.style.backgroundColor = '';
-                link.style.color = '';
-              });
-              
-              // Add active class to current link
-              const currentLink = document.querySelector(`.nav-link[href="#${section.id}"]`);
-              if (currentLink) {
-                currentLink.classList.add('active');
-                currentLink.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
-                currentLink.style.color = 'var(--color-primary)';
-              }
-            }
-          });
-        }
-        
-        window.addEventListener('scroll', setActiveLink);
-        setActiveLink();
-      });
-    </script>
-
-    <script>
-      // Center active items in the navigation bar on mobile
-      document.addEventListener('DOMContentLoaded', function() {
-        const navList = document.querySelector('.nav-list');
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section[id]');
-        let isMobile = window.innerWidth <= 768;
-        
-        // Function to center an item in the navigation
-        function centerItemInNav(item) {
-          if (!item || !isMobile) return;
-          
-          const navListWidth = navList.offsetWidth;
-          const itemWidth = item.offsetWidth;
-          const itemLeft = item.offsetLeft;
-          const itemCenter = itemLeft + itemWidth / 2;
-          const navListCenter = navListWidth / 2;
-          const scrollLeft = itemCenter - navListCenter;
-          
-          navList.scrollTo({
-            left: scrollLeft,
-            behavior: 'smooth'
-          });
-        }
-        
-        // Center the item when clicking on a nav link
-        navLinks.forEach(link => {
-          link.addEventListener('click', function(e) {
-            // Allow a moment for the active class to be added
-            setTimeout(() => centerItemInNav(this), 100);
-          });
-        });
-        
-        // Function to update active state based on scroll position
-        function setActiveLink() {
-          let scrollPos = window.scrollY + 100;
-          let activeLink = null;
-          
-          // Find the current section
-          sections.forEach((section, i) => {
-            if (section.offsetTop <= scrollPos && 
-                (section.offsetTop + section.offsetHeight > scrollPos || i === sections.length - 1)) {
-              
-              // Remove active class from all links
-              navLinks.forEach(link => {
-                link.classList.remove('active');
-                link.style.backgroundColor = '';
-                link.style.color = '';
-              });
-              
-              // Add active class to current link
-              activeLink = document.querySelector(`.nav-link[href="#${section.id}"]`);
-              if (activeLink) {
-                activeLink.classList.add('active');
-                activeLink.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
-                activeLink.style.color = 'var(--color-primary)';
-                
-                // Center the active link
-                centerItemInNav(activeLink);
-              }
-            }
-          });
-        }
-        
-        // Initial centering of active item
-        window.addEventListener('load', function() {
-          // Find the initial active link
-          const initialActive = document.querySelector('.nav-link.active') || navLinks[0];
-          if (initialActive) {
-            initialActive.classList.add('active');
-            initialActive.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
-            initialActive.style.color = 'var(--color-primary)';
-            
-            // Give the browser a moment to calculate positions
-            setTimeout(() => centerItemInNav(initialActive), 300);
-          }
-        });
-        
-        // Update on scroll
-        window.addEventListener('scroll', setActiveLink);
-        
-        // Update on resize
-        window.addEventListener('resize', function() {
-          // Update mobile status
-          isMobile = window.innerWidth <= 768;
-          
-          // Find the current active link and center it
-          const currentActive = document.querySelector('.nav-link.active');
-          if (currentActive) {
-            centerItemInNav(currentActive);
-          }
-        });
-        
-        // Run initially
-        setActiveLink();
-      });
     </script>
 
     <script>
@@ -3125,6 +1613,34 @@ print(puzzle["grid_size"])         # Grid dimensions</div>
           });
         }
       });
+    </script>
+    <script>
+      // Section navigation: highlight the current section and draw the progress line.
+      (function () {
+        var links = Array.prototype.slice.call(document.querySelectorAll('.nav-link'));
+        var list = document.querySelector('.nav-list');
+        var progress = document.querySelector('.nav-progress');
+        var sections = links.map(function (l) { return document.querySelector(l.getAttribute('href')); }).filter(Boolean);
+        var current = null;
+        function update() {
+          var y = window.scrollY + 120;
+          var active = null;
+          sections.forEach(function (s) { if (s.offsetTop <= y) active = s; });
+          if (active !== current) {
+            current = active;
+            links.forEach(function (l) { l.classList.toggle('active', !!active && l.getAttribute('href') === '#' + active.id); });
+            var link = list.querySelector('.nav-link.active');
+            if (link && list.scrollWidth > list.clientWidth) {
+              list.scrollTo({ left: link.parentElement.offsetLeft - (list.clientWidth - link.offsetWidth) / 2, behavior: 'smooth' });
+            }
+          }
+          var h = document.documentElement.scrollHeight - window.innerHeight;
+          progress.style.setProperty('--p', h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0);
+        }
+        window.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update);
+        update();
+      })();
     </script>
   </body>
 </html>
